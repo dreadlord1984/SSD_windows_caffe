@@ -192,7 +192,9 @@ namespace caffe {
 		* 统计每个ground_truth_box被匹配次数并检查匹配结果
 		***********************************************************************************************/
 		for (int i = 0; i < num; ++i) { // 对于每个样本
-
+			if (all_gt_bboxes.find(i) == all_gt_bboxes.end()){
+				continue;// 如果样本不包含gt_box跳出继续
+			}
 			/*int resize_width = 384;
 			int resize_height = 256;
 			cv::Mat cv_img_resize = cv::Mat::zeros(resize_height, resize_width, CV_8UC3);
