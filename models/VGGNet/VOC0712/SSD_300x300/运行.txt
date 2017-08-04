@@ -1,0 +1,3 @@
+ train 	--solver="E:/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/solver.prototxt" 	--weights="E:/caffe-master_/models/VGGNet/VGG_ILSVRC_16_layers_fc_reduced.caffemodel" --gpu 0
+		
+test_ssd.exe -confidence_threshold 0.6 E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/deploy.prototxt E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/VGG_VOC0712_SSD_300x300_iter_120000.caffemodel E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/list.txt

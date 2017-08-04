@@ -1,0 +1,2 @@
+E:/tyang/caffe-master_/Build/x64/Release/classification.exe  -confidence_threshold 0.6  E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/deploy.prototxt E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/VGG_VOC0712_SSD_300x300_iter_120000.caffemodel	 E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/list.txt
+pause

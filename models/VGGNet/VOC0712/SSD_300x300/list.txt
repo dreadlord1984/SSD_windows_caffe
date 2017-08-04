@@ -1,0 +1,2 @@
+E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/000001.jpg
+E:/tyang/caffe-master_/models/VGGNet/VOC0712/SSD_300x300/000017.jpg
