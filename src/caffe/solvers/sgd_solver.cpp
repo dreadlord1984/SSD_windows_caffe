@@ -138,14 +138,17 @@ void SGDSolver<Dtype>::ApplyUpdate() {
 	if (_access("temp.txt", 0) != -1){ // 如果临时文件存在读取转存！
 		ofstream  outfile("check.txt", ios::out | ios::app);
 		ifstream  infile("temp.txt");
-		 int num_of_batch, num_of_box;
+		string type;
+		float overlap;
+		int num_of_batch, num_of_box;
 		float xmin, ymin, xmax, ymax;
 		std::string line;
 		while (std::getline(infile, line)) {
 			std::istringstream iss(line);
-			iss >> num_of_batch >> num_of_box
+			iss >> type >> overlap >> num_of_batch >> num_of_box
 			  >> xmin >> ymin >> xmax >> ymax;
-			outfile << this->iter_ << " " << num_of_batch << " " << num_of_box << " "
+			outfile << type << " " << overlap << " "
+				<< this->iter_ << " " << num_of_batch << " " << num_of_box << " "
 				<< xmin << " " << ymin << " " << xmax << " " << ymax << endl;
 		}
 		infile.close();
