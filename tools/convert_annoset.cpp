@@ -19,6 +19,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <io.h>
 
 #include "boost/scoped_ptr.hpp"
 #include "boost/variant.hpp"
@@ -140,6 +141,21 @@ int main(int argc, char** argv) {
     shuffle(lines.begin(), lines.end());
   }
   LOG(INFO) << "A total of " << lines.size() << " images.";
+
+  /**********************************************************************************************/
+  char savePath[100];
+  strcpy(savePath, argv[3]);
+  strcat(savePath, "_list.txt");
+  if (_access(savePath, 0) != -1) // 如果文件存在，删除！
+	  remove(savePath);
+  std::ofstream  outfile(savePath, ios::out);
+  std::vector<std::pair<std::string, boost::variant<int, std::string> > >::iterator iter = lines.begin();
+  for (; iter != lines.end(); ++iter)
+  {
+	  outfile << iter->first << std::endl;
+  }
+  outfile.close();
+  /**********************************************************************************************/
 
   if (encode_type.size() && !encoded)
     LOG(INFO) << "encode_type specified, assuming encoded=true.";
