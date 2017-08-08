@@ -181,12 +181,12 @@ namespace caffe {
 
 
 		/**********************************************************************************************/
-		const float overlap_threshold = 0.5;
+		const char* model = "small"; // 选择只统计IOU<0.5的bbox还是统计全部匹配
+		const float overlap_threshold = 0.5; // IOU统计阈值
 		int num = all_loc_preds.size(); // batch_size
 		ofstream  outfile;
 		if (_access("temp.txt", 0) != -1) // 如果临时文件存在，删除！
 			remove("temp.txt");
-
 		/**********************************************************************************************
 		* 对于每个样本，从所有的prior boxes的匹配结果(<prior box序号, 匹配的ground_truth_box序号>)中，
 		* 统计每个ground_truth_box被匹配次数并检查匹配结果
@@ -195,11 +195,6 @@ namespace caffe {
 			if (all_gt_bboxes.find(i) == all_gt_bboxes.end()){
 				continue;// 如果样本不包含gt_box跳出继续
 			}
-			/*int resize_width = 384;
-			int resize_height = 256;
-			cv::Mat cv_img_resize = cv::Mat::zeros(resize_height, resize_width, CV_8UC3);
-			cv::namedWindow("result", 1);*/
-			
 			map<int, int> match_box_index;
 			int num_matches = 0;
 			const map<int, vector<int> >& match_indices = all_match_indices_[i];
@@ -215,46 +210,61 @@ namespace caffe {
 					{
 						continue;
 					}
-
-					/*cv::Rect pos(prior_bboxes[m].xmin() * resize_width, prior_bboxes[m].ymin() * resize_height,
-						prior_bboxes[m].xmax() * resize_width - prior_bboxes[m].xmin()* resize_width,
-						prior_bboxes[m].ymax() * resize_height - prior_bboxes[m].ymin() * resize_height);
-					cv::rectangle(cv_img_resize, pos, cv::Scalar(0, 0, 255), 2, 8, 0);*/
-
 					const int gt_idx = match_index[m];//匹配的ground box序号
 
 					/**********************************************************************************************
 					* 对于每一对匹配，如果匹配度小于阈值，则打印该样本所在位置：
 					* 包括匹配程度、样本在一个batch里的序号和该ground_truth_box在样本中序号和位置
 					***********************************************************************************************/
-					if (match_overlap[m] < overlap_threshold)
+					if (strcmp(model, "small") == 0)  // 只统计IOU<0.5的bbox
 					{
 						outfile.open("temp.txt", ios::out | ios::app);
-						const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
-						outfile << "small " << match_overlap[m]  << " " 
-							<< i << " " << gt_idx << " "
-							<< gt_bbox.xmin() << " "
-							<< gt_bbox.ymin() << " "
-							<< gt_bbox.xmax() << " "
-							<< gt_bbox.ymax() << endl;
+						if (match_overlap[m] < overlap_threshold)
+						{
+							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							outfile << "small " << match_overlap[m] << " "
+								<< i << " " << gt_idx << " "
+								<< gt_bbox.xmin() << " "
+								<< gt_bbox.ymin() << " "
+								<< gt_bbox.xmax() << " "
+								<< gt_bbox.ymax() << endl;
+						}
+						outfile.close();
+					}
+					else if (strcmp(model, "all") == 0) // 统计所以匹配的bbox
+					{
+						outfile.open("temp.txt", ios::out | ios::app);
+						if (match_overlap[m] < overlap_threshold)
+						{
+							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							outfile << "small " << match_overlap[m] << " "
+								<< i << " " << gt_idx << " "
+								<< gt_bbox.xmin() << " "
+								<< gt_bbox.ymin() << " "
+								<< gt_bbox.xmax() << " "
+								<< gt_bbox.ymax() << endl;
+						}
+						else
+						{
+							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							outfile << "biger " << match_overlap[m] << " "
+								<< i << " " << gt_idx << " "
+								<< gt_bbox.xmin() << " "
+								<< gt_bbox.ymin() << " "
+								<< gt_bbox.xmax() << " "
+								<< gt_bbox.ymax() << endl;
+						}
 						outfile.close();
 					}
 					match_box_index[gt_idx]++;
 				}
 			}
-
 			/**********************************************************************************************
-			* 对于每一个ground_truth_box，如果未被匹配，则打印该样本所在位置：
+			* 对于包含gt_box的样本中的每一个gt_box，如果未被匹配，则打印该样本所在位置：
 			* 包括匹配程度、样本在一个batch里的序号和该ground_truth_box在样本中序号和位置
 			***********************************************************************************************/
 			for (int j = 0; j < all_gt_bboxes.find(i)->second.size(); j++)
 			{
-				/*const NormalizedBBox& match_gt_bbox = all_gt_bboxes.find(i)->second[j];
-				cv::Rect pos(match_gt_bbox.xmin() * resize_width, match_gt_bbox.ymin() * resize_height,
-				match_gt_bbox.xmax() * resize_width - match_gt_bbox.xmin()* resize_width,
-				match_gt_bbox.ymax() * resize_height - match_gt_bbox.ymin() * resize_height);
-				cv::rectangle(cv_img_resize, pos, cv::Scalar(0, 255, 0), 2, 8, 0);*/
-
 				if (match_box_index[j] == 0)
 				{
 					const NormalizedBBox& not_match_gt_bbox = all_gt_bboxes.find(i)->second[j];
@@ -265,10 +275,6 @@ namespace caffe {
 						<< not_match_gt_bbox.ymax() << endl;
 				}
 			}
-
-			/*cv::imshow("result", cv_img_resize);
-			cv::waitKey(0);*/
-
 		}
 		/**********************************************************************************************/
 
