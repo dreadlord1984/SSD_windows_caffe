@@ -33,7 +33,7 @@ set ANNOTYPE="detection"
 
 set	TRAINVAL="train"
 set VAL="val"
-set SHUFFLE=false
+set SHUFFLE=true
 set GRAY=false
 set CHECK_SIZE=false
 set CHECK_LABEL=true

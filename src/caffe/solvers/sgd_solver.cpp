@@ -134,6 +134,8 @@ template <typename Dtype>
 void SGDSolver<Dtype>::ApplyUpdate() {
 	CHECK(Caffe::root_solver());
 	Dtype rate = GetLearningRate();
+
+#ifdef BOX_LIST
 	/**********************************************************************************************/
 	if (_access("temp.txt", 0) != -1){ // 如果临时文件存在读取转存！
 		ofstream  outfile("check.txt", ios::out | ios::app);
@@ -146,7 +148,7 @@ void SGDSolver<Dtype>::ApplyUpdate() {
 		while (std::getline(infile, line)) {
 			std::istringstream iss(line);
 			iss >> type >> overlap >> num_of_batch >> num_of_box
-			  >> xmin >> ymin >> xmax >> ymax;
+				>> xmin >> ymin >> xmax >> ymax;
 			outfile << type << " " << overlap << " "
 				<< this->iter_ << " " << num_of_batch << " " << num_of_box << " "
 				<< xmin << " " << ymin << " " << xmax << " " << ymax << endl;
@@ -154,8 +156,12 @@ void SGDSolver<Dtype>::ApplyUpdate() {
 		infile.close();
 		outfile.close();
 		remove("temp.txt");
-  }
-  /**********************************************************************************************/
+	}
+	/**********************************************************************************************/
+#endif // BOX_LIST
+
+
+
   if (this->param_.display() && this->iter_ % this->param_.display() == 0) {
     LOG(INFO) << "Iteration " << this->iter_ << ", lr = " << rate;
   }

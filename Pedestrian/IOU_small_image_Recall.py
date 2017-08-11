@@ -5,18 +5,23 @@ sys.setdefaultencoding('utf8')
 import numpy as np
 import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
-import os
-import sys
+import matplotlib
+import prettyplotlib as ppl
 
 plt.rcParams['figure.figsize'] = (10, 10)
 plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
+thresholds = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5], dtype=np.float64)
+# TPs = np.array([0,    0,    1,    5,   13,   52,  137,  387,  850, 2826], dtype=np.float64)
+# FNs = np.array([75,  604, 1391, 1840, 1920, 2361, 2285, 2098, 2163, 3726], dtype=np.float64)
+TPs = np.zeros((len(thresholds)), dtype=np.int) # 正检
+FNs = np.zeros((len(thresholds)), dtype=np.int) # 漏检
+s_ids = np.arange(thresholds.size)
 
 
 import caffe
 caffe.set_device(0)
 caffe.set_mode_gpu()
-
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
 
@@ -90,16 +95,27 @@ resize_height = 256
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
-imgList = "Data_0807/test.txt"
-TPs = 0 # 正检
-FPs = 0 # 误检
-FNs = 0 # 漏检
+imgList = "Data_0807/IOU_small_image_List.txt"
 
 for imgFile in open(imgList).readlines():  # 对于每个测试图片
-    img_name = ROOTDIR + imgFile.strip().split('.jpg ')[0]
-    xml_name = ROOTDIR + imgFile.strip().split('.jpg ')[1]
-    image = caffe.io.load_image(img_name+'.jpg')
-    true_boxes = readXML(xml_name);
+    plt.close('all')
+    datas = imgFile.strip().split('\t')
+    img_name = ROOTDIR + datas[0]
+    xml_name = ROOTDIR + datas[1]
+    image = caffe.io.load_image(img_name)
+    width = image.shape[1]
+    height = image.shape[0]
+    true_boxes = readXML(xml_name) # 所有的ground truth boxes
+    min_true_boxes = [] # [[IOU, [xmin, ymin, xmax, ymax]]]
+    min_boxes_total = int(datas[2]) # 小匹配box数量
+    for i in range(0, min_boxes_total, 1):
+        min_box_num = int(datas[6 * i + 3]) # 当前小匹配box序号（从0开始）
+        min_box = [float(datas[6*i + 5]) * width, float(datas[6*i + 6]) * height, float(datas[6*i + 7]) * width, float(datas[6*i + 8]) * height]
+        if (computIOU(true_boxes[min_box_num], min_box) > 0.99):
+            min_true_boxes.append([float(datas[6*i + 4]), true_boxes[min_box_num]])
+        else:
+            print "error ", img_name.decode("gb2312")
+            break
     transformed_image = transformer.preprocess('data', image)
     net.blobs['data'].data[...] = transformed_image
     # Forward pass.
@@ -126,12 +142,9 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
 
     colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist()
 
-    plt.imshow(image)
-    currentAxis = plt.gca()
+    # plt.imshow(image)
+    # currentAxis = plt.gca()
 
-    TP = 0 # 正检
-    FP = 0 # 误检
-    FN = 0 # 漏检
     detectBoxes = []
     for i in xrange(top_conf.shape[0]): # 对每个检测到的目标
         not_match = 0
@@ -142,35 +155,40 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
         score = top_conf[i]
         label = int(top_label_indices[i])
         label_name = top_labels[i]
-        display_txt = '%s: %.2f'%(label_name, score)
-        coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
+        # display_txt = '%s: %.2f'%(label_name, score)
+        # coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
         color = colors[label]
         detectBoxes.append([xmin, ymin, xmax, ymax])
-        currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
-        currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
-        for boxT in true_boxes:
-            if (computIOU(boxT, [xmin, ymin, xmax, ymax]) < 0.5):
-                not_match += 1  # 未匹配次数
-        if not_match == len(true_boxes):
-            FP += 1
+        # currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
+        # currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
 
-    for boxT in true_boxes:
-        currentAxis.add_patch(plt.Rectangle((boxT[0], boxT[1]), boxT[2] - boxT[0], boxT[3] - boxT[1],
-                                            fill=False, edgecolor=colors[5], linewidth=2))
+    for boxT in min_true_boxes:
+        # currentAxis.add_patch(plt.Rectangle((boxT[1][0], boxT[1][1]), boxT[1][2] - boxT[1][0], boxT[1][3] - boxT[1][1],
+        #                                     fill=False, edgecolor=colors[5], linewidth=2))
+        matching = False
+        div = int(boxT[0] / thresholds[0])
         for boxP in detectBoxes:
-            if (computIOU(boxT, boxP) > 0.5): # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
-                TP += 1  # 正确检测
+            if (computIOU(boxT[1], boxP) > 0.5): # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
+                matching = True # 正确检测
                 break
-
-    FN = len(true_boxes) - TP
-    display_txt2 = 'TP: %i FP: %i FN: %i'%(TP, FP, FN)
-    currentAxis.text(5, 15, display_txt2, bbox={'facecolor': colors[10], 'alpha': 0.5})
-
-    TPs += TP
-    FPs += FP
-    FNs += FN
-    plt.show()
-
-print 'TPs: %i FPs: %i FNs: %i'%(TPs, FPs, FNs)
+        if matching:
+            TPs[div] += 1
+        else:
+            FNs[div] += 1
+    # plt.show()
 
 
+print 'TPs: ', TPs
+print 'FNs: ', FNs
+
+matplotlib.rcParams['figure.figsize'] = (8, 5)  # 设定显示大小
+fig, ax = plt.subplots(1)
+labels = [thresholds[i] for i in s_ids]
+recall2 = np.divide(TPs, np.add(TPs, FNs))
+anno_area2s = [('%f' % a) for a in recall2[s_ids]]
+ppl.bar(ax, np.arange(len(recall2)), recall2[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
+plt.xticks(rotation=25)
+ax.set_title('(small_IOU_recall)')
+ax.set_ylabel('Recall')
+plt.savefig('Data_0807/small_IOU_recall.png')
+plt.show()

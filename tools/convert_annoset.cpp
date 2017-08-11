@@ -142,6 +142,8 @@ int main(int argc, char** argv) {
   }
   LOG(INFO) << "A total of " << lines.size() << " images.";
 
+
+#ifdef BOX_LIST
   /**********************************************************************************************/
   char savePath[100];
   strcpy(savePath, argv[3]);
@@ -152,10 +154,15 @@ int main(int argc, char** argv) {
   std::vector<std::pair<std::string, boost::variant<int, std::string> > >::iterator iter = lines.begin();
   for (; iter != lines.end(); ++iter)
   {
-	  outfile << iter->first << std::endl;
+	  outfile << iter->first << "\t";
+	  outfile << iter->second << std::endl;
   }
   outfile.close();
   /**********************************************************************************************/
+#endif // BOX_LIST
+
+
+
 
   if (encode_type.size() && !encoded)
     LOG(INFO) << "encode_type specified, assuming encoded=true.";

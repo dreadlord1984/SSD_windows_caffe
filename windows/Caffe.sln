@@ -77,6 +77,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_ssd", "test_SSD\test_s
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "read_xml", "read_xml\read_xml.vcxproj", "{E371A119-1273-4773-8DE0-A35C9BB73AE4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pridict_save", "pridict_save\pridict_save.vcxproj", "{22A4E0EA-89E9-4378-8711-37B22B3136D8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -163,6 +165,10 @@ Global
 		{E371A119-1273-4773-8DE0-A35C9BB73AE4}.Debug|x64.Build.0 = Debug|x64
 		{E371A119-1273-4773-8DE0-A35C9BB73AE4}.Release|x64.ActiveCfg = Release|x64
 		{E371A119-1273-4773-8DE0-A35C9BB73AE4}.Release|x64.Build.0 = Release|x64
+		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Debug|x64.ActiveCfg = Debug|x64
+		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Debug|x64.Build.0 = Debug|x64
+		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Release|x64.ActiveCfg = Release|x64
+		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

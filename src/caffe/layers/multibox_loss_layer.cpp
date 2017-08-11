@@ -6,7 +6,6 @@
 
 #include "caffe/layers/multibox_loss_layer.hpp"
 #include "caffe/util/math_functions.hpp"
-
 namespace caffe {
 
 	template <typename Dtype>
@@ -180,6 +179,8 @@ namespace caffe {
 			multibox_loss_param_, &all_match_overlaps, &all_match_indices_);
 
 
+
+#ifdef BOX_LIST
 		/**********************************************************************************************/
 		const char* model = "small"; // 选择只统计IOU<0.5的bbox还是统计全部匹配
 		const float overlap_threshold = 0.5; // IOU统计阈值
@@ -277,6 +278,10 @@ namespace caffe {
 			}
 		}
 		/**********************************************************************************************/
+#endif // BOXES
+
+
+
 
 		num_matches_ = 0;
 		int num_negs = 0;

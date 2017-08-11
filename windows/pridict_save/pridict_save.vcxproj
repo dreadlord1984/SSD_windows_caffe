@@ -14,10 +14,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{22A4E0EA-89E9-4378-8711-37B22B3136D7}</ProjectGUID>
+    <ProjectGUID>{22A4E0EA-89E9-4378-8711-37B22B3136D8}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
-    <RootNamespace>ssd_detect</RootNamespace>
+    <RootNamespace>pridict_save</RootNamespace>
     <NuGetPackageImportStamp>bf162e60</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -73,7 +73,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\caffe\test\ssd_detect.cpp" />
+    <ClCompile Include="pridict_save.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(SolutionDir)\CommonSettings.targets" />
