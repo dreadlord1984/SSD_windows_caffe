@@ -182,7 +182,7 @@ namespace caffe {
 
 #ifdef BOX_LIST
 		/**********************************************************************************************/
-		const char* model = "small"; // 选择只统计IOU<0.5的bbox还是统计全部匹配
+		const char* model = "all"; // 选择只统计IOU<0.5的bbox还是统计全部匹配
 		const float overlap_threshold = 0.5; // IOU统计阈值
 		int num = all_loc_preds.size(); // batch_size
 		ofstream  outfile;
@@ -215,20 +215,21 @@ namespace caffe {
 
 					/**********************************************************************************************
 					* 对于每一对匹配，如果匹配度小于阈值，则打印该样本所在位置：
-					* 包括匹配程度、样本在一个batch里的序号和该ground_truth_box在样本中序号和位置
+					* <status> <prior_with_gt_IOU> <proir_box_num> <prior_box_cordinate> <num_of_one_batch> <gt_box_num>
 					***********************************************************************************************/
 					if (strcmp(model, "small") == 0)  // 只统计IOU<0.5的bbox
 					{
 						outfile.open("temp.txt", ios::out | ios::app);
 						if (match_overlap[m] < overlap_threshold)
 						{
-							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							/*const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];*/
 							outfile << "small " << match_overlap[m] << " "
-								<< i << " " << gt_idx << " "
-								<< gt_bbox.xmin() << " "
-								<< gt_bbox.ymin() << " "
-								<< gt_bbox.xmax() << " "
-								<< gt_bbox.ymax() << endl;
+								<< m << " "
+								<< prior_bboxes[m].xmin() << " "
+								<< prior_bboxes[m].ymin() << " "
+								<< prior_bboxes[m].xmax() << " "
+								<< prior_bboxes[m].ymax() << " "
+								<< i << " " << gt_idx << endl;
 						}
 						outfile.close();
 					}
@@ -237,23 +238,25 @@ namespace caffe {
 						outfile.open("temp.txt", ios::out | ios::app);
 						if (match_overlap[m] < overlap_threshold)
 						{
-							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							/*const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];*/
 							outfile << "small " << match_overlap[m] << " "
-								<< i << " " << gt_idx << " "
-								<< gt_bbox.xmin() << " "
-								<< gt_bbox.ymin() << " "
-								<< gt_bbox.xmax() << " "
-								<< gt_bbox.ymax() << endl;
+								<< m << " "
+								<< prior_bboxes[m].xmin() << " "
+								<< prior_bboxes[m].ymin() << " "
+								<< prior_bboxes[m].xmax() << " "
+								<< prior_bboxes[m].ymax() << " "
+								<< i << " " << gt_idx << endl;
 						}
 						else
 						{
-							const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];
+							/*const NormalizedBBox& gt_bbox = all_gt_bboxes.find(i)->second[gt_idx];*/
 							outfile << "biger " << match_overlap[m] << " "
-								<< i << " " << gt_idx << " "
-								<< gt_bbox.xmin() << " "
-								<< gt_bbox.ymin() << " "
-								<< gt_bbox.xmax() << " "
-								<< gt_bbox.ymax() << endl;
+								<< m << " "
+								<< prior_bboxes[m].xmin() << " "
+								<< prior_bboxes[m].ymin() << " "
+								<< prior_bboxes[m].xmax() << " "
+								<< prior_bboxes[m].ymax() << " "
+								<< i << " " << gt_idx << endl;
 						}
 						outfile.close();
 					}

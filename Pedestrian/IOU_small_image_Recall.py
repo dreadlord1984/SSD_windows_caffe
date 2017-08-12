@@ -11,11 +11,18 @@ import prettyplotlib as ppl
 plt.rcParams['figure.figsize'] = (10, 10)
 plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
-thresholds = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5], dtype=np.float64)
+thresholds = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9, 0.95, 1.0], dtype=np.float64)
+
+# TPs = np.array([ 0,      0,      1,      5,     13,     52,    137,    387,    850,   2825,
+#  293421, 169059,  94053,  49970,  24021,  10935,   4427,   1437,    351,     21], dtype=np.float64)
+# FNs = np.array([75,   604,  1391,  1840,  1920,  2361,  2285,  2098,  2163,  3724,
+#                 53607, 26623, 13216,  6642,  3193,  1470,   578,   172,    43,     4], dtype=np.float64)
+# thresholds = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5], dtype=np.float64)
 # TPs = np.array([0,    0,    1,    5,   13,   52,  137,  387,  850, 2826], dtype=np.float64)
 # FNs = np.array([75,  604, 1391, 1840, 1920, 2361, 2285, 2098, 2163, 3726], dtype=np.float64)
-TPs = np.zeros((len(thresholds)), dtype=np.int) # 正检
-FNs = np.zeros((len(thresholds)), dtype=np.int) # 漏检
+
+TPs = np.zeros((len(thresholds)), dtype=np.float64) # 正检
+FNs = np.zeros((len(thresholds)), dtype=np.float64) # 漏检
 s_ids = np.arange(thresholds.size)
 
 
@@ -95,7 +102,7 @@ resize_height = 256
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
-imgList = "Data_0807/IOU_small_image_List.txt"
+imgList = "Data_0807/IOU_ALL_image_List.txt"
 
 for imgFile in open(imgList).readlines():  # 对于每个测试图片
     plt.close('all')
@@ -111,7 +118,7 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     for i in range(0, min_boxes_total, 1):
         min_box_num = int(datas[6 * i + 3]) # 当前小匹配box序号（从0开始）
         min_box = [float(datas[6*i + 5]) * width, float(datas[6*i + 6]) * height, float(datas[6*i + 7]) * width, float(datas[6*i + 8]) * height]
-        if (computIOU(true_boxes[min_box_num], min_box) > 0.99):
+        if (computIOU(true_boxes[min_box_num], min_box) > 0.95):
             min_true_boxes.append([float(datas[6*i + 4]), true_boxes[min_box_num]])
         else:
             print "error ", img_name.decode("gb2312")
@@ -181,14 +188,14 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
 print 'TPs: ', TPs
 print 'FNs: ', FNs
 
-matplotlib.rcParams['figure.figsize'] = (8, 5)  # 设定显示大小
+matplotlib.rcParams['figure.figsize'] = (15, 5)  # 设定显示大小
 fig, ax = plt.subplots(1)
 labels = [thresholds[i] for i in s_ids]
 recall2 = np.divide(TPs, np.add(TPs, FNs))
 anno_area2s = [('%f' % a) for a in recall2[s_ids]]
 ppl.bar(ax, np.arange(len(recall2)), recall2[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
 plt.xticks(rotation=25)
-ax.set_title('(small_IOU_recall)')
+ax.set_title('(ALL_IOU_recall)')
 ax.set_ylabel('Recall')
-plt.savefig('Data_0807/small_IOU_recall.png')
+plt.savefig('Data_0807/ALL_IOU_recall.png')
 plt.show()
