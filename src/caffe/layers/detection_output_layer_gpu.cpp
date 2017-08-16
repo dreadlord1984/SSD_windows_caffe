@@ -8,7 +8,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-
+#include <io.h>
 #include "boost/filesystem.hpp"
 #include "boost/foreach.hpp"
 
@@ -69,9 +69,29 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       if (!share_location_) {
         cur_bbox_data += c * num_priors_ * 4;
       }
-      ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
-          confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
-      num_det += indices[c].size();
+
+#ifdef BOX_LIST
+	  indices[c].clear();
+	  if (_access("temp.txt", 0) != -1) // 如果临时文件存在读取转存！
+	  {
+		  int prior_boxes_num, prior_box_index;
+		  string line;
+		  ifstream  infile("temp.txt");
+		  while (std::getline(infile, line)) {
+			  std::istringstream iss(line);
+			  iss >> prior_box_index;
+			  indices[c].push_back(prior_box_index);
+		  }
+		  num_det += indices[c].size(); // nms后剩下检测框
+		  remove("temp.txt");
+	  }
+
+#else
+	  ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
+		  confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
+	  num_det += indices[c].size(); // nms后剩下检测框
+#endif // BOX_LIST
+
     }
     if (keep_top_k_ > -1 && num_det > keep_top_k_) {
       vector<pair<float, pair<int, int> > > score_index_pairs;
@@ -150,6 +170,11 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       if (!share_location_) {
         cur_bbox_data += label * num_priors_ * 4;
       }
+#ifdef BOX_LIST
+	  /********************************************************************/
+	  ofstream  outfile("result.txt", ios::out | ios::app);
+	  /********************************************************************/
+#endif // BOX_LIST
       for (int j = 0; j < indices.size(); ++j) {
         int idx = indices[j];
         top_data[count * 7] = i;
@@ -158,6 +183,24 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         for (int k = 0; k < 4; ++k) {
           top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
         }
+#ifdef BOX_LIST
+		/********************************************************************/
+		NormalizedBBox bbox;
+		bbox.set_xmin(top_data[count * 7 + 3]);
+		bbox.set_ymin(top_data[count * 7 + 4]);
+		bbox.set_xmax(top_data[count * 7 + 5]);
+		bbox.set_ymax(top_data[count * 7 + 6]);
+		float score = top_data[count * 7 + 2];
+		float xmin = bbox.xmin();
+		float ymin = bbox.ymin();
+		float xmax = bbox.xmax();
+		float ymax = bbox.ymax();
+		outfile << "\t" << idx << "\t" << score << "\t"
+			<< xmin << "\t" << ymin << "\t" << xmax << "\t" << ymax;
+		/********************************************************************/
+#endif // BOX_LIST
+
+
         if (need_save_) {
           // Generate output bbox.
           NormalizedBBox bbox;
@@ -194,11 +237,16 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
           }
           cur_det.add_child("bbox", cur_bbox);
           cur_det.put<float>("score", score);
-
           detections_.push_back(std::make_pair("", cur_det));
         }
         ++count;
       }
+#ifdef BOX_LIST
+	  /********************************************************************/
+	  outfile << endl;
+	  outfile.close();
+	  /********************************************************************/
+#endif // BOX_LIST
     }
     if (need_save_) {
       ++name_count_;

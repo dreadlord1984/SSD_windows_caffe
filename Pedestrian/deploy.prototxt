@@ -1912,7 +1912,15 @@ layer {
       top_k: 400
     }
     code_type: CENTER_SIZE
-    keep_top_k: 200
-    confidence_threshold: 0.01
+    #keep_top_k: 200
+    confidence_threshold: 0.5 # NMS ±≈≈–Ú…∏—°„–÷µ
+    #save_output_param {
+    #  output_directory: "E:/caffe-master_/Pedestrian/Data_0810/XML"
+    #	 output_name_prefix: "comp4_det_test_"
+    #  output_format: "VOC"
+    #  label_map_file: "E:/caffe-master_/Pedestrian/labelmap_VehicleFull.prototxt"
+    #  name_size_file: "E:/caffe-master_/Pedestrian/Data_0810/val_name_size.txt"
+    #  num_test_image: 4952
+    #}
   }
 }

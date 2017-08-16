@@ -25,6 +25,7 @@
 #include <string>
 #include <utility>
 #include <vector>
+#include <io.h>
 
 #ifdef USE_OPENCV
 using namespace caffe;  // NOLINT(build/namespaces)
@@ -295,30 +296,77 @@ int main(int argc, char** argv) {
 	}
 	std::ostream out(buf);
 
+#ifdef BOX_LIST
+	/********************************************************************/
+	if (_access("result.txt", 0) != -1){ // 如果临时文件存在读取转存！
+		remove("result.txt");
+	}
+	/********************************************************************/
+#else
+	cv::namedWindow("result");
+#endif // BOX_LIST
+
 	// Process image one by one.
 	std::ifstream infile(argv[3]);
-	std::string file;
-	cv::namedWindow("result");
-	//  std::vector<cv::Rect> pos;
-
+	std::string file, xmlfile;
+	std::string imagefile;;
+	string root = "\\\\192.168.1.186\\PedestrianData\\";
 	string djStrLine;
 	while (infile) {
 		if (getline(infile, djStrLine))
 		{
 			int dwPos = djStrLine.rfind(".jpg");
 			file = djStrLine.substr(0, dwPos + 4);
+			int dwEnd = djStrLine.rfind(".xml");
+			xmlfile = djStrLine.substr(dwPos + 5, (dwEnd + dwPos - 1));
+			std::istringstream iss(djStrLine.substr(dwEnd + 4));
+
+#ifdef BOX_LIST
+			if (_access("temp.txt", 0) != -1)
+				remove("temp.txt");
+			std::ofstream  tmpfile("temp.txt", ios::out);
+			int index, gt_num;
+			int prior_boxes_num;
+			float IOU, xmin, ymin, xmax, ymax;
+			iss  >> prior_boxes_num;
+			while (iss >> index){
+				iss >> IOU >> xmin >> ymin >> xmax >> ymax >> gt_num;
+				tmpfile << index << "\n";
+			}
+			tmpfile.close();
+#endif // BOX_LIST
+
 		}
+		else
+		{
+			break;
+		}
+
+		imagefile = file;
+		file = root + file;
 		if (file_type == "image") {
 			std::cout << file << std::endl;
 			cv::Mat img = cv::imread(file, -1);
 			CHECK(!img.empty()) << "Unable to decode image " << file;
+	
+#ifdef BOX_LIST
+			/* Print the detection results. */
+			// <img_name> <<prior_box1_index> <prior_box1_coordinates> ...>
+			/********************************************************************/
+			std::ofstream  outfile("result.txt", ios::out | ios::app);
+			outfile << imagefile;
+			outfile.close();
 			double t1 = cv::getTickCount();
 			std::vector<vector<float> > detections = detector.Detect(img);
 			t1 = cv::getTickCount() - t1;
 			std::cout << "time:" << 1000 * t1 / cv::getTickFrequency() << std::endl;
-
-			/* Print the detection results. */
-			//	  pos.clear();
+			/********************************************************************/
+#else
+			/* Showw the detection results with confidence_threshold */
+			double t1 = cv::getTickCount();
+			std::vector<vector<float> > detections = detector.Detect(img);
+			t1 = cv::getTickCount() - t1;
+			std::cout << "time:" << 1000 * t1 / cv::getTickFrequency() << std::endl;
 			for (int i = 0; i < detections.size(); ++i)
 			{
 				const vector<float>& d = detections[i];
@@ -344,6 +392,7 @@ int main(int argc, char** argv) {
 			}
 			cv::imshow("result", img);
 			cv::waitKey(0);
+#endif // BOX_LIST
 		}
 		else if (file_type == "video") {
 			cv::VideoCapture cap(file);
