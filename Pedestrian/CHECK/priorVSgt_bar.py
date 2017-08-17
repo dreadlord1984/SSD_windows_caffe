@@ -27,7 +27,7 @@ def draw_curve(dataList):
     plt.xticks(rotation=25)
     ax.set_title('(prior vs ground_truth)')
     ax.set_ylabel('Distribution')
-    plt.savefig('Data_0810/bar.png')
+    plt.savefig('../Data_0810/priorVSgt.png')
     plt.show()
 
 if __name__ == "__main__":

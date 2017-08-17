@@ -29,10 +29,14 @@ def save_data(priorList, resultList, data_xlsx):
             # reslut_conf = []  # 检测得到result box置信度
             result_boxes_total = (len(result_datas)-1)/6  # 检测得到的box数量
             for j in range(0, result_boxes_total, 1):
-                index = int(prior_IOU[j] / thresholds[0])
+                #index = int(prior_IOU[j] / thresholds[0])
+                for i in range(0, len(thresholds), 1):  # 判断IOU区间段
+                    if (prior_IOU[j] < thresholds[i]):
+                        index = i
+                        break
                 conf = float(result_datas[6 * j + 2]) #分类置信度
                 # reslut_conf.append(conf)
-                if conf >= 0.5:
+                if conf >= conf_threshold:
                     all_change_group[index]['Pos'] += 1
                 else:
                     all_change_group[index]['Neg']  += 1
@@ -68,6 +72,7 @@ def show_bar(data_mat):
     df = pd.read_excel(data_mat, 'Sheet')
     var = df.groupby(['IOU', 'Status']).NUM.sum()
     var.unstack().plot(kind='bar', stacked=True, color=['red', 'blue'])
+    plt.title('Pos vs Neg')
     plt.show()
 
 #matplotlib.rcParams['figure.figsize'] = (6, 8)  # 设定显示大小
@@ -75,11 +80,12 @@ plt.rcParams['image.interpolation'] = 'nearest'
 plt.rcParams['image.cmap'] = 'gray'
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 min_threshold = 0.1
-thresholds = np.linspace( min_threshold, 1, 10 ) # IOU 区间
+thresholds = np.linspace( min_threshold, 1, 10 ) # IOU 区间段
 all_change_group = []  # 初始化
 for i in range(0, len(thresholds), 1):
     all_change_group.append({'Neg': 0, 'Pos': 0})
+conf_threshold = 0.5 # 分类置信度阈值
 
 if __name__ == "__main__":
-    # save_data("../Data_0810/IOU_ALL_image_List.txt", "../Data_0810/result_ALL_image_List.txt", "../Data_0810/confidence_change_statistic.xlsx")
-    show_bar("../Data_0810/confidence_change_statistic.xlsx")
+    save_data("../Data_0810/IOU_ALL_image_List.txt", "../Data_0810/result_ALL_image_List.txt", "../Data_0810/confidence_change_under_conf.xlsx")
+    show_bar("../Data_0810/confidence_change_under_conf.xlsx")
