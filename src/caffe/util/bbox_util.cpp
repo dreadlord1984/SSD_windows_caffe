@@ -1640,7 +1640,7 @@ void EncodeConfPrediction(const Dtype* conf_data, const int num,
       if (do_neg_mining) {
         // Save negative bboxes scores and labels.
         for (int n = 0; n < all_neg_indices[i].size(); ++n) {
-          int j = all_neg_indices[i][n];
+          int j = all_neg_indices[i][n]; //¸ºÑù±¾index
           CHECK_LT(j, num_priors);
           caffe_copy<Dtype>(num_classes, conf_data + j * num_classes,
               conf_pred_data + count * num_classes);

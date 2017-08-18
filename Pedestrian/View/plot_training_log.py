@@ -29,9 +29,9 @@ def create_field_index():
     train_key = 'Train'  
     test_key = 'Test'  
     field_index = {train_key:{'Iters':0, 'Seconds':1, train_key + ' learning rate':2,  
-                              train_key + ' loss':3},#根据自己的**.log.train文件修改了2和3的顺序  
-                   test_key:{'Iters':0, 'Seconds':1, 'learning rate':2,test_key + ' accuracy':3,  
-                             test_key + ' loss':4}}#自己增加test_key 中learning rate  
+                              train_key + ' mbox_loss_1':3},#根据自己的**.log.train文件修改了2和3的顺序
+                   test_key:{'Iters':0, 'Seconds':1, 'learning rate':2,test_key + ' detection_eval':3,
+                             test_key + ' loss':4}}#自己增加test_key 中learning rate
     fields = set()  
     for data_file_type in field_index.keys():  
         fields = fields.union(set(field_index[data_file_type].keys()))  
@@ -148,7 +148,8 @@ def plot_chart(chart_type, path_to_png, path_to_log_list):
     plt.title(get_chart_type_description(chart_type))  
     plt.xlabel(x_axis_field)  
     plt.ylabel(y_axis_field)  
-    plt.savefig(path_to_png)  
+    plt.savefig(path_to_png)
+    plt.grid()
     plt.show()  
 
 def print_help():
@@ -175,24 +176,22 @@ def is_valid_chart_type(chart_type):
     return chart_type >= 0 and chart_type < len(get_supported_chart_types())
 
 if __name__ == '__main__':
-    if len(sys.argv) < 4:
+    #print_help()
+    chart_type = 6 # 0.4,6
+    if not is_valid_chart_type(chart_type):
+        print '%s is not a valid chart type.' % chart_type
         print_help()
-    else:
-        chart_type = int(sys.argv[1])
-        if not is_valid_chart_type(chart_type):
-            print '%s is not a valid chart type.' % chart_type
-            print_help()
-        path_to_png = sys.argv[2]
-        if not path_to_png.endswith('.png'):
-            print 'Path must ends with png' % path_to_png
+    path_to_png = 'train.png'
+    if not path_to_png.endswith('.png'):
+        print 'Path must ends with png' % path_to_png
+        sys.exit()
+    path_to_logs = ["INFO2017-08-18T09-13-35.log"]
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
             sys.exit()
-        path_to_logs = sys.argv[3:]
-        for path_to_log in path_to_logs:
-            if not os.path.exists(path_to_log):
-                print 'Path does not exist: %s' % path_to_log
-                sys.exit()
-            if not path_to_log.endswith(get_log_file_suffix()):
-                print 'Log file must end in %s.' % get_log_file_suffix()
-                print_help()
-        ## plot_chart accpets multiple path_to_logs
-        plot_chart(chart_type, path_to_png, path_to_logs)
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(chart_type, path_to_png, path_to_logs)
