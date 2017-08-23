@@ -87,5 +87,7 @@ for i in range(0, len(thresholds), 1):
 conf_threshold = 0.5 # 分类置信度阈值
 
 if __name__ == "__main__":
-    save_data("../Data_0810/IOU_ALL_image_List.txt", "../Data_0810/result_ALL_image_List.txt", "../Data_0810/confidence_change_under_conf.xlsx")
-    show_bar("../Data_0810/confidence_change_under_conf.xlsx")
+    save_data("../Data_0810/IOU_ALL_image_List.txt",
+              "../Data_0810/result_ALL_image_List.txt",
+              "../Data_0810/one_confidence_change_with_IOU_statistic.xlsx")
+    show_bar("../Data_0810/one_confidence_change_with_IOU_statistic.xlsx")

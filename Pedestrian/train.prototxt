@@ -1929,6 +1929,10 @@ layer {
     neg_pos_ratio: 3.0
     neg_overlap: 0.5
     code_type: CENTER_SIZE
-	mining_type: HARD_EXAMPLE
+		mining_type: HARD_EXAMPLE
+		nms_param {
+      nms_threshold: 0.3
+      top_k: 64
+    }
   }
 }

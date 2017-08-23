@@ -120,6 +120,7 @@ def showList(IOU_small_List):
                                                  fill=False, edgecolor=colors[1], linewidth=1))
             currentAxis.text(databox[0], databox[1], display_txt, bbox={'facecolor': colors[1], 'alpha': 0.5})
         plt.show()
+        # break
     print "end"
 
 batch_size = 32
@@ -128,4 +129,4 @@ ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 
 if __name__ == "__main__":
     copyList("../Data_0810/IOU_ALL.txt", "../Data_0810/train_lmdb_list.txt", "../Data_0810/IOU_ALL_image_List.txt")
-    showList("../Data_0810/IOU_ALL_image_List.txt")
+    # showList("../Data_0810/IOU_ALL_image_List.txt")

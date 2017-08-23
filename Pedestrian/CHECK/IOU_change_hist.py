@@ -136,5 +136,7 @@ def show_hist(hist_mat):
     plt.show()
 
 if __name__ == "__main__":
-    save_data("Data_0810/IOU_ALL_image_List.txt", "Data_0810/result_ALL_image_List.txt", "Data_0810/IOU_change.mat")
-    show_hist("Data_0810/IOU_change.mat")
+    save_data("Data_0810/IOU_ALL_image_List.txt",
+              "Data_0810/result_ALL_image_List.txt",
+              "Data_0810/IOU_change_hist.mat")
+    show_hist("Data_0810/IOU_change_hist.mat")

@@ -28,14 +28,14 @@ def save_data(priorList, resultList, data_xlsx):
 
             # reslut_conf = []  # 检测得到result box置信度
             result_boxes_total = (len(result_datas)-1)/6  # 检测得到的box数量
-            for k in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
-                for j in range(0, result_boxes_total, 1): # 对于每个prior box
-                    # index = int(prior_IOU[j] / thresholds[0])
-                    for i in range(0, len(thresholds), 1): # 判断IOU区间段
-                        if (prior_IOU[j] < thresholds[i]):
-                            index = i
-                            break
-                    conf = float(result_datas[6 * j + 2]) #分类置信度
+            for j in range(0, result_boxes_total, 1): # 对于每个prior box
+                # index = int(prior_IOU[j] / thresholds[0])
+                for i in range(0, len(thresholds), 1): # 判断IOU区间段
+                    if (prior_IOU[j] < thresholds[i]):
+                        index = i
+                        break
+                conf = float(result_datas[6 * j + 2]) #分类置信度
+                for k in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
                     if conf >= conf_thresholds[k]:
                         all_change_group[k][index]['Pos'] += 1
                     else:
@@ -70,21 +70,21 @@ def save_data(priorList, resultList, data_xlsx):
 @function:将各个conf阈值条件下confidence的变化以recall曲线展现
 @param param1: confidence变化文件
 """
-def show_bar(data_mat):
+def show_curve(data_xlsx):
     fig1, ax1 = plt.subplots(1)
     prior_num = []
     for k in range(0, len(conf_thresholds), 1):
         recalls = []
         sheet_name = 'Sheet'+ str(k+1)
-        df = pd.read_excel(data_mat, sheet_name)
+        df = pd.read_excel(data_xlsx, sheet_name)
         var = list(df['NUM'])
         for j in range(0, len(thresholds), 1):
             if k==0:
                 prior_num.append(var[2*j+1] + var[2*j])
             recall = float(var[2*j+1]) / (float(var[2*j+1]) + float(var[2*j]))
             recalls.append(recall)
-        ax1.plot(thresholds, recalls, lw=2, color=colors[k], label=str(thresholds[k])) # 绘制每一条recall曲线
-        # plt.annotate(thresholds[k], xy=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
+        ax1.plot(thresholds, recalls, lw=2, color=colors[k], label=str(conf_thresholds[k])) # 绘制每一条recall曲线
+        # plt.annotate(conf_thresholds[k], xy=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
         #              xytext=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
         #              arrowprops = dict(facecolor="r", headlength=5, headwidth=5, width=2))
 
@@ -114,5 +114,7 @@ for j in range(0, len(conf_thresholds), 1):
 
 
 if __name__ == "__main__":
-    save_data("../Data_0810/IOU_ALL_image_List.txt", "../Data_0810/result_ALL_image_List.txt", "../Data_0810/confidence_change_statistic.xlsx")
-    show_bar("../Data_0810/confidence_change_statistic.xlsx")
+    # save_data("../Data_0810/IOU_ALL_image_List.txt",
+    #           "../Data_0810/result_ALL_image_List.txt",
+    #           "../Data_0810/confidence_change_with_IOU_statistic.xlsx")
+    show_curve("../Data_0810/confidence_change_with_IOU_statistic.xlsx")

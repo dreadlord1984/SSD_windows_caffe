@@ -3,6 +3,7 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
 import scipy.io
@@ -10,15 +11,15 @@ import scipy.io
 """
 @function:从xml文件中读取box信息
 @param param1: xml文件
-@return: boxes
+@return: boxes, width, height
 """
 def readXML(xml_name):
     tree = et.parse(xml_name) #打开xml文档
     # 得到文档元素对象
     root = tree.getroot()
     size = root.find('size')  # 找到root节点下的size节点
-    width = size.find('width').text  # 子节点下节点width的值
-    height = size.find('height').text  # 子节点下节点height的值
+    width = int(size.find('width').text)  # 子节点下节点width的值
+    height = int(size.find('height').text)  # 子节点下节点height的值
 
     boundingBox = []
     for object in root.findall('object'):  # 找到root节点下的所有object节点
@@ -28,7 +29,7 @@ def readXML(xml_name):
         xmax = bndbox.find('xmax').text
         ymax = bndbox.find('ymax').text
         boundingBox.append([int(xmin), int(ymin), int(xmax), int(ymax)])
-    return boundingBox
+    return boundingBox, width, height
 
 """
 @function:计算两个box的IOU
@@ -62,10 +63,10 @@ def save_data(priorList, resultList, data_mat):
             result_datas = resultFile.strip().split('\t')
             img_name = ROOTDIR + prior_datas[0]
             xml_name = ROOTDIR + prior_datas[1]
-            image = plt.imread(img_name)
-            width = image.shape[1]
-            height = image.shape[0]
-            true_boxes = readXML(xml_name) # 所有的ground truth boxes
+            # image = plt.imread(img_name)
+            # width = image.shape[1]
+            # height = image.shape[0]
+            true_boxes, width, height = readXML(xml_name) # 所有的ground truth boxes
             prior_IOU = []  # 训练时所有匹配的prior box与gt box的IOU
             prior_boxes = [] # 训练时所有匹配的prior box坐标 [[prior_box_index, [xmin, ymin, xmax, ymax]]...]
             gt_boxes = [] # 样本所有gt box坐标 [[gt_box_index, [xmin, ymin, xmax, ymax]]...]
@@ -144,5 +145,7 @@ all_change_group = [[0 for x in range(len(change_scope))] for y in range(len(thr
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本所在根目录
 
 if __name__ == "__main__":
-    # save_data("../Data_0810/IOU_ALL_image_List.txt", "../Data_0810/result_ALL_image_List.txt", "../Data_0810/IOU_change_statistic.mat")
-    show_hist("../Data_0810/IOU_change_statistic.mat")
+    save_data("../Data_0810/IOU_ALL_image_List.txt",
+              "../Data_0810/result_ALL_image_List.txt",
+              "../Data_0810/IOU_change_curve.mat")
+    show_hist("../Data_0810/IOU_change_curve.mat")

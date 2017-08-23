@@ -19,17 +19,17 @@ def draw_curve(dataList):
             if (IOU < thresholds[i]):
                 group[i] += 1
                 break
-    matplotlib.rcParams['figure.figsize'] = (8, 5)  # 设定显示大小
+    matplotlib.rcParams['figure.figsize'] = (8, 6)  # 设定显示大小
     fig, ax = plt.subplots(1)
     labels = [thresholds[i] for i in s_ids]
     anno_area2s = [('%d' % a) for a in group[s_ids]]
     ppl.bar(ax, np.arange(len(group)), group[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
     plt.xticks(rotation=25)
     ax.set_title('(prior vs ground_truth)')
+    ax.set_xlabel('IOU')
     ax.set_ylabel('Distribution')
     plt.savefig('../Data_0810/priorVSgt.png')
     plt.show()
 
 if __name__ == "__main__":
     draw_curve("../Data_0810/IOU_ALL.txt")
-
