@@ -101,6 +101,7 @@ int main(int argc, char** argv) {
 
   std::ifstream infile(argv[2]);
   std::vector<std::pair<std::string, boost::variant<int, std::string> > > lines;
+  std::vector<std::string> lines2;
   std::string filename;
   int label;
   std::string labelname;
@@ -109,7 +110,16 @@ int main(int argc, char** argv) {
     while (infile >> filename >> label) {
       lines.push_back(std::make_pair(filename, label));
     }
-  } else if (anno_type == "detection") {
+  }
+  else if (anno_type == "just_shuffle") {
+	  while (infile) {
+		  if (getline(infile, djStrLine))
+		  {
+			  lines2.push_back(djStrLine);
+		  }
+	  }
+  }
+  else if (anno_type == "detection") {
     type = AnnotatedDatum_AnnotationType_BBOX;
     LabelMap label_map;
     CHECK(ReadProtoFromTextFile(label_map_file, &label_map))
@@ -135,12 +145,38 @@ int main(int argc, char** argv) {
     }
 #endif
   }
+
+  if (anno_type == "just_shuffle"){
+	  if (FLAGS_shuffle) {
+		  // randomly shuffle data
+		  LOG(INFO) << "Shuffling data";
+		  shuffle(lines2.begin(), lines2.end());
+	  }
+	  LOG(INFO) << "A total of " << lines2.size() << " images.";
+
+	  char savePath[100];
+	  strcpy(savePath, argv[3]);
+	  strcat(savePath, "_list.txt");
+	  if (_access(savePath, 0) != -1) // 如果文件存在，删除！
+		  remove(savePath);
+	  std::ofstream  outfile(savePath, ios::out);
+	  std::vector<std::string>::iterator iter = lines2.begin();
+	  for (; iter != lines2.end(); ++iter)
+	  {
+		  outfile << *iter << std::endl;
+	  }
+	  outfile.close();
+	  return 0;
+  }
+
+
   if (FLAGS_shuffle) {
     // randomly shuffle data
     LOG(INFO) << "Shuffling data";
     shuffle(lines.begin(), lines.end());
   }
   LOG(INFO) << "A total of " << lines.size() << " images.";
+
 
 
 #ifdef BOX_LIST

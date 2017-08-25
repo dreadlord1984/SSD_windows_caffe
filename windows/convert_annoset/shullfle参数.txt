@@ -1,0 +1,1 @@
+./ all_list.txt shuffle --anno_type="just_shuffle"  --shuffle=true

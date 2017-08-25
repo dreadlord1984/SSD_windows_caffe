@@ -174,6 +174,19 @@ namespace caffe {
 			&all_loc_preds);
 
 		// Find matches between source bboxes and ground truth bboxes.
+
+		/************************************************************************/
+
+		if (all_match_indices_.size())
+		{
+			all_match_indices_.clear();
+			all_neg_indices_.clear();
+		}
+		/************************************************************************/
+
+
+
+
 		vector<map<int, vector<float> > > all_match_overlaps;
 		FindMatches(all_loc_preds, all_gt_bboxes, prior_bboxes, prior_variances,
 			multibox_loss_param_, &all_match_overlaps, &all_match_indices_);

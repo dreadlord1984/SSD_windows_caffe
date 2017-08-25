@@ -56,7 +56,7 @@ echo "create val leveldb(lmdb)..."
 SET GLOG_logtostderr = 1
 echo "create train leveldb(lmdb)..."
 SET GLOG_logtostderr = 1
-%BINDIR%\convert_annoset.exe %ROOTDIR% %VAL_DATA_LIST% %OUTDIR%/%VAL%_%DBTYPE% --encoded=%encoded% --encode_type=%encode_type% --anno_type=%ANNOTYPE% --label_map_file=%MAPFILE% --min_dim=%MIN_DIM% --max_dim=%MAX_DIM% --resize_width=%RESIZE_WIDTH% --resize_height=%RESIZE_HEIGHT% --check_label=%CHECK_LABEL% --shuffle=%SHUFFLE% --gray=%GRAY% --backend=%DBTYPE%
+%BINDIR%\convert_annoset.exe %ROOTDIR% %VAL_DATA_LIST% %OUTDIR%/%VAL%_%DBTYPE% --encoded=%encoded% --encode_type=%encode_type% --anno_type=%ANNOTYPE% --label_map_file=%MAPFILE% --min_dim=%MIN_DIM% --max_dim=%MAX_DIM% --resize_width=%RESIZE_WIDTH% --resize_height=%RESIZE_HEIGHT% --check_label=%CHECK_LABEL% --shuffle=false --gray=%GRAY% --backend=%DBTYPE%
 
 SET GLOG_logtostderr = 1
 %BINDIR%\convert_annoset.exe %ROOTDIR% %TRAIN_DATA_LIST% %OUTDIR%/%TRAINVAL%_%DBTYPE% --encoded=%encoded% --encode_type=%encode_type% --anno_type=%ANNOTYPE% --label_map_file=%MAPFILE% --min_dim=%MIN_DIM% --max_dim=%MAX_DIM% --resize_width=%RESIZE_WIDTH% --resize_height=%RESIZE_HEIGHT% --check_label=%CHECK_LABEL% --shuffle=%SHUFFLE% --gray=%GRAY% --backend=%DBTYPE% 

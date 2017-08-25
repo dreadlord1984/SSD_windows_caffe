@@ -140,7 +140,7 @@ def draw_curve(data_mat):
                 color=colors[0])
         axes[0].set_title(strand_names)
         axes[0].set_ylabel(yalbel_names)
-        axes[0].set_xlabel('gt box area ratio')
+        axes[0].set_xlabel('IOU')
 
         # 2. 绘制不同confidence阈值下的recall曲线
         prior_num = []
@@ -163,13 +163,15 @@ def draw_curve(data_mat):
                          arrowprops=dict(facecolor="r", headlength=5, headwidth=5, width=2))
         plt.grid()
         plt.xticks(s_ids, IOU_thresholds)
-        plt.xlabel('gt box area ratio')
+        plt.xlabel('IOU')
         plt.ylabel('area: ' + '%.4f' % area_thresholds[pl] + ' Recall')
         plt.title('IOU-Recall')
         plt.legend(loc="upper left")
+        plt.ylim((0, 1))
         # ax2 = axes[1].twiny()
         # plt.xticks(s_ids, prior_num, rotation=10)
-    plt.show()
+        plt.savefig('../Data_0810/figure_' + str(pl) + '.png')
+        plt.show()
 
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本所在根目录
 min_conf_threshold = 0.1 # 最小分类置信度阈值

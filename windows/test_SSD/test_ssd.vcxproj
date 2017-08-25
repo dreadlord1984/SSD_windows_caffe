@@ -48,7 +48,7 @@
       <SubSystem>Console</SubSystem>
     </Link>
     <ClCompile>
-      <PreprocessorDefinitions>BOX_LIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

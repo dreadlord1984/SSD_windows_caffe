@@ -1077,12 +1077,12 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     bbox.set_ymin(gt_data[start_idx + 4]);
     bbox.set_xmax(gt_data[start_idx + 5]);
     bbox.set_ymax(gt_data[start_idx + 6]);
-	////合法性判断
-	//if ((bbox.xmax() - bbox.xmin()) < 0.05 || (bbox.ymax() - bbox.ymin()) < 0.07)
-	//{
-	//	continue;
-	//}
-	////
+	//合法性判断 训练
+	/*if ((bbox.xmax() - bbox.xmin()) < 0.001 || (bbox.ymax() - bbox.ymin()) < 0.001)
+	{
+		continue;
+	}*/
+	//
     bbox.set_difficult(difficult);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
@@ -1122,12 +1122,12 @@ void GetGroundTruth(const Dtype* gt_data, const int num_gt,
     bbox.set_ymin(gt_data[start_idx + 4]);
     bbox.set_xmax(gt_data[start_idx + 5]);
     bbox.set_ymax(gt_data[start_idx + 6]);
-	//合法性判断
-	if ((bbox.xmax() - bbox.xmin()) < 0.07 || (bbox.ymax() - bbox.ymin()) < 0.07)
-	{
-		continue;
-	}
-	//
+	////合法性判断 测试
+	//if ((bbox.xmax() - bbox.xmin()) < 0.07 || (bbox.ymax() - bbox.ymin()) < 0.07)
+	//{
+	//	continue;
+	//}
+	////
     bbox.set_difficult(difficult);
     float bbox_size = BBoxSize(bbox);
     bbox.set_size(bbox_size);
