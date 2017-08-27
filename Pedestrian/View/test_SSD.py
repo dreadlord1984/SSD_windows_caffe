@@ -69,7 +69,7 @@ def computIOU(A, B):
     return iou
 
 model_def = 'deploy.prototxt'
-model_weights = 'snapshot_iter_30000.caffemodel'
+model_weights = 'snapshot_iter_110000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
 imgList = "../Data_0731/val.txt"
 

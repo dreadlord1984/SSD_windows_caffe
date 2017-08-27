@@ -20,7 +20,7 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0810/val_lmdb"
+    source: "E:/caffe-master_/Pedestrian/Data_0825/val_lmdb"
     batch_size: 10
     backend: LMDB
   }

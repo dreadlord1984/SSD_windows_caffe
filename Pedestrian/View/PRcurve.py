@@ -143,7 +143,7 @@ def save_data(testList, resultList, recall_mat):
 @function:绘制PR曲线
 @param param1: 模型结果数量，模型一结果，模型二结果
 """
-def draw_curve(recall_num, data_mat_1, data_mat_2 = 0):
+def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0):
     fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
     if recall_num == 1:
         data = scipy.io.loadmat(data_mat_1)
@@ -163,11 +163,16 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0):
             recalls.append(recall)
             precisions.append(precision)
         axes.plot(recalls, precisions, lw=2, color='navy',
-                     label=str(conf_thresholds[conf_i]))  # 绘制每一条recall曲线
+                     label=data_mat_1)  # 绘制每一条recall曲线
         plt.plot(recalls, precisions, 'ro')
     else:
         for curve_i in range(0, recall_num, 1):
-            data_name = 'recall_%s' %str(curve_i) + '.mat'
+            if curve_i==0:
+                data_name = data_mat_1
+            elif curve_i==1:
+                data_name = data_mat_2
+            elif curve_i==2:
+                data_name = data_mat_3
             data = scipy.io.loadmat(data_name)
             data = data['all_change_group'][0]
             recalls = []
@@ -208,10 +213,8 @@ for j in range(0, len(conf_thresholds), 1):
 s_ids = np.arange(len(conf_thresholds))
 
 
-
-
 if __name__ == "__main__":
-    # save_data("val.txt",
-    #           "result_conf_1.txt",
-    #           "recall_1.mat")
-    draw_curve(1, "recall_1.mat")
+    # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+    #           "snapshot_iter_120000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "snapshot_iter_120000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    draw_curve(2, "snapshot_iter_110000.mat", "snapshot_iter_120000.mat") # 曲线数量+各个曲线对应的统计结果文件

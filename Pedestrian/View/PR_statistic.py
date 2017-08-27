@@ -70,10 +70,10 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deploy.prototxt'
-model_weights = 'snapshot_iter_120000.caffemodel'
-ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
-imgList = "../Data_0810/val.txt"
+model_def = 'deploy.prototxt' # 检测网络
+model_weights = 'snapshot_iter_120000.caffemodel' # 训练好的模型
+ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 待测试样本集所在根目录
+imgList = "../Data_0825/val.txt" # 样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights
@@ -94,7 +94,8 @@ net.blobs['data'].reshape(1,3,resize_height,resize_width)
 TPs = 0 # 正检
 FPs = 0 # 误检
 FNs = 0 # 漏检
-result_file = 'result_conf.txt'
+
+result_file = model_weights.strip().split('.caffemodel')[0]+'.txt'
 if  os.path.exists(result_file):
     os.remove(result_file)
 output = open(result_file, 'w')

@@ -494,10 +494,10 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     LOG(INFO)     << "Test interrupted.";
     return;
   }
-  if (param_.test_compute_loss()) {
+ /* if (param_.test_compute_loss()) {
     loss /= param_.test_iter(test_net_id);
     LOG(INFO) << "Test loss: " << loss;
-  }
+  }*/
   for (int i = 0; i < all_true_pos.size(); ++i) {
     if (all_true_pos.find(i) == all_true_pos.end()) {
       LOG(FATAL) << "Missing output_blob true_pos: " << i;
@@ -543,8 +543,17 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     mAP /= num_pos.size();
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
-    LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-              << mAP;
+
+	if (param_.test_compute_loss()) {
+		loss /= param_.test_iter(test_net_id);
+		LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+			<< mAP << " Test loss: " << loss;
+	}
+	else
+	{
+		LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+			<< mAP;
+	}
   }
 }
 
