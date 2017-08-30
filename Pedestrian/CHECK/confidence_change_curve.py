@@ -96,6 +96,7 @@ def show_curve(data_xlsx):
     ax2 = ax1.twiny()
     ax2.set_xlim(0.1, 1)
     plt.xticks(thresholds, prior_num, rotation=10)
+    plt.savefig('../Data_0810/confidence_change_with_IOU_statistic.png')
     plt.show()
 
 #matplotlib.rcParams['figure.figsize'] = (6, 8)  # 设定显示大小

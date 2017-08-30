@@ -71,7 +71,7 @@ def computIOU(A, B):
 model_def = 'deploy.prototxt'
 model_weights = 'snapshot_iter_110000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
-imgList = "../Data_0731/val.txt"
+imgList = "../Data_0825/val.txt"
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights

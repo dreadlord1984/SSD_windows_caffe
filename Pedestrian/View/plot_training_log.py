@@ -177,7 +177,7 @@ def is_valid_chart_type(chart_type):
 
 if __name__ == '__main__':
     #print_help()
-    chart_type = 4  # 0：mAP, 4：learning rate, 6:loss
+    chart_type = 0  # 0：mAP, 4：learning rate, 6:loss
     if not is_valid_chart_type(chart_type):
         print '%s is not a valid chart type.' % chart_type
         print_help()
@@ -185,7 +185,7 @@ if __name__ == '__main__':
     if not path_to_png.endswith('.png'):
         print 'Path must ends with png' % path_to_png
         sys.exit()
-    path_to_logs = ["INFO2017-08-26T20-25-28.log"] # log文件
+    path_to_logs = ["INFO2017-08-28T08-44-10.log"] # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
