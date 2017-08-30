@@ -25,3 +25,5 @@ if errorlevel 1 (
 )
 
 rmdir /S /Q "%PROTO_TEMP_DIR%"
+
+pause

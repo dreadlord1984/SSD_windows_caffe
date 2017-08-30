@@ -139,7 +139,7 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
   // Insert detection evaluate status.
   for (map<int, LabelBBox>::iterator it = all_detections.begin();
        it != all_detections.end(); ++it) {
-    int image_id = it->first;
+    int image_id = it->first;// 样本索引
     LabelBBox& detections = it->second;
     if (all_gt_bboxes.find(image_id) == all_gt_bboxes.end()) {
       // No ground truth for current image. All detections become false_pos.
@@ -160,7 +160,7 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
         }
       }
     } else {
-      LabelBBox& label_bboxes = all_gt_bboxes.find(image_id)->second;
+      LabelBBox& label_bboxes = all_gt_bboxes.find(image_id)->second; // 样本image_id的gt boxes
       for (LabelBBox::iterator iit = detections.begin();
            iit != detections.end(); ++iit) {
         int label = iit->first;
@@ -190,7 +190,7 @@ void DetectionEvaluateLayer<Dtype>::Forward_cpu(
           }
           vector<bool> visited(gt_bboxes.size(), false);
           // Sort detections in descend order based on scores.
-          std::sort(bboxes.begin(), bboxes.end(), SortBBoxDescend);
+          std::sort(bboxes.begin(), bboxes.end(), SortBBoxDescend);// 从小到大排列
           for (int i = 0; i < bboxes.size(); ++i) {
             top_data[num_det * 5] = image_id;
             top_data[num_det * 5 + 1] = label;

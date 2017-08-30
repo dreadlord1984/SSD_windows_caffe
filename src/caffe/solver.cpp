@@ -465,20 +465,20 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
       const Dtype* result_vec = result[j]->cpu_data();
       int num_det = result[j]->height();
       for (int k = 0; k < num_det; ++k) {
-        int item_id = static_cast<int>(result_vec[k * 5]);
-        int label = static_cast<int>(result_vec[k * 5 + 1]);
+        int item_id = static_cast<int>(result_vec[k * 5]); // -1~prd_boxes
+        int label = static_cast<int>(result_vec[k * 5 + 1]);// 1
         if (item_id == -1) {
           // Special row of storing number of positives for a label.
           if (all_num_pos[j].find(label) == all_num_pos[j].end()) {
-            all_num_pos[j][label] = static_cast<int>(result_vec[k * 5 + 2]);
+            all_num_pos[j][label] = static_cast<int>(result_vec[k * 5 + 2]);// gt boxes 数量
           } else {
             all_num_pos[j][label] += static_cast<int>(result_vec[k * 5 + 2]);
           }
         } else {
           // Normal row storing detection status.
-          float score = result_vec[k * 5 + 2];
-          int tp = static_cast<int>(result_vec[k * 5 + 3]);
-          int fp = static_cast<int>(result_vec[k * 5 + 4]);
+          float score = result_vec[k * 5 + 2]; // 每一个pre box是目标的置信度
+          int tp = static_cast<int>(result_vec[k * 5 + 3]); // 正检？yes:1, no:0
+          int fp = static_cast<int>(result_vec[k * 5 + 4]); // 误检？yes:1, no:0
           if (tp == 0 && fp == 0) {
             // Ignore such case. It happens when a detection bbox is matched to
             // a difficult gt bbox and we don't evaluate on difficult gt bbox.
@@ -494,10 +494,10 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     LOG(INFO)     << "Test interrupted.";
     return;
   }
- /* if (param_.test_compute_loss()) {
+  if (param_.test_compute_loss()) {
     loss /= param_.test_iter(test_net_id);
     LOG(INFO) << "Test loss: " << loss;
-  }*/
+  }
   for (int i = 0; i < all_true_pos.size(); ++i) {
     if (all_true_pos.find(i) == all_true_pos.end()) {
       LOG(FATAL) << "Missing output_blob true_pos: " << i;
@@ -519,7 +519,7 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     for (map<int, int>::const_iterator it = num_pos.begin();
          it != num_pos.end(); ++it) {
       int label = it->first;
-      int label_num_pos = it->second;
+      int label_num_pos = it->second; // 这一个测试batch里所有的gt boxes数量
       if (true_pos.find(label) == true_pos.end()) {
         LOG(WARNING) << "Missing true_pos for label: " << label;
         continue;
@@ -544,16 +544,8 @@ void Solver<Dtype>::TestDetection(const int test_net_id) {
     const int output_blob_index = test_net->output_blob_indices()[i];
     const string& output_name = test_net->blob_names()[output_blob_index];
 
-	if (param_.test_compute_loss()) {
-		loss /= param_.test_iter(test_net_id);
-		LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-			<< mAP << " Test loss: " << loss;
-	}
-	else
-	{
-		LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
-			<< mAP;
-	}
+	LOG(INFO) << "    Test net output #" << i << ": " << output_name << " = "
+		<< mAP;
   }
 }
 

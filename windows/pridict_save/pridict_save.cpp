@@ -396,13 +396,13 @@ int main(int argc, char** argv) {
 					int posy = static_cast<int>(d[4] * img.rows);
 					int posw = static_cast<int>(d[5] * img.cols) - posx;
 					int posh = static_cast<int>(d[6] * img.rows) - posy;
-					/*cv::Rect pos(posx, posy, posw, posh);
+					cv::Rect pos(posx, posy, posw, posh);
 					cv::rectangle(img, pos, colortable[static_cast<int>(d[1])], 3, 8, 0);
-					cv::putText(img, classname[static_cast<int>(d[1])], cv::Point(posx + 15, posy + 15), CV_FONT_HERSHEY_SIMPLEX, 0.5, colortable[static_cast<int>(d[1])], 2, 2);*/
+					cv::putText(img, std::to_string(score), cv::Point(posx + 15, posy + 15), CV_FONT_HERSHEY_SIMPLEX, 0.5, colortable[static_cast<int>(d[1])], 2, 2);
 				}
 			}
-			/*cv::imshow("result", img);
-			cv::waitKey(0);*/
+			cv::imshow("result", img);
+			cv::waitKey(0);
 		}
 		else {
 			LOG(FATAL) << "Unknown file_type: " << file_type;
