@@ -1268,6 +1268,7 @@ message MultiBoxLossParameter {
   enum ConfLossType {
     SOFTMAX = 0;
     LOGISTIC = 1;
+    FocalLoss = 2;
   }
   optional ConfLossType conf_loss_type = 2 [default = SOFTMAX];
   // Weight for localization loss.
@@ -1754,7 +1755,7 @@ message V1LayerParameter {
     CONTRASTIVE_LOSS = 37;
     CONVOLUTION = 4;
     DATA = 5;
-    DECONVOLUTION = 39;
+    DECONVOLUTION = 40;
     DROPOUT = 6;
     DUMMY_DATA = 32;
     EUCLIDEAN_LOSS = 7;
@@ -1780,6 +1781,7 @@ message V1LayerParameter {
     SILENCE = 36;
     SOFTMAX = 20;
     SOFTMAX_LOSS = 21;
+    FocalLoss = 39;
     SPLIT = 22;
     SLICE = 33;
     TANH = 23;
@@ -1821,6 +1823,7 @@ message V1LayerParameter {
   optional ReLUParameter relu_param = 30;
   optional SigmoidParameter sigmoid_param = 38;
   optional SoftmaxParameter softmax_param = 39;
+  optional FocalLossParameter focal_loss_param = 28;
   optional SliceParameter slice_param = 31;
   optional TanHParameter tanh_param = 37;
   optional ThresholdParameter threshold_param = 25;

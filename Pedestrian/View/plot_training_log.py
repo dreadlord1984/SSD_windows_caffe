@@ -185,7 +185,7 @@ if __name__ == '__main__':
     if not path_to_png.endswith('.png'):
         print 'Path must ends with png' % path_to_png
         sys.exit()
-    path_to_logs = ["INFO2017-08-28T08-44-10.log"] # log文件
+    path_to_logs = ["INFO2017-08-30T09-33-45.log"] # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log

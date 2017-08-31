@@ -384,6 +384,7 @@
     <ClCompile Include="..\..\src\caffe\util\sampler.cpp">
       <Filter>src\util</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\caffe\layers\focal_loss_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\caffe\proto\caffe.pb.h">
@@ -731,6 +732,7 @@
     <ClInclude Include="..\..\include\caffe\util\sampler.hpp">
       <Filter>include\util</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\caffe\layers\focal_loss_layer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <CudaCompile Include="..\..\src\caffe\layers\contrastive_loss_layer.cu">
@@ -925,6 +927,7 @@
     <CudaCompile Include="..\..\src\caffe\layers\detection_output_layer_gpu.cpp">
       <Filter>cu\layers</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\..\src\caffe\layers\focal_loss_layer.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

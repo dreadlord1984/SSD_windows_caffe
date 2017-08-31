@@ -41,10 +41,10 @@ void FocalLossLayer<Dtype>::LayerSetUp(
 
   // focal loss parameter
   FocalLossParameter focal_loss_param = this->layer_param_.focal_loss_param();
-  alpha_ = focal_loss_param.alpha();
-  beta_  = focal_loss_param.beta();
-  gamma_ = focal_loss_param.gamma();
-  type_  = focal_loss_param.type();
+  alpha_ = focal_loss_param.alpha(); // д╛хо0.25
+  beta_  = focal_loss_param.beta(); // д╛хо1.0
+  gamma_ = focal_loss_param.gamma(); // д╛хо2.0
+  type_  = focal_loss_param.type(); // type 0
   LOG(INFO) << "alpha: " << alpha_;
   LOG(INFO) << "beta: "  << beta_;
   LOG(INFO) << "gamma: " << gamma_;

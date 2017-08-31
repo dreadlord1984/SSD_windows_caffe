@@ -95,7 +95,7 @@ void FocalLossLayer<Dtype>::Forward_gpu(
   // Similarly, this memory is never used elsewhere, and thus we can use it
   // to avoid having to allocate additional GPU memory.
   Dtype* counts = prob_.mutable_gpu_diff();
-
+  /*std::cout << "NNNNNNNNNNNNNNNNNNNNNN" << std::endl;*/
   // NOLINT_NEXT_LINE(whitespace/operators)
   FocalLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
       CAFFE_CUDA_NUM_THREADS>>>(nthreads, log_prob_data, power_prob_data, 

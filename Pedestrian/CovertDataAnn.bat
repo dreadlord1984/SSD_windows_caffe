@@ -14,7 +14,7 @@ REM the directory which includes the convert_annoset.exe
 set BINDIR=E:\caffe-master_\Build\x64\Release
 
 REM The directory to store the link of the database files
-set OUTDIR=E:/caffe-master_/Pedestrian/Data_0731
+set OUTDIR=E:/caffe-master_/Pedestrian/testFL
 
 REM resize the image to specified dimension. 
 set RESIZE_HEIGHT=256		REM 0 - keep unchanged
@@ -33,7 +33,7 @@ set ANNOTYPE="detection"
 
 set	TRAINVAL="train"
 set VAL="val"
-set SHUFFLE=true
+set SHUFFLE=false
 set GRAY=false
 set CHECK_SIZE=false
 set CHECK_LABEL=true

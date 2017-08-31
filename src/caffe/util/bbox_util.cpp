@@ -1665,6 +1665,9 @@ namespace caffe {
 						case MultiBoxLossParameter_ConfLossType_LOGISTIC:
 							conf_gt_data[idx * num_classes + gt_label] = 1;
 							break;
+						case MultiBoxLossParameter_ConfLossType_FocalLoss:
+							conf_gt_data[idx] = gt_label;
+							break;
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";
 						}
@@ -1693,6 +1696,9 @@ namespace caffe {
 								background_label_id < num_classes) {
 								conf_gt_data[count * num_classes + background_label_id] = 1;
 							}
+							break;
+						case MultiBoxLossParameter_ConfLossType_FocalLoss:
+							conf_gt_data[count] = background_label_id;
 							break;
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";

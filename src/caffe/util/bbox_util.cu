@@ -613,6 +613,7 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
     SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
         prob_gpu_data);
     conf_gpu_data = prob_blob.gpu_data();
+	/*std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;*/
   }
   // Compute the loss.
   Blob<Dtype> conf_loss_blob(num, num_preds_per_class, 1, 1);
@@ -623,13 +624,18 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
     CAFFE_CUDA_NUM_THREADS>>>(num_threads, conf_gpu_data, num_preds_per_class,
         num_classes, loss_type, match_blob.gpu_data(), conf_loss_gpu_data);
   // Save the loss.
+  /*std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;*/
   all_conf_loss->clear();
   const Dtype* loss_data = conf_loss_blob.cpu_data();
+  //for (int i = 0; i < 10; ++i) {
+	 // std::cout << loss_data[i] << std::endl;
+  //}
   for (int i = 0; i < num; ++i) {
     vector<float> conf_loss(loss_data, loss_data + num_preds_per_class);
     all_conf_loss->push_back(conf_loss);
     loss_data += num_preds_per_class;
   }
+
 }
 
 // Explicit initialization.
