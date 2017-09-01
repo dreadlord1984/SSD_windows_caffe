@@ -67,7 +67,12 @@ Makefile.config
 *.binaryproto
 *leveldb
 *lmdb
-
+#pridict_save/*
+*.txt
+Data_0810
+*.log
+*.train
+*.test
 # build, distribute, and bins (+ python proto bindings)
 build
 .build_debug/*
