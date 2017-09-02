@@ -1906,11 +1906,15 @@ layer {
   propagate_down: false
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: NONE # FULL VALID BATCH_SIZE NONE
   }
   multibox_loss_param {
     loc_loss_type: SMOOTH_L1
-    conf_loss_type: FocalLoss #SOFTMAX LOGISTIC FocalLoss
+    conf_loss_type: SOFTMAX #SOFTMAX LOGISTIC FocalLoss 
+    
+    fl_alpha: 1.0
+    fl_gamma:  0.0
+    
     loc_weight: 0.0
     num_classes: 2
     share_location: true

@@ -124,7 +124,7 @@ template <typename Dtype>
 void FocalLossLayer<Dtype>::compute_intermediate_values_of_cpu() {
   // compute the corresponding variables
   const int count        = prob_.count();
-  const Dtype* prob_data = prob_.cpu_data();
+  const Dtype* prob_data = prob_.cpu_data();// [pre_num, 2],0/1类概率之和为1
   const Dtype* ones_data = ones_.cpu_data();
   Dtype* log_prob_data   = log_prob_.mutable_cpu_data();
   Dtype* power_prob_data = power_prob_.mutable_cpu_data();
@@ -132,6 +132,11 @@ void FocalLossLayer<Dtype>::compute_intermediate_values_of_cpu() {
   /// log(p_t)
   const Dtype eps        = Dtype(FLT_MIN); // where FLT_MIN = 1.17549e-38, here u can change it
   // more stable
+  ///////////////////////////////////////////////////////////////////////////
+  /*for (int i = 0; i < 10; i++) {
+	  std::cout << prob_data[i] << " " << prob_data[i + 1] << std::endl;
+	  }*/
+  ///////////////////////////////////////////////////////////////////////////
   for(int i = 0; i < prob_.count(); i++) {
     log_prob_data[i] = log(std::max(prob_data[i], eps));
   }
