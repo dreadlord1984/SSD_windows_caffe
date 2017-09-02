@@ -35,7 +35,7 @@ void FocalLossLayer<Dtype>::compute_intermediate_values_of_gpu() {
       CAFFE_CUDA_NUM_THREADS>>>(nthreads, prob_data, log_prob_data, eps);
   /// caffe_gpu_log(count,  prob_data, log_prob_data);
 
-  /// (1 - p_t) ^ gamma
+  /// alpha *(1 - p_t) ^ gamma
   caffe_gpu_sub(count,  ones_data, prob_data, power_prob_data);
   caffe_gpu_powx(count, power_prob_.gpu_data(), gamma_, power_prob_data);
   caffe_gpu_scal(count, alpha_, power_prob_data);
@@ -95,7 +95,7 @@ void FocalLossLayer<Dtype>::Forward_gpu(
   // Similarly, this memory is never used elsewhere, and thus we can use it
   // to avoid having to allocate additional GPU memory.
   Dtype* counts = prob_.mutable_gpu_diff();
-  /*std::cout << "NNNNNNNNNNNNNNNNNNNNNN" << std::endl;*/
+  std::cout << "NNNNNNNNNNNNNNNNNNNNNN" << std::endl;
   // NOLINT_NEXT_LINE(whitespace/operators)
   FocalLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
       CAFFE_CUDA_NUM_THREADS>>>(nthreads, log_prob_data, power_prob_data, 

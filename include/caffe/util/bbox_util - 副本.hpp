@@ -499,16 +499,14 @@ template <typename Dtype>
 void GetDetectionsGPU(const Dtype* bbox_data, const Dtype* conf_data,
           const int image_id, const int label, const vector<int>& indices,
           const bool clip_bbox, Blob<Dtype>* detection_blob);
-/*****************************************************************************/
+
 template <typename Dtype>
   void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
       const int num_preds_per_class, const int num_classes,
       const int background_label_id, const ConfLossType loss_type,
       const vector<map<int, vector<int> > >& all_match_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      vector<vector<float> >* all_conf_loss,
-	  const float fl_alpha, const float fl_gamma, const float fl_beta);
-/*****************************************************************************/
+      vector<vector<float> >* all_conf_loss);
 #endif  // !CPU_ONLY
 
 #ifdef USE_OPENCV
