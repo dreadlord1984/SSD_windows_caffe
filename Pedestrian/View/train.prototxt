@@ -29,7 +29,7 @@ layer {
   }
   data_param {
     source: "E:/caffe-master_/Pedestrian/testFL/train_lmdb"
-    batch_size: 6
+    batch_size: 1
     backend: LMDB
   }
   annotated_data_param {
@@ -1991,7 +1991,7 @@ layer {
   propagate_down: false
   propagate_down: false
   loss_param {
-    normalization: NONE
+    normalization: VALID
   }
   multibox_loss_param {
     loc_loss_type: SMOOTH_L1

@@ -910,11 +910,6 @@ namespace caffe {
 		const bool use_prior_for_nms = multibox_loss_param.use_prior_for_nms();
 		const ConfLossType conf_loss_type = multibox_loss_param.conf_loss_type();
 		const MiningType mining_type = multibox_loss_param.mining_type();
-		/*****************************************************************************/
-		const float fl_alpha = multibox_loss_param.fl_alpha();
-		const float fl_gamma = multibox_loss_param.fl_gamma();
-		const float fl_beta = multibox_loss_param.fl_beta();
-		/*****************************************************************************/
 		if (mining_type == MultiBoxLossParameter_MiningType_NONE) {
 			return;
 		}
@@ -939,11 +934,9 @@ namespace caffe {
 			background_label_id, conf_loss_type, *all_match_indices, all_gt_bboxes,
 			&all_conf_loss);
 #else
-		/*****************************************************************************/
 		ComputeConfLossGPU(conf_blob, num, num_priors, num_classes,
 			background_label_id, conf_loss_type, *all_match_indices, all_gt_bboxes,
-			&all_conf_loss, fl_alpha, fl_gamma, fl_beta);
-		/*****************************************************************************/
+			&all_conf_loss);
 #endif
 		vector<vector<float> > all_loc_loss;
 		if (mining_type == MultiBoxLossParameter_MiningType_HARD_EXAMPLE) {
@@ -1571,7 +1564,6 @@ namespace caffe {
 					}
 					Dtype sum = 0.;
 					for (int c = 0; c < num_classes; ++c) {
-						/*std::cout << conf_data[start_idx + c] << std::endl;*/
 						sum += std::exp(conf_data[start_idx + c] - maxval);
 					}
 					Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
@@ -1673,11 +1665,9 @@ namespace caffe {
 						case MultiBoxLossParameter_ConfLossType_LOGISTIC:
 							conf_gt_data[idx * num_classes + gt_label] = 1;
 							break;
-						/*****************************************************************************/
 						case MultiBoxLossParameter_ConfLossType_FocalLoss:
 							conf_gt_data[idx] = gt_label;
 							break;
-						/*****************************************************************************/
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";
 						}
@@ -1707,11 +1697,9 @@ namespace caffe {
 								conf_gt_data[count * num_classes + background_label_id] = 1;
 							}
 							break;
-						/*****************************************************************************/
 						case MultiBoxLossParameter_ConfLossType_FocalLoss:
 							conf_gt_data[count] = background_label_id;
 							break;
-						/*****************************************************************************/
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";
 						}

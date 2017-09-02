@@ -56,6 +56,7 @@ class NetState;
 class NetStateRule;
 class ParamSpec;
 class LayerParameter;
+class FocalLossParameter;
 class TransformationParameter;
 class ResizeParameter;
 class SaltPepperParameter;
@@ -240,8 +241,8 @@ inline bool SolverParameter_SolverType_Parse(
     SolverParameter_SolverType_descriptor(), name, value);
 }
 enum ParamSpec_DimCheckMode {
-  _ParamSpec_DimCheckMode_STRICT = 0,
-  _ParamSpec_DimCheckMode_PERMISSIVE = 1
+	_ParamSpec_DimCheckMode_STRICT = 0,
+	_ParamSpec_DimCheckMode_PERMISSIVE = 1
 };
 bool ParamSpec_DimCheckMode_IsValid(int value);
 const ParamSpec_DimCheckMode ParamSpec_DimCheckMode_DimCheckMode_MIN = _ParamSpec_DimCheckMode_STRICT;
@@ -257,6 +258,25 @@ inline bool ParamSpec_DimCheckMode_Parse(
     const ::std::string& name, ParamSpec_DimCheckMode* value) {
   return ::google::protobuf::internal::ParseNamedEnum<ParamSpec_DimCheckMode>(
     ParamSpec_DimCheckMode_descriptor(), name, value);
+}
+enum FocalLossParameter_Type {
+  FocalLossParameter_Type_ORIGIN = 0,
+  FocalLossParameter_Type_LINEAR = 1
+};
+bool FocalLossParameter_Type_IsValid(int value);
+const FocalLossParameter_Type FocalLossParameter_Type_Type_MIN = FocalLossParameter_Type_ORIGIN;
+const FocalLossParameter_Type FocalLossParameter_Type_Type_MAX = FocalLossParameter_Type_LINEAR;
+const int FocalLossParameter_Type_Type_ARRAYSIZE = FocalLossParameter_Type_Type_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* FocalLossParameter_Type_descriptor();
+inline const ::std::string& FocalLossParameter_Type_Name(FocalLossParameter_Type value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    FocalLossParameter_Type_descriptor(), value);
+}
+inline bool FocalLossParameter_Type_Parse(
+    const ::std::string& name, FocalLossParameter_Type* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<FocalLossParameter_Type>(
+    FocalLossParameter_Type_descriptor(), name, value);
 }
 enum ResizeParameter_Resize_mode {
   ResizeParameter_Resize_mode_WARP = 1,
@@ -813,8 +833,8 @@ inline bool V1LayerParameter_LayerType_Parse(
     V1LayerParameter_LayerType_descriptor(), name, value);
 }
 enum V1LayerParameter_DimCheckMode {
-  _V1LayerParameter_DimCheckMode_STRICT = 0,
-  _V1LayerParameter_DimCheckMode_PERMISSIVE = 1
+	_V1LayerParameter_DimCheckMode_STRICT = 0,
+	_V1LayerParameter_DimCheckMode_PERMISSIVE = 1
 };
 bool V1LayerParameter_DimCheckMode_IsValid(int value);
 const V1LayerParameter_DimCheckMode V1LayerParameter_DimCheckMode_DimCheckMode_MIN = _V1LayerParameter_DimCheckMode_STRICT;
@@ -4704,6 +4724,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::WindowDataParameter* release_window_data_param();
   inline void set_allocated_window_data_param(::caffe::WindowDataParameter* window_data_param);
 
+  // optional .caffe.FocalLossParameter focal_loss_param = 10632;
+  inline bool has_focal_loss_param() const;
+  inline void clear_focal_loss_param();
+  static const int kFocalLossParamFieldNumber = 10632;
+  inline const ::caffe::FocalLossParameter& focal_loss_param() const;
+  inline ::caffe::FocalLossParameter* mutable_focal_loss_param();
+  inline ::caffe::FocalLossParameter* release_focal_loss_param();
+  inline void set_allocated_focal_loss_param(::caffe::FocalLossParameter* focal_loss_param);
+
   // @@protoc_insertion_point(class_scope:caffe.LayerParameter)
  private:
   inline void set_has_name();
@@ -4822,6 +4851,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_video_data_param();
   inline void set_has_window_data_param();
   inline void clear_has_window_data_param();
+  inline void set_has_focal_loss_param();
+  inline void clear_has_focal_loss_param();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -4892,6 +4923,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::TileParameter* tile_param_;
   ::caffe::VideoDataParameter* video_data_param_;
   ::caffe::WindowDataParameter* window_data_param_;
+  ::caffe::FocalLossParameter* focal_loss_param_;
   int phase_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
@@ -4899,6 +4931,139 @@ class LayerParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static LayerParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class FocalLossParameter : public ::google::protobuf::Message {
+ public:
+  FocalLossParameter();
+  virtual ~FocalLossParameter();
+
+  FocalLossParameter(const FocalLossParameter& from);
+
+  inline FocalLossParameter& operator=(const FocalLossParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const FocalLossParameter& default_instance();
+
+  void Swap(FocalLossParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  FocalLossParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const FocalLossParameter& from);
+  void MergeFrom(const FocalLossParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  typedef FocalLossParameter_Type Type;
+  static const Type ORIGIN = FocalLossParameter_Type_ORIGIN;
+  static const Type LINEAR = FocalLossParameter_Type_LINEAR;
+  static inline bool Type_IsValid(int value) {
+    return FocalLossParameter_Type_IsValid(value);
+  }
+  static const Type Type_MIN =
+    FocalLossParameter_Type_Type_MIN;
+  static const Type Type_MAX =
+    FocalLossParameter_Type_Type_MAX;
+  static const int Type_ARRAYSIZE =
+    FocalLossParameter_Type_Type_ARRAYSIZE;
+  static inline const ::google::protobuf::EnumDescriptor*
+  Type_descriptor() {
+    return FocalLossParameter_Type_descriptor();
+  }
+  static inline const ::std::string& Type_Name(Type value) {
+    return FocalLossParameter_Type_Name(value);
+  }
+  static inline bool Type_Parse(const ::std::string& name,
+      Type* value) {
+    return FocalLossParameter_Type_Parse(name, value);
+  }
+
+  // accessors -------------------------------------------------------
+
+  // optional .caffe.FocalLossParameter.Type type = 1 [default = ORIGIN];
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 1;
+  inline ::caffe::FocalLossParameter_Type type() const;
+  inline void set_type(::caffe::FocalLossParameter_Type value);
+
+  // optional float gamma = 2 [default = 2];
+  inline bool has_gamma() const;
+  inline void clear_gamma();
+  static const int kGammaFieldNumber = 2;
+  inline float gamma() const;
+  inline void set_gamma(float value);
+
+  // optional float alpha = 3 [default = 0.25];
+  inline bool has_alpha() const;
+  inline void clear_alpha();
+  static const int kAlphaFieldNumber = 3;
+  inline float alpha() const;
+  inline void set_alpha(float value);
+
+  // optional float beta = 4 [default = 1];
+  inline bool has_beta() const;
+  inline void clear_beta();
+  static const int kBetaFieldNumber = 4;
+  inline float beta() const;
+  inline void set_beta(float value);
+
+  // @@protoc_insertion_point(class_scope:caffe.FocalLossParameter)
+ private:
+  inline void set_has_type();
+  inline void clear_has_type();
+  inline void set_has_gamma();
+  inline void clear_has_gamma();
+  inline void set_has_alpha();
+  inline void clear_has_alpha();
+  inline void set_has_beta();
+  inline void clear_has_beta();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  int type_;
+  float gamma_;
+  float alpha_;
+  float beta_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static FocalLossParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -21500,6 +21665,148 @@ inline void LayerParameter::set_allocated_window_data_param(::caffe::WindowDataP
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.window_data_param)
 }
 
+// optional .caffe.FocalLossParameter focal_loss_param = 10632;
+inline bool LayerParameter::has_focal_loss_param() const {
+  return (_has_bits_[2] & 0x00000004u) != 0;
+}
+inline void LayerParameter::set_has_focal_loss_param() {
+  _has_bits_[2] |= 0x00000004u;
+}
+inline void LayerParameter::clear_has_focal_loss_param() {
+  _has_bits_[2] &= ~0x00000004u;
+}
+inline void LayerParameter::clear_focal_loss_param() {
+  if (focal_loss_param_ != NULL) focal_loss_param_->::caffe::FocalLossParameter::Clear();
+  clear_has_focal_loss_param();
+}
+inline const ::caffe::FocalLossParameter& LayerParameter::focal_loss_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.focal_loss_param)
+  return focal_loss_param_ != NULL ? *focal_loss_param_ : *default_instance_->focal_loss_param_;
+}
+inline ::caffe::FocalLossParameter* LayerParameter::mutable_focal_loss_param() {
+  set_has_focal_loss_param();
+  if (focal_loss_param_ == NULL) focal_loss_param_ = new ::caffe::FocalLossParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.focal_loss_param)
+  return focal_loss_param_;
+}
+inline ::caffe::FocalLossParameter* LayerParameter::release_focal_loss_param() {
+  clear_has_focal_loss_param();
+  ::caffe::FocalLossParameter* temp = focal_loss_param_;
+  focal_loss_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_focal_loss_param(::caffe::FocalLossParameter* focal_loss_param) {
+  delete focal_loss_param_;
+  focal_loss_param_ = focal_loss_param;
+  if (focal_loss_param) {
+    set_has_focal_loss_param();
+  } else {
+    clear_has_focal_loss_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.focal_loss_param)
+}
+
+// -------------------------------------------------------------------
+
+// FocalLossParameter
+
+// optional .caffe.FocalLossParameter.Type type = 1 [default = ORIGIN];
+inline bool FocalLossParameter::has_type() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void FocalLossParameter::set_has_type() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void FocalLossParameter::clear_has_type() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void FocalLossParameter::clear_type() {
+  type_ = 0;
+  clear_has_type();
+}
+inline ::caffe::FocalLossParameter_Type FocalLossParameter::type() const {
+  // @@protoc_insertion_point(field_get:caffe.FocalLossParameter.type)
+  return static_cast< ::caffe::FocalLossParameter_Type >(type_);
+}
+inline void FocalLossParameter::set_type(::caffe::FocalLossParameter_Type value) {
+  assert(::caffe::FocalLossParameter_Type_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:caffe.FocalLossParameter.type)
+}
+
+// optional float gamma = 2 [default = 2];
+inline bool FocalLossParameter::has_gamma() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void FocalLossParameter::set_has_gamma() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void FocalLossParameter::clear_has_gamma() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void FocalLossParameter::clear_gamma() {
+  gamma_ = 2;
+  clear_has_gamma();
+}
+inline float FocalLossParameter::gamma() const {
+  // @@protoc_insertion_point(field_get:caffe.FocalLossParameter.gamma)
+  return gamma_;
+}
+inline void FocalLossParameter::set_gamma(float value) {
+  set_has_gamma();
+  gamma_ = value;
+  // @@protoc_insertion_point(field_set:caffe.FocalLossParameter.gamma)
+}
+
+// optional float alpha = 3 [default = 0.25];
+inline bool FocalLossParameter::has_alpha() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void FocalLossParameter::set_has_alpha() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void FocalLossParameter::clear_has_alpha() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void FocalLossParameter::clear_alpha() {
+  alpha_ = 0.25f;
+  clear_has_alpha();
+}
+inline float FocalLossParameter::alpha() const {
+  // @@protoc_insertion_point(field_get:caffe.FocalLossParameter.alpha)
+  return alpha_;
+}
+inline void FocalLossParameter::set_alpha(float value) {
+  set_has_alpha();
+  alpha_ = value;
+  // @@protoc_insertion_point(field_set:caffe.FocalLossParameter.alpha)
+}
+
+// optional float beta = 4 [default = 1];
+inline bool FocalLossParameter::has_beta() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void FocalLossParameter::set_has_beta() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void FocalLossParameter::clear_has_beta() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void FocalLossParameter::clear_beta() {
+  beta_ = 1;
+  clear_has_beta();
+}
+inline float FocalLossParameter::beta() const {
+  // @@protoc_insertion_point(field_get:caffe.FocalLossParameter.beta)
+  return beta_;
+}
+inline void FocalLossParameter::set_beta(float value) {
+  set_has_beta();
+  beta_ = value;
+  // @@protoc_insertion_point(field_set:caffe.FocalLossParameter.beta)
+}
+
 // -------------------------------------------------------------------
 
 // TransformationParameter
@@ -33973,6 +34280,11 @@ template <> struct is_proto_enum< ::caffe::ParamSpec_DimCheckMode> : ::google::p
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
+}
+template <> struct is_proto_enum< ::caffe::FocalLossParameter_Type> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::caffe::FocalLossParameter_Type>() {
+  return ::caffe::FocalLossParameter_Type_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::ResizeParameter_Resize_mode> : ::google::protobuf::internal::true_type {};
 template <>

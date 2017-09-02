@@ -537,13 +537,11 @@ template void GetDetectionsGPU(const double* bbox_data, const double* conf_data,
           const int image_id, const int label, const vector<int>& indices,
           const bool clip_bbox, Blob<double>* detection_blob);
 
-/*****************************************************************************/
 template <typename Dtype>
 __global__ void ComputeConfLossKernel(const int nthreads,
     const Dtype* conf_data, const int num_preds_per_class,
     const int num_classes, const ConfLossType loss_type,
-    const Dtype* match_data, Dtype* conf_loss_data,
-	const Dtype fl_alpha, const Dtype fl_gamma, const Dtype fl_beta) {
+    const Dtype* match_data, Dtype* conf_loss_data) {
   CUDA_KERNEL_LOOP(index, nthreads) {
     int label = match_data[index];
     int num = index / num_preds_per_class;
@@ -566,21 +564,10 @@ __global__ void ComputeConfLossKernel(const int nthreads,
         loss -= input * (target - (input >= 0)) -
           log(1 + exp(input - 2 * input * (input >= 0)));
       }
-	}
-	/*****************************************************************************/
-	else if (loss_type == MultiBoxLossParameter_ConfLossType_FocalLoss) {
-		// Compute Focal probability.
-		Dtype prob = conf_data[start_idx + label];
-
-		Dtype power_prob = fl_alpha * pow((1 - prob), fl_gamma);
-
-		loss = - power_prob * log(Max(prob, Dtype(FLT_MIN)));
-	}
-	/*****************************************************************************/
+    }
     conf_loss_data[index] = loss;
   }
 }
-/*****************************************************************************/
 
 template <typename Dtype>
 void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
@@ -588,8 +575,7 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
       const int background_label_id, const ConfLossType loss_type,
       const vector<map<int, vector<int> > >& all_match_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      vector<vector<float> >* all_conf_loss,
-	  const float fl_alpha, const float fl_gamma, const float fl_weight) {
+      vector<vector<float> >* all_conf_loss) {
   CHECK_LT(background_label_id, num_classes);
   Blob<Dtype> match_blob(num, num_preds_per_class, 1, 1);
   Dtype* match_data = match_blob.mutable_cpu_data();
@@ -622,31 +608,28 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
   const Dtype* conf_gpu_data = conf_blob.gpu_data();
   Blob<Dtype> prob_blob;
   prob_blob.ReshapeLike(conf_blob);
-  if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX || loss_type == MultiBoxLossParameter_ConfLossType_FocalLoss){
+  if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
     Dtype* prob_gpu_data = prob_blob.mutable_gpu_data();
     SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
         prob_gpu_data);
     conf_gpu_data = prob_blob.gpu_data();
-	std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;
+	/*std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;*/
   }
   // Compute the loss.
   Blob<Dtype> conf_loss_blob(num, num_preds_per_class, 1, 1);
   Dtype* conf_loss_gpu_data = conf_loss_blob.mutable_gpu_data();
   const int num_threads = num * num_preds_per_class;
   // NOLINT_NEXT_LINE(whitespace/operators)
-  /*****************************************************************************/
   ComputeConfLossKernel<Dtype><<<CAFFE_GET_BLOCKS(num_threads),
     CAFFE_CUDA_NUM_THREADS>>>(num_threads, conf_gpu_data, num_preds_per_class,
-        num_classes, loss_type, match_blob.gpu_data(), conf_loss_gpu_data,
-		fl_alpha, fl_gamma, fl_weight);
-  /*****************************************************************************/
+        num_classes, loss_type, match_blob.gpu_data(), conf_loss_gpu_data);
   // Save the loss.
-  std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;
+  /*std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;*/
   all_conf_loss->clear();
   const Dtype* loss_data = conf_loss_blob.cpu_data();
-  for (int i = 0; i < 10; ++i) {
-	  std::cout << loss_data[i] << std::endl;
-  }
+  //for (int i = 0; i < 10; ++i) {
+	 // std::cout << loss_data[i] << std::endl;
+  //}
   for (int i = 0; i < num; ++i) {
     vector<float> conf_loss(loss_data, loss_data + num_preds_per_class);
     all_conf_loss->push_back(conf_loss);
@@ -654,21 +637,19 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
   }
 
 }
-/*****************************************************************************/
+
 // Explicit initialization.
 template void ComputeConfLossGPU(const Blob<float>& conf_data, const int num,
       const int num_preds_per_class, const int num_classes,
       const int background_label_id, const ConfLossType loss_type,
       const vector<map<int, vector<int> > >& all_match_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      vector<vector<float> >* all_conf_loss,
-	  const float fl_alpha, const float fl_gamma, const float fl_beta);
+      vector<vector<float> >* all_conf_loss);
 template void ComputeConfLossGPU(const Blob<double>& conf_data, const int num,
       const int num_preds_per_class, const int num_classes,
       const int background_label_id, const ConfLossType loss_type,
       const vector<map<int, vector<int> > >& all_match_indices,
       const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-      vector<vector<float> >* all_conf_loss,
-	  const float fl_alpha, const float fl_gamma, const float fl_beta);
-/*****************************************************************************/
+      vector<vector<float> >* all_conf_loss);
+
 }  // namespace caffe
