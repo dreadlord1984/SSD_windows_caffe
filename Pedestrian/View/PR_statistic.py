@@ -71,7 +71,7 @@ def computIOU(A, B):
     return iou
 
 model_def = 'deploy.prototxt' # 检测网络
-model_weights = 'snapshot_iter_120000.caffemodel' # 训练好的模型
+model_weights = '../View/COMPARE/MAX_NEGATIVE_A75G20/MAX_NEGATIVE_A75G20_iter_150000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 待测试样本集所在根目录
 imgList = "../Data_0825/val.txt" # 样本列表
 
@@ -134,9 +134,6 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     # plt.imshow(image)
     # currentAxis = plt.gca()
 
-    TP = 0 # 正检
-    FP = 0 # 误检
-    FN = 0 # 漏检
     # detectBoxes = []
     output.write('\t')
     output.write(str(top_conf.shape[0]))

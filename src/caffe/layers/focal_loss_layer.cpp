@@ -142,10 +142,10 @@ void FocalLossLayer<Dtype>::compute_intermediate_values_of_cpu() {
   }
   /// caffe_log(count,  prob_data, log_prob_data);
 
-  /// alpha* (1 - p_t) ^ gamma
+  /// (1 - p_t) ^ gamma
   caffe_sub(count,  ones_data, prob_data, power_prob_data);
   caffe_powx(count, power_prob_.cpu_data(), gamma_, power_prob_data);
-  caffe_scal(count, alpha_, power_prob_data);
+  //caffe_scal(count, alpha_, power_prob_data);
 }
 
 template <typename Dtype>
@@ -175,16 +175,29 @@ void FocalLossLayer<Dtype>::Forward_cpu(
       }
       DCHECK_GE(label_value, 0);
       DCHECK_LT(label_value, channels);
-      const int index = i * dim + label_value * inner_num_ + j;
-      // FL(p_t) = -(1 - p_t) ^ gamma * log(p_t)
-      // loss -= std::max(power_prob_data[index] * log_prob_data[index],
-      //                      Dtype(log(Dtype(FLT_MIN))));
-      loss -= power_prob_data[index] * log_prob_data[index];
+      const int index = i * dim + label_value * inner_num_ + j;// 奇数是正样本、偶数是负样本序号
+
+	  /*****************************************************************************/
+      // FL(p_t) = -2*alpha_t*(1 - p_t) ^ gamma * log(p_t)
+	  if (label_value == 0)
+	  {
+		  loss -= 2*(1-alpha_) * power_prob_data[index] * log_prob_data[index];
+	  } 
+	  else
+	  {
+		  loss -= 2*alpha_ * power_prob_data[index] * log_prob_data[index];
+	  }
+	  /*****************************************************************************/
+
+	  // loss -= std::max(power_prob_data[index] * log_prob_data[index],Dtype(log(Dtype(FLT_MIN))));
+      //loss -= power_prob_data[index] * log_prob_data[index];
       ++count;
     }
   }
 
+
   // prob
+
   top[0]->mutable_cpu_data()[0] = loss / get_normalizer(normalization_, count);
   if (top.size() == 2) {
     top[1]->ShareData(prob_);

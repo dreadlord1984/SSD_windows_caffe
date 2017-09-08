@@ -569,12 +569,24 @@ __global__ void ComputeConfLossKernel(const int nthreads,
 	}
 	/*****************************************************************************/
 	else if (loss_type == MultiBoxLossParameter_ConfLossType_FocalLoss) {
-		// Compute Focal probability.
+		// Compute softmax probability.
 		Dtype prob = conf_data[start_idx + label];
+		loss = -log(Max(prob, Dtype(FLT_MIN)));
 
-		Dtype power_prob = fl_alpha * pow((1 - prob), fl_gamma);
+		// Compute Focal probability.
+		//FL(p_t) = -2*alpha_t*(1 - p_t) ^ gamma * log(p_t)
+		/*Dtype prob = conf_data[start_idx + label];
 
-		loss = - power_prob * log(Max(prob, Dtype(FLT_MIN)));
+		Dtype power_prob =  pow((1 - prob), fl_gamma);
+		if (label == 0)
+		{
+			loss = -2 * (1-fl_alpha) * power_prob * log(Max(prob, Dtype(FLT_MIN)));
+		}
+		else
+		{
+			loss = -2 * fl_alpha * power_prob * log(Max(prob, Dtype(FLT_MIN)));
+		}*/
+
 	}
 	/*****************************************************************************/
     conf_loss_data[index] = loss;
@@ -627,7 +639,7 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
     SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
         prob_gpu_data);
     conf_gpu_data = prob_blob.gpu_data();
-	std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;
+	/*std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;*/
   }
   // Compute the loss.
   Blob<Dtype> conf_loss_blob(num, num_preds_per_class, 1, 1);
@@ -641,12 +653,12 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
 		fl_alpha, fl_gamma, fl_weight);
   /*****************************************************************************/
   // Save the loss.
-  std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;
+  /*std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;*/
   all_conf_loss->clear();
   const Dtype* loss_data = conf_loss_blob.cpu_data();
-  for (int i = 0; i < 10; ++i) {
+ /* for (int i = 0; i < 10; ++i) {
 	  std::cout << loss_data[i] << std::endl;
-  }
+  }*/
   for (int i = 0; i < num; ++i) {
     vector<float> conf_loss(loss_data, loss_data + num_preds_per_class);
     all_conf_loss->push_back(conf_loss);

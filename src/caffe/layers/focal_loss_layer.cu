@@ -38,7 +38,7 @@ void FocalLossLayer<Dtype>::compute_intermediate_values_of_gpu() {
   /// alpha *(1 - p_t) ^ gamma
   caffe_gpu_sub(count,  ones_data, prob_data, power_prob_data);
   caffe_gpu_powx(count, power_prob_.gpu_data(), gamma_, power_prob_data);
-  caffe_gpu_scal(count, alpha_, power_prob_data);
+  //caffe_gpu_scal(count, alpha_, power_prob_data);
 }
 
 template <typename Dtype>
@@ -52,7 +52,8 @@ __global__ void FocalLossForwardGPU(const int nthreads,
           const int spatial_dim,
           const bool has_ignore_label_, 
           const int ignore_label_,
-          Dtype* counts) 
+          Dtype* counts,
+		  Dtype alpha)
 {
   CUDA_KERNEL_LOOP(index, nthreads) {
     const int n = index / spatial_dim;
@@ -62,9 +63,22 @@ __global__ void FocalLossForwardGPU(const int nthreads,
       loss[index]   = 0;
       counts[index] = 0;
     } else {
-      int ind       = n * dim + label_value * spatial_dim + s;
-      // loss[index]   = -max(power_prob_data[ind] * log_prob_data[ind], Dtype(log(Dtype(FLT_MIN))));
-      loss[index]   = -power_prob_data[ind] * log_prob_data[ind];
+      int ind       = n * dim + label_value * spatial_dim + s; // 奇数是正样本、偶数是负样本序号
+
+	  // FL(p_t) = -2*alpha_t*(1 - p_t) ^ gamma * log(p_t)
+	  /*****************************************************************************/
+	  if (label_value == 0)
+	  {
+		  loss[index] = -2 * (1 - alpha) * power_prob_data[ind] * log_prob_data[ind];
+	  }
+	  else
+	  {
+		  loss[index] = -2 * alpha * power_prob_data[ind] * log_prob_data[ind];
+	  }
+	  /*****************************************************************************/
+
+	  // loss[index]   = -max(power_prob_data[ind] * log_prob_data[ind], Dtype(log(Dtype(FLT_MIN))));
+      //loss[index]   = -power_prob_data[ind] * log_prob_data[ind];
       counts[index] = 1;
     }
   }
@@ -95,11 +109,14 @@ void FocalLossLayer<Dtype>::Forward_gpu(
   // Similarly, this memory is never used elsewhere, and thus we can use it
   // to avoid having to allocate additional GPU memory.
   Dtype* counts = prob_.mutable_gpu_diff();
-  std::cout << "NNNNNNNNNNNNNNNNNNNNNN" << std::endl;
+  /*std::cout << "NNNNNNNNNN" << alpha_ << "NNNNNNNNNNNN" << std::endl;*/
   // NOLINT_NEXT_LINE(whitespace/operators)
+
+  /*****************************************************************************/
   FocalLossForwardGPU<Dtype><<<CAFFE_GET_BLOCKS(nthreads),
       CAFFE_CUDA_NUM_THREADS>>>(nthreads, log_prob_data, power_prob_data, 
-      label, loss_data,outer_num_, dim, inner_num_, has_ignore_label_, ignore_label_, counts);
+	  label, loss_data, outer_num_, dim, inner_num_, has_ignore_label_, ignore_label_, counts, alpha_);
+  /*****************************************************************************/
 
   Dtype loss;
   caffe_gpu_asum(nthreads, loss_data, &loss);
@@ -107,6 +124,7 @@ void FocalLossLayer<Dtype>::Forward_gpu(
 
   // Only launch another CUDA kernel if we actually need the count of valid
   // outputs.
+  
   if (normalization_ == LossParameter_NormalizationMode_VALID &&
       has_ignore_label_) {
     caffe_gpu_asum(nthreads, counts, &valid_count);

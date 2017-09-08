@@ -120,8 +120,8 @@ def show_hist(data_mat):
     all_change_group = all_change_group['IOU_change_statistic']
     color = ['k', 'b', 'g', 'r', 'm']
     for i in range(0, len(all_change_group), 1):
-        #plt.subplot(151+i) # 放在一个图片里显示
-        plt.subplots(1)
+        plt.subplot(151+i) # 放在一个图片里显示
+        # plt.subplots(1)
         plt.plot(change_scope, all_change_group[i], lw=2,color=color[i])
         rects = plt.bar(left=change_scope, height=all_change_group[i], color='lightyellow',
                         width=0.05, align="center", yerr=0.000001)
@@ -145,7 +145,7 @@ all_change_group = [[0 for x in range(len(change_scope))] for y in range(len(thr
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本所在根目录
 
 if __name__ == "__main__":
-    save_data("../Data_0810/IOU_ALL_image_List.txt",
-              "../Data_0810/result_ALL_image_List.txt",
-              "../Data_0810/IOU_change_curve.mat")
-    show_hist("../Data_0810/IOU_change_curve.mat")
+    save_data("../Data_0825/IOU_ALL_image_List.txt",
+              "../View/COMPARE/MAX_NEGATIVE_A75G20/result_ALL_image_List.txt",
+              "../View/COMPARE/MAX_NEGATIVE_A75G20/IOU_change_curve.mat")
+    show_hist("../View/COMPARE/MAX_NEGATIVE_A75G20/IOU_change_curve.mat")

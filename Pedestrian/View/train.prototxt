@@ -1991,7 +1991,7 @@ layer {
   propagate_down: false
   propagate_down: false
   loss_param {
-    normalization: NONE
+    normalization: VALID
   }
   multibox_loss_param {
     loc_loss_type: SMOOTH_L1

@@ -170,7 +170,7 @@ def draw_curve(data_mat):
         plt.ylim((0, 1))
         # ax2 = axes[1].twiny()
         # plt.xticks(s_ids, prior_num, rotation=10)
-        plt.savefig('../Data_0810/figure_' + str(pl) + '.png')
+        plt.savefig('../View/COMPARE/MAX_NEGATIVE_A75G20/figure_' + str(pl) + '.png')
         plt.show()
 
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本所在根目录
@@ -193,7 +193,7 @@ s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    # save_data("../Data_0810/IOU_ALL_image_List.txt",
-    #           "../Data_0810/result_ALL_image_List.txt",
-    #           "../Data_0810/object_confidence_IOU_change_curve.mat")
-    draw_curve("../Data_0810/object_confidence_IOU_change_curve.mat")
+    save_data("../Data_0825/IOU_ALL_image_List.txt",
+              "../View/COMPARE/MAX_NEGATIVE_A75G20/result_ALL_image_List.txt",
+              "../View/COMPARE/MAX_NEGATIVE_A75G20/object_confidence_IOU_change_curve.mat")
+    draw_curve("../View/COMPARE/MAX_NEGATIVE_A75G20/object_confidence_IOU_change_curve.mat")

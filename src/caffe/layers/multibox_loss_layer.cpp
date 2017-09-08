@@ -106,11 +106,8 @@ namespace caffe {
 			layer_param.set_type("SoftmaxWithLoss");
 			layer_param.add_loss_weight(Dtype(1.));
 
-			/************************************************************
-			// 可在protxt里设置loss_param{normalization:NONE}
 			layer_param.mutable_loss_param()->set_normalization(
 				LossParameter_NormalizationMode_NONE);
-			**************************************************************/
 
 
 			SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
@@ -146,12 +143,12 @@ namespace caffe {
 			layer_param.set_name(this->layer_param_.name() + "_focal_conf");
 			layer_param.set_type("FocalLoss");
 			layer_param.add_loss_weight(Dtype(1.));
+			layer_param.mutable_loss_param()->set_normalization(
+				LossParameter_NormalizationMode_NONE);
 			FocalLossParameter *focal_loss_param = layer_param.mutable_focal_loss_param();
 			focal_loss_param->set_alpha(multibox_loss_param.fl_alpha());
 			focal_loss_param->set_gamma(multibox_loss_param.fl_gamma());
 			focal_loss_param->set_beta(multibox_loss_param.fl_beta());
-			/*layer_param.mutable_loss_param()->set_normalization(
-				LossParameter_NormalizationMode_NONE);*/
 
 			// Fake reshape.
 			vector<int> conf_shape(1, 1);

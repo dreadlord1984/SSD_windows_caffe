@@ -150,7 +150,6 @@ def plot_chart(chart_type, path_to_png, path_to_log_list):
     plt.ylabel(y_axis_field)  
     plt.savefig(path_to_png)
     plt.grid()
-    plt.show()  
 
 def print_help():
     print """This script mainly serves as the basis of your customizations.
@@ -181,11 +180,11 @@ if __name__ == '__main__':
     if not is_valid_chart_type(chart_type):
         print '%s is not a valid chart type.' % chart_type
         print_help()
-    path_to_png = 'train.png'
+    path_to_png = 'COMPARE/mAP.png'
     if not path_to_png.endswith('.png'):
         print 'Path must ends with png' % path_to_png
         sys.exit()
-    path_to_logs = ["INFO2017-08-30T09-33-45.log"] # log文件
+    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20/MAX_NEGATIVE_A75G20.log"] # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -195,3 +194,27 @@ if __name__ == '__main__':
             print_help()
     ## plot_chart accpets multiple path_to_logs
     plot_chart(chart_type, path_to_png, path_to_logs)
+
+    path_to_logs = ["COMPARE/NONE_A75G20/NONE_A75G20.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(chart_type, path_to_png, path_to_logs)
+
+    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(chart_type, path_to_png, path_to_logs)
+
+    plt.show()

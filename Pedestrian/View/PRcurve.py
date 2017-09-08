@@ -132,7 +132,7 @@ def save_data(testList, resultList, recall_mat):
                             if (computIOU(boxT, result_box[1]) > 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
                                 TP += 1  # 正确检测
                                 break
-                FN = len(true_boxes) - TP
+                FN = len(true_boxes) - TP # 漏检
                 all_change_group[conf_i]['TP'] += TP
                 all_change_group[conf_i]['FP'] += FP
                 all_change_group[conf_i]['FN'] += FN
@@ -141,9 +141,9 @@ def save_data(testList, resultList, recall_mat):
 
 """
 @function:绘制PR曲线
-@param param1: 模型结果数量，模型一结果，模型二结果
+@param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果
 """
-def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0):
+def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0):
     fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
     if recall_num == 1:
         data = scipy.io.loadmat(data_mat_1)
@@ -158,8 +158,8 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0):
                 recall = 0
                 precision = 0
             else:
-                recall = TP / (TP + FP)
-                precision = TP / (TP + FN)
+                recall = TP / (TP + FN)
+                precision = TP / (TP + FP)
             recalls.append(recall)
             precisions.append(precision)
         axes.plot(recalls, precisions, lw=2, color='navy',
@@ -173,11 +173,14 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0):
                 data_name = data_mat_2
             elif curve_i==2:
                 data_name = data_mat_3
+            elif curve_i == 3:
+                data_name = data_mat_4
             data = scipy.io.loadmat(data_name)
             data = data['all_change_group'][0]
             recalls = []
             precisions = []
             for conf_i in range(0, len(conf_thresholds), 1):
+                #conf_i = 2
                 TP = float(data[conf_i]['TP'])
                 FP = float(data[conf_i]['FP'])
                 FN = float(data[conf_i]['FN'])
@@ -185,13 +188,13 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0):
                     recall = 0
                     precision = 0
                 else:
-                    recall = TP / (TP + FP)
-                    precision = TP / (TP + FN)
+                    recall = TP / (TP + FN)
+                    precision = TP / (TP + FP)
                 recalls.append(recall)
                 precisions.append(precision)
-            axes.plot(recalls, precisions, lw=2, color=colors[curve_i],
+            axes.plot(recalls, precisions, lw=2, color=colors[2*curve_i],
                       label=data_name )  # 绘制每一条recall曲线
-            plt.plot(recalls, precisions, 'ro')
+            plt.plot(recalls, precisions, 'o', color=colors[2*curve_i])
     plt.legend(loc="lower left")
     #画对角线
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
@@ -215,6 +218,10 @@ s_ids = np.arange(len(conf_thresholds))
 
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "snapshot_iter_120000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "snapshot_iter_120000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
-    draw_curve(2, "snapshot_iter_110000.mat", "snapshot_iter_120000.mat") # 曲线数量+各个曲线对应的统计结果文件
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_130000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_130000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    draw_curve(2,
+            "snapshot_iter_110000.mat",
+            # "HARD_EXAMPLE_alpha75_gamma2.mat",
+            # "MAX_NEGATIVE_alpha75_gamma2.mat",
+            "MAX_NEGATIVE_A75G20_S_iter_130000.mat") # 曲线数量+各个曲线对应的统计结果文件
