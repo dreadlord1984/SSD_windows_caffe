@@ -143,7 +143,7 @@ def save_data(testList, resultList, recall_mat):
 @function:绘制PR曲线
 @param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果
 """
-def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0):
+def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0, data_mat_5 = 0):
     fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
     if recall_num == 1:
         data = scipy.io.loadmat(data_mat_1)
@@ -175,6 +175,8 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
                 data_name = data_mat_3
             elif curve_i == 3:
                 data_name = data_mat_4
+            elif curve_i == 4:
+                data_name = data_mat_5
             data = scipy.io.loadmat(data_name)
             data = data['all_change_group'][0]
             recalls = []
@@ -192,9 +194,9 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
                     precision = TP / (TP + FP)
                 recalls.append(recall)
                 precisions.append(precision)
-            axes.plot(recalls, precisions, lw=2, color=colors[2*curve_i],
+            axes.plot(recalls, precisions, lw=2, color=colors[curve_i],
                       label=data_name )  # 绘制每一条recall曲线
-            plt.plot(recalls, precisions, 'o', color=colors[2*curve_i])
+            plt.plot(recalls, precisions, 'o', color=colors[curve_i])
     plt.legend(loc="lower left")
     #画对角线
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
@@ -203,6 +205,7 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
     plt.ylim([0.0, 1.05])
     plt.xlim([0.0, 1.0])
     plt.title('Precision-Recall')
+    plt.grid()
     plt.show()
 
 
@@ -218,10 +221,13 @@ s_ids = np.arange(len(conf_thresholds))
 
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_130000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_130000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
-    draw_curve(2,
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_150000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_150000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+
+    # 曲线数量+各个曲线对应的统计结果文件
+    draw_curve(4,
             "snapshot_iter_110000.mat",
-            # "HARD_EXAMPLE_alpha75_gamma2.mat",
-            # "MAX_NEGATIVE_alpha75_gamma2.mat",
-            "MAX_NEGATIVE_A75G20_S_iter_130000.mat") # 曲线数量+各个曲线对应的统计结果文件
+            "NONE_A75G2_iter_150000.mat",
+            "MAX_NEGATIVE_A75G20_iter_150000.mat",
+            "MAX_NEGATIVE_A75G20_S_iter_130000.mat",
+            )

@@ -206,7 +206,7 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S.log"]  # log文件
+    path_to_logs = ["COMPARE/HARD_EXAMPLE_A75G20/HARD_EXAMPLE_A75G20.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log

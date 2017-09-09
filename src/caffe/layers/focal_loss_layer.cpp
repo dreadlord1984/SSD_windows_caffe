@@ -242,7 +242,7 @@ void FocalLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
 
         // the gradient from FL w.r.t p_t, here ignore the `sign`
         int ind_i  = i * dim + label_value * inner_num_ + j; // index of ground-truth label
-        Dtype grad = 0 - gamma_ * (power_prob_data[ind_i] / std::max(1 - prob_data[ind_i], eps)) 
+		Dtype grad = 0 - 2 * (label_value == 1 ? alpha_ : 1 - alpha_) * gamma_ * (power_prob_data[ind_i] / std::max(1 - prob_data[ind_i], eps))
                                 * log_prob_data[ind_i] * prob_data[ind_i]
                        + power_prob_data[ind_i];
         // the gradient w.r.t input data x
