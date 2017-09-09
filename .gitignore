@@ -16,9 +16,9 @@
 *.a
 
 # Compiled protocol buffers
-*.pb.h
-*.pb.cc
-*_pb2.py
+#*.pb.h
+#*.pb.cc
+#*_pb2.py
 
 # Compiled python
 *.pyc
@@ -109,3 +109,5 @@ MANIFEST-*
 /data/mnist
 /Pedestrian/CHECK/prior_with_gt_box_statistic.slides.html
 /Pedestrian/View/train.png
+/Pedestrian/View/*.mat
+/Pedestrian/Data_0810/*.xlsx
