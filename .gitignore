@@ -92,6 +92,7 @@ doxygen
 docs/dev
 
 # LevelDB files
+data
 *.sst
 *.ldb
 LOCK
