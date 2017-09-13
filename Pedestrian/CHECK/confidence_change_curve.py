@@ -26,7 +26,6 @@ def save_data(priorList, resultList, data_xlsx):
             for i in range(0, prior_boxes_total, 1):
                 prior_IOU.append(float(prior_datas[7*i + 4]))
 
-            # reslut_conf = []  # 检测得到result box置信度
             result_boxes_total = (len(result_datas)-1)/6  # 检测得到的box数量
             for j in range(0, result_boxes_total, 1): # 对于每个prior box
                 # index = int(prior_IOU[j] / thresholds[0])
@@ -84,9 +83,9 @@ def show_curve(data_xlsx):
             recall = float(var[2*j+1]) / (float(var[2*j+1]) + float(var[2*j]))
             recalls.append(recall)
         ax1.plot(thresholds, recalls, lw=2, color=colors[k], label=str(conf_thresholds[k])) # 绘制每一条recall曲线
-        # plt.annotate(conf_thresholds[k], xy=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
-        #              xytext=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
-        #              arrowprops = dict(facecolor="r", headlength=5, headwidth=5, width=2))
+        plt.annotate(conf_thresholds[k], xy=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
+                     xytext=(thresholds[len(thresholds)/2], recalls[len(recalls)/2]),
+                     arrowprops = dict(facecolor="r", headlength=5, headwidth=5, width=2))
 
     plt.grid()
     plt.xlabel('IOU')
@@ -96,7 +95,8 @@ def show_curve(data_xlsx):
     ax2 = ax1.twiny()
     ax2.set_xlim(0.1, 1)
     plt.xticks(thresholds, prior_num, rotation=10)
-    plt.savefig('../View/COMPARE/MAX_NEGATIVE_A75G20/confidence_change_with_IOU_statistic.png')
+    savename = data_xlsx.strip().split('.xlsx')[0] + '.png'
+    plt.savefig(savename)
     plt.show()
 
 #matplotlib.rcParams['figure.figsize'] = (6, 8)  # 设定显示大小
@@ -115,7 +115,7 @@ for j in range(0, len(conf_thresholds), 1):
 
 
 if __name__ == "__main__":
-    save_data("../Data_0825/IOU_ALL_image_List.txt",
-              "../View/COMPARE/MAX_NEGATIVE_A75G20/result_ALL_image_List.txt",
-              "../View/COMPARE/MAX_NEGATIVE_A75G20/confidence_change_with_IOU_statistic.xlsx")
-    show_curve("../View/COMPARE/MAX_NEGATIVE_A75G20/confidence_change_with_IOU_statistic.xlsx")
+    # save_data("../Data_0825/IOU_ALL_image_List.txt",
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/result_ALL_image_List.txt",
+    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/confidence_change_with_IOU_statistic.xlsx")
+    show_curve("../View/COMPARE/NONE_A75G20_S/confidence_change_with_IOU_statistic.xlsx")

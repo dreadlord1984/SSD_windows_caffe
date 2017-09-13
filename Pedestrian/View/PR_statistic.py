@@ -71,7 +71,7 @@ def computIOU(A, B):
     return iou
 
 model_def = 'deploy.prototxt' # 检测网络
-model_weights = '../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_150000.caffemodel' # 训练好的模型
+model_weights = '../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 待测试样本集所在根目录
 imgList = "../Data_0825/val.txt" # 样本列表
 

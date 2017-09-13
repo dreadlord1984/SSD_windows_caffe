@@ -141,7 +141,7 @@ def save_data(testList, resultList, recall_mat):
 
 """
 @function:绘制PR曲线
-@param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果
+@param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果,...
 """
 def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0, data_mat_5 = 0):
     fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
@@ -182,7 +182,7 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
             recalls = []
             precisions = []
             for conf_i in range(0, len(conf_thresholds), 1):
-                #conf_i = 2
+                conf_i = 4
                 TP = float(data[conf_i]['TP'])
                 FP = float(data[conf_i]['FP'])
                 FN = float(data[conf_i]['FN'])
@@ -209,7 +209,8 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
     plt.show()
 
 
-colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
+# colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
+colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple']
 lw = 2
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
@@ -221,13 +222,14 @@ s_ids = np.arange(len(conf_thresholds))
 
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_150000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "../View/COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S_iter_150000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    #           "../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve(4,
+    draw_curve(5,
             "snapshot_iter_110000.mat",
-            "NONE_A75G2_iter_150000.mat",
+            "NONE_A75G20_iter_150000.mat",
             "MAX_NEGATIVE_A75G20_iter_150000.mat",
             "MAX_NEGATIVE_A75G20_S_iter_130000.mat",
+            "NONE_A75G20_S_iter_140000.mat"
             )
