@@ -126,7 +126,9 @@ def draw_curve(data_mat, data_xlsx):
         ax.set_title(strand_name)
         ax.set_ylabel(ylabel_name)
         ax.set_xlabel('gt box area ratio')
-    plt.savefig('../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/prior_gt_statistic.png')
+
+    savename1 = data_mat[:data_mat.rfind("\\")] + "\\prior_gt_statistic.png"
+    plt.savefig(savename1)
 
     # 2. 绘制不同confidence阈值下的recall曲线
     fig1, ax1 = plt.subplots(nrows=1, figsize=(10, 12))
@@ -155,6 +157,8 @@ def draw_curve(data_mat, data_xlsx):
     ax2 = ax1.twiny()
     # ax2.set_xlabel("prior boxes num")
     plt.xticks(s_ids, prior_num, rotation=10)
+    savename2 =  data_mat[:data_mat.rfind("\\")] + + "\\ALL_area_recall.png"
+    plt.savefig(savename2)
     plt.show()
 
 
@@ -178,8 +182,8 @@ for j in range(0, len(conf_thresholds), 1):
 
 if __name__ == "__main__":
     # save_data("../Data_0825/IOU_ALL_image_List.txt",
-    #           "../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/result_ALL_image_List.txt",
-    #           "../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/object_confidence_change_curve.mat",
-    #           "../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/object_confidence_change_curve.xlsx")
-    draw_curve("../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/object_confidence_change_curve.mat",
-               "../View/COMPARE/HARD_EXAMPLE_alpha75_gamma2/object_confidence_change_curve.xlsx")
+    #           "..\Data_0810\result_ALL_image_List.txt",
+    #           "..\Data_0810\object_confidence_change_curve.mat",
+    #           "...\Data_0810\object_confidence_change_curve.xlsx")
+    draw_curve("..\Data_0810\object_confidence_change_curve.mat",
+               "..\Data_0810\object_confidence_change_curve.xlsx")

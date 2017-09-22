@@ -1,2 +1,0 @@
-E:\caffe-master_\Build\x64\Release\test_ssd.exe -confidence_threshold 0.5  E:\caffe-master_\Pedestrian\CHECK\deploy.prototxt E:\caffe-master_\Pedestrian\HARD_EXAMPLE_alpha75_gamma2.caffemodel	 E:\caffe-master_\Pedestrian\Data_0825\IOU_ALL_image_List.txt
-pause

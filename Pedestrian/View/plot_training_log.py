@@ -62,8 +62,8 @@ def get_data_file_type(chart_type):
     data_file_type = description.split()[0]
     return data_file_type
 
-def get_data_file(chart_type, path_to_log):
-    return (os.path.basename(path_to_log) + '.' +
+def get_data_file(chart_type, root_dir, path_to_log):
+    return (root_dir + os.path.basename(path_to_log) + '.' +
             get_data_file_type(chart_type).lower())
 
 def get_field_descriptions(chart_type):
@@ -116,9 +116,9 @@ def plot_chart(index, chart_type, path_to_png, path_to_log_list):
         #os.system('%s %s' % (get_log_parsing_script(), path_to_log))  
         ######################自己修改#############################  
         train_dict_list, test_dict_list = parse_log.parse_log(path_to_log)  
-        parse_log.save_csv_files(path_to_log, './', train_dict_list,test_dict_list)  
+        parse_log.save_csv_files(path_to_log, './train_test_log/', train_dict_list,test_dict_list)
         #####################记得要在前面导入parse_log模块 import parse_log########  
-        data_file = get_data_file(chart_type, path_to_log)  
+        data_file = get_data_file(chart_type, './train_test_log/', path_to_log)
         x_axis_field, y_axis_field = get_field_descriptions(chart_type)  
         x, y = get_field_indices(x_axis_field, y_axis_field)  
         data = load_data(data_file, x, y)  
@@ -147,8 +147,7 @@ def plot_chart(index, chart_type, path_to_png, path_to_log_list):
     plt.legend(loc = legend_loc, ncol = 1) # ajust ncol to fit the space  
     plt.title(get_chart_type_description(chart_type))  
     plt.xlabel(x_axis_field)  
-    plt.ylabel(y_axis_field)  
-    plt.savefig(path_to_png)
+    plt.ylabel(y_axis_field)
     plt.grid()
 
 def print_help():
@@ -174,7 +173,7 @@ Supported chart types:""" % (len(get_supported_chart_types()) - 1,
 def is_valid_chart_type(chart_type):
     return chart_type >= 0 and chart_type < len(get_supported_chart_types())
 
-colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple']
+colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Chartreuse', 'Brown']
 
 if __name__ == '__main__':
     #print_help()
@@ -186,7 +185,8 @@ if __name__ == '__main__':
     if not path_to_png.endswith('.png'):
         print 'Path must ends with png' % path_to_png
         sys.exit()
-    path_to_logs = ["COMPARE/NONE_A75G20/NONE_A75G20.log"] # log文件
+
+    path_to_logs = ["COMPARE/softmax_MAX_NEGATIVE/softmax_MAX_NEGATIVE.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -197,7 +197,7 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(0, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20/MAX_NEGATIVE_A75G20.log"]  # log文件
+    path_to_logs = ["COMPARE/softmax_NONE/softmax_NONE.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -208,7 +208,7 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(1, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/NONE_A75G20_S/NONE_A75G20_S.log"]  # log文件
+    path_to_logs = ["COMPARE/NONE_A75G20/NONE_A75G20.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(2, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D.log"]  # log文件
+    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20/MAX_NEGATIVE_A75G20.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -230,5 +230,60 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(3, chart_type, path_to_png, path_to_logs)
 
+    path_to_logs = ["COMPARE/softmax_MAX_NEGATIVE_S/softmax_MAX_NEGATIVE_S.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(4, chart_type, path_to_png, path_to_logs)
 
+    path_to_logs = ["COMPARE/MAX_NEGATIVE_A75G20_S/MAX_NEGATIVE_A75G20_S.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(5, chart_type, path_to_png, path_to_logs)
+
+    path_to_logs = ["COMPARE/NONE_A75G20_S/NONE_A75G20_S.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(6, chart_type, path_to_png, path_to_logs)
+
+    # path_to_logs = ["COMPARE/focal/alpha75_gamma2_D.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(4, chart_type, path_to_png, path_to_logs)
+
+    # path_to_logs = ["COMPARE/NONE_A75G20_S_D_P/NONE_A75G20_S_D_P.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(8, chart_type, path_to_png, path_to_logs)
+
+    plt.savefig(path_to_png)
     plt.show()

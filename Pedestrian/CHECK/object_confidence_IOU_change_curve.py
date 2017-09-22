@@ -58,7 +58,7 @@ def save_data(priorList, resultList, data_mat):
             prior_datas = priorFile.strip().split('\t')
             result_datas = resultFile.strip().split('\t')
             xml_name = ROOTDIR + prior_datas[1]
-
+            print prior_datas[1]
             # 1.记录各个gt box面积占比
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
             gt_areas = []
@@ -170,7 +170,7 @@ def draw_curve(data_mat):
         plt.ylim((0, 1))
         # ax2 = axes[1].twiny()
         # plt.xticks(s_ids, prior_num, rotation=10)
-        savename = data_mat[:data_mat.rfind("/")] + '/figure_' + str(pl) + '.png';
+        savename = data_mat[:data_mat.rfind("\\")] + '\\figure_' + str(pl) + '.png';
         plt.savefig(savename)
         plt.show()
 
@@ -189,12 +189,12 @@ all_change_group =  [[[] for x in range(len(conf_thresholds))] for y in range(le
 for k in range(0, len(area_thresholds), 1):
     for j in range(0, len(conf_thresholds), 1):
         for i in range(0, len(IOU_thresholds), 1):
-            all_change_group[j][i].append({'Neg': 0, 'Pos': 0})
+            all_change_group[k][j].append({'Neg': 0, 'Pos': 0})
 s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    save_data("../Data_0825/IOU_ALL_image_List.txt",
-              "../View/COMPARE/MAX_NEGATIVE_A75G20_S/result_ALL_image_List.txt",
-              "../View/COMPARE/MAX_NEGATIVE_A75G20_S/object_confidence_IOU_change_curve.mat")
-    draw_curve("../View/COMPARE/MAX_NEGATIVE_A75G20_S/object_confidence_IOU_change_curve.mat")
+    save_data("..\\Data_0825\\IOU_ALL_image_List.txt",
+              "..\\View\\COMPARE\\0919\\result_ALL_image_List.txt",
+              "..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")
+    # draw_curve("..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")

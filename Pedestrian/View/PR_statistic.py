@@ -70,10 +70,10 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deploy.prototxt' # 检测网络
-model_weights = '../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.caffemodel' # 训练好的模型
-ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 待测试样本集所在根目录
-imgList = "../Data_0825/val.txt" # 样本列表
+model_def = 'COMPARE\\0919\\deploy4.prototxt' # 检测网络
+model_weights = 'COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000.caffemodel' # 训练好的模型
+ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
+imgList = "..\\Data_0825\\val.txt" # 样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights

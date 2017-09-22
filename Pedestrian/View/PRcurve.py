@@ -69,7 +69,7 @@ def computIOU(A, B):
 """
 @function:从xml文件中读取box信息
 @param param1: xml文件
-@return: boxes
+@return: boxes, width, height
 """
 def readXML(xml_name):
     tree = et.parse(xml_name) #打开xml文档
@@ -96,6 +96,7 @@ def readXML(xml_name):
 @param param3: 待保存mat文件
 """
 def save_data(testList, resultList, recall_mat):
+    num = 0
     with open(testList) as fp1, open(resultList) as fp2:  # 对于每个测试图片
         for testFile in fp1:  # 每一行匹配数据 resultFile
             resultFile = fp2.readline()  # 每一行检测数据 priorFile
@@ -143,7 +144,8 @@ def save_data(testList, resultList, recall_mat):
 @function:绘制PR曲线
 @param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果,...
 """
-def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0, data_mat_5 = 0):
+def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0,
+               data_mat_5 = 0, data_mat_6 = 0, data_mat_7 = 0, data_mat_8 = 0):
     fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
     if recall_num == 1:
         data = scipy.io.loadmat(data_mat_1)
@@ -168,21 +170,35 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
     else:
         for curve_i in range(0, recall_num, 1):
             if curve_i==0:
-                data_name = data_mat_1
+                data_name_all = data_mat_1
+                data_name = data_name_all.split('\\')[-1]
             elif curve_i==1:
-                data_name = data_mat_2
+                data_name_all = data_mat_2
+                data_name = data_name_all.split('\\')[-1]
             elif curve_i==2:
-                data_name = data_mat_3
+                data_name_all = data_mat_3
+                data_name = data_name_all.split('\\')[-1]
             elif curve_i == 3:
-                data_name = data_mat_4
+                data_name_all = data_mat_4
+                data_name = data_name_all.split('\\')[-1]
             elif curve_i == 4:
-                data_name = data_mat_5
-            data = scipy.io.loadmat(data_name)
+                data_name_all = data_mat_5
+                data_name = data_name_all.split('\\')[-1]
+            elif curve_i == 5:
+                data_name_all = data_mat_6
+                data_name = data_name_all.split('\\')[-1]
+            elif curve_i == 6:
+                data_name_all = data_mat_7
+                data_name = data_name_all.split('\\')[-1]
+            elif curve_i == 7:
+                data_name_all = data_mat_8
+                data_name = data_name_all.split('\\')[-1]
+            data = scipy.io.loadmat(data_name_all)
             data = data['all_change_group'][0]
             recalls = []
             precisions = []
             for conf_i in range(0, len(conf_thresholds), 1):
-                conf_i = 4
+                # conf_i = 4
                 TP = float(data[conf_i]['TP'])
                 FP = float(data[conf_i]['FP'])
                 FN = float(data[conf_i]['FN'])
@@ -210,7 +226,8 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
 
 
 # colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
-colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple']
+colors = ['Black', 'Blue', 'DeepSkyBlue', 'Cyan', 'ForestGreen',
+          'HotPink', 'Red', 'Purple', 'Gold', 'Brown', 'Violet']
 lw = 2
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
@@ -222,14 +239,17 @@ s_ids = np.arange(len(conf_thresholds))
 
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "../View/COMPARE/NONE_A75G20_S/NONE_A75G20_S_iter_140000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve(5,
-            "snapshot_iter_110000.mat",
-            "NONE_A75G20_iter_150000.mat",
-            "MAX_NEGATIVE_A75G20_iter_150000.mat",
-            "MAX_NEGATIVE_A75G20_S_iter_130000.mat",
-            "NONE_A75G20_S_iter_140000.mat"
+    draw_curve(8,
+            "COMPARE0\\snapshot_iter_110000\\snapshot_iter_110000",
+            "COMPARE\\NONE_A75G20\\NONE_A75G20_iter_150000",
+            "COMPARE\\MAX_NEGATIVE_A75G20\MAX_NEGATIVE_A75G20_iter_150000",
+            "COMPARE\\NONE_A75G20_S\\NONE_A75G20_S_iter_140000",
+            "COMPARE\\MAX_NEGATIVE_A75G20_S\\MAX_NEGATIVE_A75G20_S_iter_130000",
+            "COMPARE\\NONE_A75G20_S_D\\NONE_A75G20_S_D_fix_n_iter_200000",
+            "COMPARE\\NONE_A75G20_S_D_P\\NONE_A75G20_S_D_P_iter_200000",
+            "COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000"
             )

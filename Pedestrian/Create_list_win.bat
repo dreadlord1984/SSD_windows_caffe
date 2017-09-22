@@ -12,8 +12,8 @@ REM and the test, trainval lists should be put in %ROOTDIR%/ImageSets/Main
 REM the following lines should be changed accordingly
 
 set ROOTDIR=\\192.168.1.186\PedestrianData
-set DATASET=Data_0728
-set OUTDATASET=Data_0731
+set DATASET=Data_0922
+set OUTDATASET=Data_0922
 REM the directory where save the result lists.
 set DSTDIR=E:\caffe-master_\Pedestrian
 REM name of the trainval and test list,  could be changed
