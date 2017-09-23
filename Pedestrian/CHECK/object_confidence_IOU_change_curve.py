@@ -58,7 +58,7 @@ def save_data(priorList, resultList, data_mat):
             prior_datas = priorFile.strip().split('\t')
             result_datas = resultFile.strip().split('\t')
             xml_name = ROOTDIR + prior_datas[1]
-            print prior_datas[1]
+            # print prior_datas[1]
             # 1.记录各个gt box面积占比
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
             gt_areas = []
@@ -194,7 +194,7 @@ s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    save_data("..\\Data_0825\\IOU_ALL_image_List.txt",
+    save_data("..\\Data_0825\\IOU_ALL_image_List2.txt",
               "..\\View\\COMPARE\\0919\\result_ALL_image_List.txt",
               "..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")
-    # draw_curve("..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")
+    draw_curve("..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")

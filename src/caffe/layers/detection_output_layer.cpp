@@ -232,9 +232,18 @@ void DetectionOutputLayer<Dtype>::Forward_cpu(
         continue;
       }
       const vector<NormalizedBBox>& bboxes = decode_bboxes.find(label)->second;
-      ApplyNMSFast(bboxes, scores, confidence_threshold_, nms_threshold_, eta_,
-          top_k_, &(indices[c]));
-      num_det += indices[c].size();
+	  if (nms_threshold_ >= 1)
+	  {
+		  for (int prior_box_index = 0; prior_box_index < num_priors_; prior_box_index++)
+			  indices[c].push_back(prior_box_index);
+		  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
+	  }
+	  else
+	  {
+		  ApplyNMSFast(bboxes, scores, confidence_threshold_, nms_threshold_, eta_,
+			  top_k_, &(indices[c]));
+		  num_det += indices[c].size();
+	  }
     }
     if (keep_top_k_ > -1 && num_det > keep_top_k_) {
       vector<pair<float, pair<int, int> > > score_index_pairs;

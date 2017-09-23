@@ -115,7 +115,7 @@ for j in range(0, len(conf_thresholds), 1):
 
 
 if __name__ == "__main__":
-    # save_data("../Data_0825/IOU_ALL_image_List.txt",
-    #           "../View/COMPARE/NONE_A75G20_S_D/result_ALL_image_List.txt",
-    #           "../View/COMPARE/NONE_A75G20_S_D/confidence_change_with_IOU_statistic.xlsx")
-    show_curve("../View/COMPARE/NONE_A75G20_S_D/confidence_change_with_IOU_statistic.xlsx")
+    save_data("../Data_0825/IOU_ALL_image_List2.txt",
+              "../View/COMPARE/0919/result_ALL_image_List.txt",
+              "../View/COMPARE/0919/confidence_change_with_IOU_statistic.xlsx")
+    show_curve("../View/COMPARE/0919/confidence_change_with_IOU_statistic.xlsx")

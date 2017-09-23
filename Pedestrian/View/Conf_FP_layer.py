@@ -275,12 +275,12 @@ for k in range(0, len(layer_priorbox_num), 1):
         allFPs[k].append({'TP': 0, 'TN':0, 'FP':0, 'FN':0}) # 正检、负检、误检、漏检
 
 if __name__ == "__main__":
-    save_data("../Data_0825/val.txt", # 样本列表
-              '../CHECK/deploy2.prototxt',  # 检测网络,使用CHECK文件夹下的，不使用NMS和keep_top_k
-              'COMPARE\NONE_A75G20_S_D\NONE_A75G20_S_D_iter_200000.caffemodel', # 模型
-              'COMPARE\NONE_A75G20_S_D_fix\layers.mat') # 待输出的统计结果，即不同conf阈值下的TP、FP
+    # save_data("../Data_0825/val.txt", # 样本列表
+    #           '../CHECK/deploy2.prototxt',  # 检测网络,使用CHECK文件夹下的，不使用NMS和keep_top_k
+    #           'COMPARE\NONE_A75G20_S_D\NONE_A75G20_S_D_iter_200000.caffemodel', # 模型
+    #           'COMPARE\NONE_A75G20_S_D_fix\layers.mat') # 待输出的统计结果，即不同conf阈值下的TP、FP
 
     # 曲线数量+各个曲线对应的统计结果文件
-    # draw_curve("COMPARE\NONE_A75G20_S_D\layers.mat", 6300)
+    draw_curve("COMPARE\NONE_A75G20_S_D\layers.mat", 6300)
 
     #  'COMPARE\NONE_A75G20_S_D_fix\NONE_A75G20_S_D_fix_iter_150000.caffemodel', # 模型

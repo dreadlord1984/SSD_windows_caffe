@@ -128,5 +128,5 @@ colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 
 if __name__ == "__main__":
-    copyList("../Data_0810/IOU_ALL.txt", "../Data_0810/train_lmdb_list.txt", "../Data_0810/IOU_ALL_image_List.txt")
-    # showList("../Data_0810/IOU_ALL_image_List.txt")
+    copyList("../Data_0825/IOU_ALL2.txt", "../Data_0825/train_lmdb_list.txt", "../Data_0825/IOU_ALL_image_List2.txt")
+    showList("../Data_0825/IOU_ALL_image_List2.txt")

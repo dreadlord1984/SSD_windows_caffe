@@ -87,9 +87,18 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
 	  }
 
 #else
-	  ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
-		  confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
-	  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
+	  if (nms_threshold_ >= 1)
+	  {
+		  for (int prior_box_index = 0; prior_box_index < num_priors_; prior_box_index++)
+			indices[c].push_back(prior_box_index);
+		  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
+	  }
+	  else
+	  {
+		  ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
+			  confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
+		  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
+	  }
 #endif // BOX_LIST
 
     }

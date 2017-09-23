@@ -141,8 +141,8 @@ for k in range(0, len(area_thresholds), 1):
 
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "../View/COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000_Object.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    #           "../View/COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000_Object.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("COMPARE\NONE_A75G20_S_D\NONE_A75G20_S_D_fix_n_iter_200000_Object")
+    draw_curve("COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000_Object")
