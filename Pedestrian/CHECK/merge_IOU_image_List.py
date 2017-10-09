@@ -81,7 +81,7 @@ def copyList(IOUList, imageList, outList):
         #     continue
     fout = file(outList, "w+")
     for newData in dataALL:
-        fout.write((newData[0] + '\t' + newData[1] + '\t' + newData[2]));
+        fout.write((newData[0] + '\t' + newData[1] + '\t' + newData[2]))
         for i in range(0,int(newData[2]),1):
             fout.write('\t')
             fout.write((newData[7*i + 3] + '\t' + newData[7*i + 4] + '\t' + newData[7*i + 5] + '\t'
@@ -110,15 +110,38 @@ def showList(IOU_small_List):
         for boxT in true_boxes:
             currentAxis.add_patch(plt.Rectangle((boxT[0], boxT[1]), boxT[2] - boxT[0], boxT[3] - boxT[1],
                                                 fill=False, edgecolor=colors[5], linewidth=2))
-        # 检查下IOU_small_List中box与样本中能否对应的上
+        # 排序
         boxes_total = int(data[2])
+        gt_boxes_set = set('x')
         for i in range(0, boxes_total, 1):
-            databox_num = int(data[7*i + 9])
-            display_txt = '%d %d %.2f' % ( float(data[7*i + 9]), float(data[7*i + 3]), float(data[7*i + 4]))
-            databox = [float(data[7*i + 5]) * width, float(data[7*i + 6]) * height, float(data[7*i + 7]) * width, float(data[7*i + 8]) * height]
-            currentAxis.add_patch(plt.Rectangle((databox[0], databox[1]), databox[2] - databox[0], databox[3] - databox[1],
+            gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+            gt_boxes_set.add(gt_box_index)
+        gt_boxes_set.remove('x')
+
+        group_prior_box = [[] for x in gt_boxes_set]
+        for i in range(0, boxes_total, 1):
+            gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+            databox = [float(data[7*i + 4]), float(data[7 * i + 5]) * width, float(data[7 * i + 6]) * height, float(data[7 * i + 7]) * width,
+                       float(data[7 * i + 8]) * height]
+            k = 0
+            for gt_index in gt_boxes_set:
+                if (gt_index == gt_box_index):
+                    group_prior_box[k].append(databox)
+                    break
+                else:
+                    k += 1
+        for i in range(0, len(gt_boxes_set), 1):
+            group_prior_box[i].sort(key=lambda x:x[0], reverse=True)
+
+        # 显示
+        for i in range(0, len(gt_boxes_set), 1):
+            dispaly_box = group_prior_box[i]
+            for k in range(0, 1, 1):
+                display_txt = '%.4f' % ( dispaly_box[k][0])
+                currentAxis.add_patch(plt.Rectangle((dispaly_box[k][1], dispaly_box[k][2]),
+                                                    dispaly_box[k][3] - dispaly_box[k][1], dispaly_box[k][4] - dispaly_box[k][2],
                                                  fill=False, edgecolor=colors[1], linewidth=1))
-            currentAxis.text(databox[0], databox[1], display_txt, bbox={'facecolor': colors[1], 'alpha': 0.5})
+                currentAxis.text(dispaly_box[k][1], dispaly_box[k][2], display_txt, bbox={'facecolor': colors[1], 'alpha': 0.5})
         plt.show()
         # break
     print "end"
@@ -128,5 +151,5 @@ colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 
 if __name__ == "__main__":
-    copyList("../Data_0825/IOU_ALL2.txt", "../Data_0825/train_lmdb_list.txt", "../Data_0825/IOU_ALL_image_List2.txt")
-    showList("../Data_0825/IOU_ALL_image_List2.txt")
+    # copyList("../Data_0922/val_eliminate_greater0.5_less0.1.txt", "../Data_0922/val_lmdb_list.txt", "../Data_0922/val_eliminate_greater0.5_less0.1_image_list.txt")
+    showList("../Data_0922/val_eliminate_greater0.5_less0.1_image_list.txt")

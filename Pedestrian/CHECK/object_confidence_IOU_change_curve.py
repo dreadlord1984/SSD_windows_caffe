@@ -194,7 +194,7 @@ s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    save_data("..\\Data_0825\\IOU_ALL_image_List2.txt",
-              "..\\View\\COMPARE\\0919\\result_ALL_image_List.txt",
-              "..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")
-    draw_curve("..\\View\\COMPARE\\0919\\object_confidence_IOU_change_curve.mat")
+    save_data("..\\Data_0825\\IOU_ALL_image_List.txt",
+              "..\\View\\COMPARE\\0927\\result_ALL_image_List.txt",
+              "..\\View\\COMPARE\\0927\\object_confidence_IOU_change_curve.mat")
+    draw_curve("..\\View\\COMPARE\\0927\\object_confidence_IOU_change_curve.mat")

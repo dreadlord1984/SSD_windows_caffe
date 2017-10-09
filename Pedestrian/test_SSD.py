@@ -68,10 +68,10 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'View\\COMPARE\\0919\\deploy4.prototxt'
-model_weights = 'View\\COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000.caffemodel'
+model_def = 'deploy2.prototxt'
+model_weights = 'View\\COMPARE\\gamma2_D_new\\gamma2_D_new_iter_200000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\"
-imgList = "Data_0825/val.txt"
+imgList = "Data_0922/val.txt"
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights

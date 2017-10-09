@@ -97,6 +97,9 @@ def save_data(testList, resultList, recall_mat):
 @param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果,...
 """
 def draw_curve(data_mat):
+    plt.rcParams['figure.figsize'] = (9, 10)
+    plt.rcParams['image.interpolation'] = 'nearest'
+    plt.rcParams['image.cmap'] = 'gray'
     data = scipy.io.loadmat(data_mat)
     data = data['all_change_group_Object']
     for area_i in range(0, len(area_thresholds), 1):  # 判断area区间段
@@ -109,8 +112,9 @@ def draw_curve(data_mat):
             else:
                 recall = TP / (TP + FN)
             recalls.append(recall)
+        P = TP + FN
         plt.plot(conf_thresholds, recalls, lw=2, color=colors[area_i],
-                     label=area_thresholds[area_i])  # 绘制每一条recall曲线
+                     label=str(area_thresholds[area_i]) + '(' +  str(int(P)) + ')')  # 绘制每一条recall曲线
         plt.plot(conf_thresholds, recalls, 'o', color=colors[area_i])
     plt.legend(loc="lower left")
     # 画对角线
@@ -140,9 +144,9 @@ for k in range(0, len(area_thresholds), 1):
         all_change_group[k].append({'TP': 0, 'FN': 0})
 
 if __name__ == "__main__":
-    # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "../View/COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000_Object.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+              "COMPARE/0927/FL_gamma3_1_4-3Lr_iter_200000.txt", # PR_statistic.py中输出的目标检测结果
+              "COMPARE/0927/FL_gamma3_1_4-3Lr_iter_200000_Object.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000_Object")
+    draw_curve("COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000_Object")

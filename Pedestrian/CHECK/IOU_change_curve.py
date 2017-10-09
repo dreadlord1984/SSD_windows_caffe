@@ -145,7 +145,7 @@ all_change_group = [[0 for x in range(len(change_scope))] for y in range(len(thr
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本所在根目录
 
 if __name__ == "__main__":
-    save_data("../Data_0825/IOU_ALL_image_List2.txt",
-              "../View/COMPARE/0919/result_ALL_image_List.txt",
-              "../View/COMPARE/0919/IOU_change_curve.mat")
-    show_hist("../View/COMPARE/0919/IOU_change_curve.mat")
+    # save_data("../Data_0825/IOU_ALL_image_List.txt",
+    #           "../View/COMPARE/0927/result_ALL_image_List.txt",
+    #           "../View/COMPARE/0927/IOU_change_curve.mat")
+    show_hist("../View/COMPARE/0927/IOU_change_curve.mat")

@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
 import os
-import sys
 
 plt.rcParams['figure.figsize'] = (10, 10)
 plt.rcParams['image.interpolation'] = 'nearest'
@@ -70,8 +69,8 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'COMPARE\\0919\\deploy4.prototxt' # 检测网络
-model_weights = 'COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000.caffemodel' # 训练好的模型
+model_def = '../deploy2.prototxt' # 检测网络
+model_weights = 'COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
 imgList = "..\\Data_0825\\val.txt" # 样本列表
 
@@ -156,19 +155,9 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
         output.write(str(ymax))
         label = int(top_label_indices[i])
         label_name = top_labels[i]
-        # display_txt = '%s: %.2f'%(label_name, score)
-        # coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
-        # color = colors[label]
-        # detectBoxes.append([xmin, ymin, xmax, ymax])
-        # currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
-        # currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
 
-
-    # for boxT in true_boxes:
-    #     currentAxis.add_patch(plt.Rectangle((boxT[0], boxT[1]), boxT[2] - boxT[0], boxT[3] - boxT[1],
-    #                                         fill=False, edgecolor=colors[5], linewidth=2))
     output.write('\n')
-    # plt.show()
+
 output.close()
 
 

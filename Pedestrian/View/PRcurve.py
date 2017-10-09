@@ -6,49 +6,6 @@ import scipy.io
 import xml.etree.cElementTree as et
 # setup plot details
 
-
-# tps = np.array([17826, 17557, 16914, 16077, 15054, 13863, 12330, 10475, 8129, 5006, 2836], dtype=np.float64) # 正检
-# fps = np.array([65275, 39675, 22468, 12002, 6273, 3662, 2268, 1442, 829, 305, 111], dtype=np.float64) # 误检
-# fns = np.array([1005, 1274, 1917, 2754, 3777, 4968, 6501, 8356, 10702, 13825, 15995], dtype=np.float64) # 漏检
-#
-# tps2 = np.array([17311, 17035, 16505, 15684, 14679, 13500, 12042, 10312, 8044, 4898, 2591], dtype=np.float64) # 正检
-# fps2 = np.array([155538, 71986, 28405, 13080, 6929, 4165, 2669, 1694, 971, 363, 119], dtype=np.float64) # 误检
-# fns2 = np.array([1520, 1796, 2326, 3147, 4158, 5331, 6789,  8519, 10793, 13933, 16240], dtype=np.float64) # 漏检
-#
-# precision = np.divide(tps, np.add(tps, fps))
-# recall = np.divide(tps ,np.add(tps, fns))
-#
-# precision2 = np.divide(tps2, np.add(tps2, fps2))
-# recall2 = np.divide(tps2 ,np.add(tps2, fns2))
-#
-# print 'thresholds ',conf_thresholds
-# print 'recall' , recall
-# print 'precision' , precision
-#
-# print 'recall2' , recall2
-# print 'precision2' , precision2
-#
-# # Plot Precision-Recall curve
-# plt.clf()
-# plt.plot(recall, precision, lw=lw, color='navy',
-#          label='Precision-Recall curve')
-# plt.plot(recall,precision,'ro')
-# plt.plot(recall2, precision2, lw=lw, color='Orange',
-#          label='Precision-Recall2 curve')
-# plt.plot(recall2,precision2,'ro')
-# #画对角线
-# plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
-#
-# plt.xlabel('Recall')
-# plt.ylabel('Precision')
-# plt.ylim([0.0, 1.05])
-# plt.xlim([0.0, 1.0])
-# plt.title('Precision-Recall')
-# plt.legend(loc="lower left")
-# plt.grid()
-# plt.savefig('PRcurve.png')
-# plt.show()
-
 """
 @function:计算两个box的IOU
 @param param1: box1
@@ -150,8 +107,10 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
     if recall_num == 1:
         data = scipy.io.loadmat(data_mat_1)
         data = data['all_change_group'][0]
+        Ps = []
         recalls = []
         precisions = []
+        data_name = data_mat_1.split('\\')[-1]
         for conf_i in range(0, len(conf_thresholds), 1):
             TP = float(data[conf_i]['TP'])
             FP = float(data[conf_i]['FP'])
@@ -160,12 +119,19 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
                 recall = 0
                 precision = 0
             else:
+                P = TP + FN
                 recall = TP / (TP + FN)
                 precision = TP / (TP + FP)
+            Ps.append(P)
             recalls.append(recall)
             precisions.append(precision)
-        axes.plot(recalls, precisions, lw=2, color='navy',
-                     label=data_mat_1)  # 绘制每一条recall曲线
+        axes.plot(recalls, precisions, lw=2, color='HotPink',
+                     label='val')  # 绘制每一条recall曲线
+        for conf_i in range(0, len(conf_thresholds), 1):
+            plt.annotate(conf_thresholds[conf_i], xy=(recalls[conf_i], precisions[conf_i]),
+                         xytext=(recalls[conf_i], precisions[conf_i]),
+                         # arrowprops=dict(facecolor="r", headlength=3, headwidth=3, width=1)
+                         )
         plt.plot(recalls, precisions, 'ro')
     else:
         for curve_i in range(0, recall_num, 1):
@@ -198,7 +164,7 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
             recalls = []
             precisions = []
             for conf_i in range(0, len(conf_thresholds), 1):
-                # conf_i = 4
+                #conf_i = 4
                 TP = float(data[conf_i]['TP'])
                 FP = float(data[conf_i]['FP'])
                 FN = float(data[conf_i]['FN'])
@@ -213,21 +179,28 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
             axes.plot(recalls, precisions, lw=2, color=colors[curve_i],
                       label=data_name )  # 绘制每一条recall曲线
             plt.plot(recalls, precisions, 'o', color=colors[curve_i])
+            for conf_i in range(0, len(conf_thresholds), 1):
+                plt.annotate(conf_thresholds[conf_i], xy=(recalls[conf_i], precisions[conf_i]),
+                             xytext=(recalls[conf_i], precisions[conf_i]),color = colors[curve_i],
+                             # arrowprops=dict(facecolor="r", headlength=3, headwidth=3, width=1)
+                             )
     plt.legend(loc="lower left")
     #画对角线
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
     plt.xlabel('Recall')
     plt.ylabel('Precision')
-    plt.ylim([0.0, 1.05])
+    plt.ylim([0.0, 1.0])
     plt.xlim([0.0, 1.0])
+    plt.yticks(np.arange(0, 1.01, 0.1))  # 设置x轴刻度
+    plt.xticks(np.arange(0, 1.01, 0.1))  # 设置x轴刻度
     plt.title('Precision-Recall')
     plt.grid()
     plt.show()
 
 
 # colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
-colors = ['Black', 'Blue', 'DeepSkyBlue', 'Cyan', 'ForestGreen',
-          'HotPink', 'Red', 'Purple', 'Gold', 'Brown', 'Violet']
+colors = ['Red', 'Blue', 'DeepSkyBlue', 'Cyan', 'ForestGreen',
+          'HotPink', 'Black', 'Purple', 'Gold', 'Brown', 'Violet']
 lw = 2
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
@@ -237,19 +210,14 @@ for j in range(0, len(conf_thresholds), 1):
 s_ids = np.arange(len(conf_thresholds))
 
 
+
 if __name__ == "__main__":
     # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "COMPARE/0919/FL_gamma3_1_Priorbox4-3_iter_190000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    #           "COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000.txt", # PR_statistic.py中输出的目标检测结果
+    #           "COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve(8,
-            "COMPARE0\\snapshot_iter_110000\\snapshot_iter_110000",
-            "COMPARE\\NONE_A75G20\\NONE_A75G20_iter_150000",
-            "COMPARE\\MAX_NEGATIVE_A75G20\MAX_NEGATIVE_A75G20_iter_150000",
-            "COMPARE\\NONE_A75G20_S\\NONE_A75G20_S_iter_140000",
-            "COMPARE\\MAX_NEGATIVE_A75G20_S\\MAX_NEGATIVE_A75G20_S_iter_130000",
+    draw_curve(2,
             "COMPARE\\NONE_A75G20_S_D\\NONE_A75G20_S_D_fix_n_iter_200000",
-            "COMPARE\\NONE_A75G20_S_D_P\\NONE_A75G20_S_D_P_iter_200000",
-            "COMPARE\\0919\\FL_gamma3_1_Priorbox4-3_iter_190000"
+            "COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000"
             )
