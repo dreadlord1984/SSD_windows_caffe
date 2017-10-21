@@ -241,8 +241,8 @@ inline bool SolverParameter_SolverType_Parse(
     SolverParameter_SolverType_descriptor(), name, value);
 }
 enum ParamSpec_DimCheckMode {
-    _ParamSpec_DimCheckMode_STRICT = 0,
-    _ParamSpec_DimCheckMode_PERMISSIVE = 1
+  _ParamSpec_DimCheckMode_STRICT = 0,
+  _ParamSpec_DimCheckMode_PERMISSIVE = 1
 };
 bool ParamSpec_DimCheckMode_IsValid(int value);
 const ParamSpec_DimCheckMode ParamSpec_DimCheckMode_DimCheckMode_MIN = _ParamSpec_DimCheckMode_STRICT;
@@ -360,26 +360,6 @@ inline bool LossParameter_NormalizationMode_Parse(
     const ::std::string& name, LossParameter_NormalizationMode* value) {
   return ::google::protobuf::internal::ParseNamedEnum<LossParameter_NormalizationMode>(
     LossParameter_NormalizationMode_descriptor(), name, value);
-}
-enum BatchNormParameter_Engine {
-  BatchNormParameter_Engine_DEFAULT = 0,
-  BatchNormParameter_Engine_CAFFE = 1,
-  BatchNormParameter_Engine_CUDNN = 2
-};
-bool BatchNormParameter_Engine_IsValid(int value);
-const BatchNormParameter_Engine BatchNormParameter_Engine_Engine_MIN = BatchNormParameter_Engine_DEFAULT;
-const BatchNormParameter_Engine BatchNormParameter_Engine_Engine_MAX = BatchNormParameter_Engine_CUDNN;
-const int BatchNormParameter_Engine_Engine_ARRAYSIZE = BatchNormParameter_Engine_Engine_MAX + 1;
-
-const ::google::protobuf::EnumDescriptor* BatchNormParameter_Engine_descriptor();
-inline const ::std::string& BatchNormParameter_Engine_Name(BatchNormParameter_Engine value) {
-  return ::google::protobuf::internal::NameOfEnum(
-    BatchNormParameter_Engine_descriptor(), value);
-}
-inline bool BatchNormParameter_Engine_Parse(
-    const ::std::string& name, BatchNormParameter_Engine* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<BatchNormParameter_Engine>(
-    BatchNormParameter_Engine_descriptor(), name, value);
 }
 enum ConvolutionParameter_Engine {
   ConvolutionParameter_Engine_DEFAULT = 0,
@@ -874,8 +854,8 @@ inline bool V1LayerParameter_LayerType_Parse(
     V1LayerParameter_LayerType_descriptor(), name, value);
 }
 enum V1LayerParameter_DimCheckMode {
-    _V1LayerParameter_DimCheckMode_STRICT = 0,
-    _V1LayerParameter_DimCheckMode_PERMISSIVE = 1
+	_V1LayerParameter_DimCheckMode_STRICT = 0,
+	_V1LayerParameter_DimCheckMode_PERMISSIVE = 1
 };
 bool V1LayerParameter_DimCheckMode_IsValid(int value);
 const V1LayerParameter_DimCheckMode V1LayerParameter_DimCheckMode_DimCheckMode_MIN = _V1LayerParameter_DimCheckMode_STRICT;
@@ -3428,13 +3408,6 @@ class SolverParameter : public ::google::protobuf::Message {
   inline ::caffe::SolverParameter_SolverType solver_type() const;
   inline void set_solver_type(::caffe::SolverParameter_SolverType value);
 
-  // optional bool layer_wise_reduce = 45 [default = true];
-  inline bool has_layer_wise_reduce() const;
-  inline void clear_layer_wise_reduce();
-  static const int kLayerWiseReduceFieldNumber = 45;
-  inline bool layer_wise_reduce() const;
-  inline void set_layer_wise_reduce(bool value);
-
   // @@protoc_insertion_point(class_scope:caffe.SolverParameter)
  private:
   inline void set_has_net();
@@ -3513,8 +3486,6 @@ class SolverParameter : public ::google::protobuf::Message {
   inline void clear_has_snapshot_after_train();
   inline void set_has_solver_type();
   inline void clear_has_solver_type();
-  inline void set_has_layer_wise_reduce();
-  inline void clear_has_layer_wise_reduce();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -3566,7 +3537,6 @@ class SolverParameter : public ::google::protobuf::Message {
   float rms_decay_;
   bool debug_info_;
   bool snapshot_after_train_;
-  bool layer_wise_reduce_;
   int solver_type_;
   mutable int _cached_size_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -6716,31 +6686,6 @@ class BatchNormParameter : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
-  typedef BatchNormParameter_Engine Engine;
-  static const Engine DEFAULT = BatchNormParameter_Engine_DEFAULT;
-  static const Engine CAFFE = BatchNormParameter_Engine_CAFFE;
-  static const Engine CUDNN = BatchNormParameter_Engine_CUDNN;
-  static inline bool Engine_IsValid(int value) {
-    return BatchNormParameter_Engine_IsValid(value);
-  }
-  static const Engine Engine_MIN =
-    BatchNormParameter_Engine_Engine_MIN;
-  static const Engine Engine_MAX =
-    BatchNormParameter_Engine_Engine_MAX;
-  static const int Engine_ARRAYSIZE =
-    BatchNormParameter_Engine_Engine_ARRAYSIZE;
-  static inline const ::google::protobuf::EnumDescriptor*
-  Engine_descriptor() {
-    return BatchNormParameter_Engine_descriptor();
-  }
-  static inline const ::std::string& Engine_Name(Engine value) {
-    return BatchNormParameter_Engine_Name(value);
-  }
-  static inline bool Engine_Parse(const ::std::string& name,
-      Engine* value) {
-    return BatchNormParameter_Engine_Parse(name, value);
-  }
-
   // accessors -------------------------------------------------------
 
   // optional bool use_global_stats = 1;
@@ -6764,38 +6709,6 @@ class BatchNormParameter : public ::google::protobuf::Message {
   inline float eps() const;
   inline void set_eps(float value);
 
-  // optional bool use_log = 4 [default = false];
-  inline bool has_use_log() const;
-  inline void clear_use_log();
-  static const int kUseLogFieldNumber = 4;
-  inline bool use_log() const;
-  inline void set_use_log(bool value);
-
-  // optional .caffe.FillerParameter scale_filler = 5;
-  inline bool has_scale_filler() const;
-  inline void clear_scale_filler();
-  static const int kScaleFillerFieldNumber = 5;
-  inline const ::caffe::FillerParameter& scale_filler() const;
-  inline ::caffe::FillerParameter* mutable_scale_filler();
-  inline ::caffe::FillerParameter* release_scale_filler();
-  inline void set_allocated_scale_filler(::caffe::FillerParameter* scale_filler);
-
-  // optional .caffe.FillerParameter bias_filler = 6;
-  inline bool has_bias_filler() const;
-  inline void clear_bias_filler();
-  static const int kBiasFillerFieldNumber = 6;
-  inline const ::caffe::FillerParameter& bias_filler() const;
-  inline ::caffe::FillerParameter* mutable_bias_filler();
-  inline ::caffe::FillerParameter* release_bias_filler();
-  inline void set_allocated_bias_filler(::caffe::FillerParameter* bias_filler);
-
-  // optional .caffe.BatchNormParameter.Engine engine = 15 [default = DEFAULT];
-  inline bool has_engine() const;
-  inline void clear_engine();
-  static const int kEngineFieldNumber = 15;
-  inline ::caffe::BatchNormParameter_Engine engine() const;
-  inline void set_engine(::caffe::BatchNormParameter_Engine value);
-
   // @@protoc_insertion_point(class_scope:caffe.BatchNormParameter)
  private:
   inline void set_has_use_global_stats();
@@ -6804,26 +6717,14 @@ class BatchNormParameter : public ::google::protobuf::Message {
   inline void clear_has_moving_average_fraction();
   inline void set_has_eps();
   inline void clear_has_eps();
-  inline void set_has_use_log();
-  inline void clear_has_use_log();
-  inline void set_has_scale_filler();
-  inline void clear_has_scale_filler();
-  inline void set_has_bias_filler();
-  inline void clear_has_bias_filler();
-  inline void set_has_engine();
-  inline void clear_has_engine();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
-  float moving_average_fraction_;
   bool use_global_stats_;
-  bool use_log_;
-  ::caffe::FillerParameter* scale_filler_;
+  float moving_average_fraction_;
   float eps_;
-  int engine_;
-  ::caffe::FillerParameter* bias_filler_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -7562,20 +7463,6 @@ class DataParameter : public ::google::protobuf::Message {
   inline ::google::protobuf::uint32 prefetch() const;
   inline void set_prefetch(::google::protobuf::uint32 value);
 
-  // optional bool random_order = 11 [default = true];
-  inline bool has_random_order() const;
-  inline void clear_random_order();
-  static const int kRandomOrderFieldNumber = 11;
-  inline bool random_order() const;
-  inline void set_random_order(bool value);
-
-  // optional uint32 init_seed = 12 [default = 1234];
-  inline bool has_init_seed() const;
-  inline void clear_init_seed();
-  static const int kInitSeedFieldNumber = 12;
-  inline ::google::protobuf::uint32 init_seed() const;
-  inline void set_init_seed(::google::protobuf::uint32 value);
-
   // @@protoc_insertion_point(class_scope:caffe.DataParameter)
  private:
   inline void set_has_source();
@@ -7598,10 +7485,6 @@ class DataParameter : public ::google::protobuf::Message {
   inline void clear_has_force_encoded_color();
   inline void set_has_prefetch();
   inline void clear_has_prefetch();
-  inline void set_has_random_order();
-  inline void clear_has_random_order();
-  inline void set_has_init_seed();
-  inline void clear_has_init_seed();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -7616,9 +7499,7 @@ class DataParameter : public ::google::protobuf::Message {
   ::google::protobuf::uint32 crop_size_;
   bool mirror_;
   bool force_encoded_color_;
-  bool random_order_;
   ::google::protobuf::uint32 prefetch_;
-  ::google::protobuf::uint32 init_seed_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -18508,30 +18389,6 @@ inline void SolverParameter::set_solver_type(::caffe::SolverParameter_SolverType
   // @@protoc_insertion_point(field_set:caffe.SolverParameter.solver_type)
 }
 
-// optional bool layer_wise_reduce = 45 [default = true];
-inline bool SolverParameter::has_layer_wise_reduce() const {
-  return (_has_bits_[1] & 0x00001000u) != 0;
-}
-inline void SolverParameter::set_has_layer_wise_reduce() {
-  _has_bits_[1] |= 0x00001000u;
-}
-inline void SolverParameter::clear_has_layer_wise_reduce() {
-  _has_bits_[1] &= ~0x00001000u;
-}
-inline void SolverParameter::clear_layer_wise_reduce() {
-  layer_wise_reduce_ = true;
-  clear_has_layer_wise_reduce();
-}
-inline bool SolverParameter::layer_wise_reduce() const {
-  // @@protoc_insertion_point(field_get:caffe.SolverParameter.layer_wise_reduce)
-  return layer_wise_reduce_;
-}
-inline void SolverParameter::set_layer_wise_reduce(bool value) {
-  set_has_layer_wise_reduce();
-  layer_wise_reduce_ = value;
-  // @@protoc_insertion_point(field_set:caffe.SolverParameter.layer_wise_reduce)
-}
-
 // -------------------------------------------------------------------
 
 // SolverState
@@ -23971,137 +23828,6 @@ inline void BatchNormParameter::set_eps(float value) {
   // @@protoc_insertion_point(field_set:caffe.BatchNormParameter.eps)
 }
 
-// optional bool use_log = 4 [default = false];
-inline bool BatchNormParameter::has_use_log() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void BatchNormParameter::set_has_use_log() {
-  _has_bits_[0] |= 0x00000008u;
-}
-inline void BatchNormParameter::clear_has_use_log() {
-  _has_bits_[0] &= ~0x00000008u;
-}
-inline void BatchNormParameter::clear_use_log() {
-  use_log_ = false;
-  clear_has_use_log();
-}
-inline bool BatchNormParameter::use_log() const {
-  // @@protoc_insertion_point(field_get:caffe.BatchNormParameter.use_log)
-  return use_log_;
-}
-inline void BatchNormParameter::set_use_log(bool value) {
-  set_has_use_log();
-  use_log_ = value;
-  // @@protoc_insertion_point(field_set:caffe.BatchNormParameter.use_log)
-}
-
-// optional .caffe.FillerParameter scale_filler = 5;
-inline bool BatchNormParameter::has_scale_filler() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
-}
-inline void BatchNormParameter::set_has_scale_filler() {
-  _has_bits_[0] |= 0x00000010u;
-}
-inline void BatchNormParameter::clear_has_scale_filler() {
-  _has_bits_[0] &= ~0x00000010u;
-}
-inline void BatchNormParameter::clear_scale_filler() {
-  if (scale_filler_ != NULL) scale_filler_->::caffe::FillerParameter::Clear();
-  clear_has_scale_filler();
-}
-inline const ::caffe::FillerParameter& BatchNormParameter::scale_filler() const {
-  // @@protoc_insertion_point(field_get:caffe.BatchNormParameter.scale_filler)
-  return scale_filler_ != NULL ? *scale_filler_ : *default_instance_->scale_filler_;
-}
-inline ::caffe::FillerParameter* BatchNormParameter::mutable_scale_filler() {
-  set_has_scale_filler();
-  if (scale_filler_ == NULL) scale_filler_ = new ::caffe::FillerParameter;
-  // @@protoc_insertion_point(field_mutable:caffe.BatchNormParameter.scale_filler)
-  return scale_filler_;
-}
-inline ::caffe::FillerParameter* BatchNormParameter::release_scale_filler() {
-  clear_has_scale_filler();
-  ::caffe::FillerParameter* temp = scale_filler_;
-  scale_filler_ = NULL;
-  return temp;
-}
-inline void BatchNormParameter::set_allocated_scale_filler(::caffe::FillerParameter* scale_filler) {
-  delete scale_filler_;
-  scale_filler_ = scale_filler;
-  if (scale_filler) {
-    set_has_scale_filler();
-  } else {
-    clear_has_scale_filler();
-  }
-  // @@protoc_insertion_point(field_set_allocated:caffe.BatchNormParameter.scale_filler)
-}
-
-// optional .caffe.FillerParameter bias_filler = 6;
-inline bool BatchNormParameter::has_bias_filler() const {
-  return (_has_bits_[0] & 0x00000020u) != 0;
-}
-inline void BatchNormParameter::set_has_bias_filler() {
-  _has_bits_[0] |= 0x00000020u;
-}
-inline void BatchNormParameter::clear_has_bias_filler() {
-  _has_bits_[0] &= ~0x00000020u;
-}
-inline void BatchNormParameter::clear_bias_filler() {
-  if (bias_filler_ != NULL) bias_filler_->::caffe::FillerParameter::Clear();
-  clear_has_bias_filler();
-}
-inline const ::caffe::FillerParameter& BatchNormParameter::bias_filler() const {
-  // @@protoc_insertion_point(field_get:caffe.BatchNormParameter.bias_filler)
-  return bias_filler_ != NULL ? *bias_filler_ : *default_instance_->bias_filler_;
-}
-inline ::caffe::FillerParameter* BatchNormParameter::mutable_bias_filler() {
-  set_has_bias_filler();
-  if (bias_filler_ == NULL) bias_filler_ = new ::caffe::FillerParameter;
-  // @@protoc_insertion_point(field_mutable:caffe.BatchNormParameter.bias_filler)
-  return bias_filler_;
-}
-inline ::caffe::FillerParameter* BatchNormParameter::release_bias_filler() {
-  clear_has_bias_filler();
-  ::caffe::FillerParameter* temp = bias_filler_;
-  bias_filler_ = NULL;
-  return temp;
-}
-inline void BatchNormParameter::set_allocated_bias_filler(::caffe::FillerParameter* bias_filler) {
-  delete bias_filler_;
-  bias_filler_ = bias_filler;
-  if (bias_filler) {
-    set_has_bias_filler();
-  } else {
-    clear_has_bias_filler();
-  }
-  // @@protoc_insertion_point(field_set_allocated:caffe.BatchNormParameter.bias_filler)
-}
-
-// optional .caffe.BatchNormParameter.Engine engine = 15 [default = DEFAULT];
-inline bool BatchNormParameter::has_engine() const {
-  return (_has_bits_[0] & 0x00000040u) != 0;
-}
-inline void BatchNormParameter::set_has_engine() {
-  _has_bits_[0] |= 0x00000040u;
-}
-inline void BatchNormParameter::clear_has_engine() {
-  _has_bits_[0] &= ~0x00000040u;
-}
-inline void BatchNormParameter::clear_engine() {
-  engine_ = 0;
-  clear_has_engine();
-}
-inline ::caffe::BatchNormParameter_Engine BatchNormParameter::engine() const {
-  // @@protoc_insertion_point(field_get:caffe.BatchNormParameter.engine)
-  return static_cast< ::caffe::BatchNormParameter_Engine >(engine_);
-}
-inline void BatchNormParameter::set_engine(::caffe::BatchNormParameter_Engine value) {
-  assert(::caffe::BatchNormParameter_Engine_IsValid(value));
-  set_has_engine();
-  engine_ = value;
-  // @@protoc_insertion_point(field_set:caffe.BatchNormParameter.engine)
-}
-
 // -------------------------------------------------------------------
 
 // BiasParameter
@@ -25147,54 +24873,6 @@ inline void DataParameter::set_prefetch(::google::protobuf::uint32 value) {
   set_has_prefetch();
   prefetch_ = value;
   // @@protoc_insertion_point(field_set:caffe.DataParameter.prefetch)
-}
-
-// optional bool random_order = 11 [default = true];
-inline bool DataParameter::has_random_order() const {
-  return (_has_bits_[0] & 0x00000400u) != 0;
-}
-inline void DataParameter::set_has_random_order() {
-  _has_bits_[0] |= 0x00000400u;
-}
-inline void DataParameter::clear_has_random_order() {
-  _has_bits_[0] &= ~0x00000400u;
-}
-inline void DataParameter::clear_random_order() {
-  random_order_ = true;
-  clear_has_random_order();
-}
-inline bool DataParameter::random_order() const {
-  // @@protoc_insertion_point(field_get:caffe.DataParameter.random_order)
-  return random_order_;
-}
-inline void DataParameter::set_random_order(bool value) {
-  set_has_random_order();
-  random_order_ = value;
-  // @@protoc_insertion_point(field_set:caffe.DataParameter.random_order)
-}
-
-// optional uint32 init_seed = 12 [default = 1234];
-inline bool DataParameter::has_init_seed() const {
-  return (_has_bits_[0] & 0x00000800u) != 0;
-}
-inline void DataParameter::set_has_init_seed() {
-  _has_bits_[0] |= 0x00000800u;
-}
-inline void DataParameter::clear_has_init_seed() {
-  _has_bits_[0] &= ~0x00000800u;
-}
-inline void DataParameter::clear_init_seed() {
-  init_seed_ = 1234u;
-  clear_has_init_seed();
-}
-inline ::google::protobuf::uint32 DataParameter::init_seed() const {
-  // @@protoc_insertion_point(field_get:caffe.DataParameter.init_seed)
-  return init_seed_;
-}
-inline void DataParameter::set_init_seed(::google::protobuf::uint32 value) {
-  set_has_init_seed();
-  init_seed_ = value;
-  // @@protoc_insertion_point(field_set:caffe.DataParameter.init_seed)
 }
 
 // -------------------------------------------------------------------
@@ -33196,13 +32874,13 @@ inline void V1LayerParameter::set_allocated_focal_loss_param(::caffe::FocalLossP
 
 // optional .caffe.SliceParameter slice_param = 31;
 inline bool V1LayerParameter::has_slice_param() const {
-  return (_has_bits_[1] & 0x00000020u) != 0;
+  return (_has_bits_[1] & 0x00000010u) != 0;
 }
 inline void V1LayerParameter::set_has_slice_param() {
-  _has_bits_[1] |= 0x00000020u;
+  _has_bits_[1] |= 0x00000010u;
 }
 inline void V1LayerParameter::clear_has_slice_param() {
-  _has_bits_[1] &= ~0x00000020u;
+  _has_bits_[1] &= ~0x00000010u;
 }
 inline void V1LayerParameter::clear_slice_param() {
   if (slice_param_ != NULL) slice_param_->::caffe::SliceParameter::Clear();
@@ -33237,13 +32915,13 @@ inline void V1LayerParameter::set_allocated_slice_param(::caffe::SliceParameter*
 
 // optional .caffe.TanHParameter tanh_param = 37;
 inline bool V1LayerParameter::has_tanh_param() const {
-  return (_has_bits_[1] & 0x00000040u) != 0;
+  return (_has_bits_[1] & 0x00000020u) != 0;
 }
 inline void V1LayerParameter::set_has_tanh_param() {
-  _has_bits_[1] |= 0x00000040u;
+  _has_bits_[1] |= 0x00000020u;
 }
 inline void V1LayerParameter::clear_has_tanh_param() {
-  _has_bits_[1] &= ~0x00000040u;
+  _has_bits_[1] &= ~0x00000020u;
 }
 inline void V1LayerParameter::clear_tanh_param() {
   if (tanh_param_ != NULL) tanh_param_->::caffe::TanHParameter::Clear();
@@ -33278,13 +32956,13 @@ inline void V1LayerParameter::set_allocated_tanh_param(::caffe::TanHParameter* t
 
 // optional .caffe.ThresholdParameter threshold_param = 25;
 inline bool V1LayerParameter::has_threshold_param() const {
-  return (_has_bits_[1] & 0x00000080u) != 0;
+  return (_has_bits_[1] & 0x00000040u) != 0;
 }
 inline void V1LayerParameter::set_has_threshold_param() {
-  _has_bits_[1] |= 0x00000080u;
+  _has_bits_[1] |= 0x00000040u;
 }
 inline void V1LayerParameter::clear_has_threshold_param() {
-  _has_bits_[1] &= ~0x00000080u;
+  _has_bits_[1] &= ~0x00000040u;
 }
 inline void V1LayerParameter::clear_threshold_param() {
   if (threshold_param_ != NULL) threshold_param_->::caffe::ThresholdParameter::Clear();
@@ -33319,13 +32997,13 @@ inline void V1LayerParameter::set_allocated_threshold_param(::caffe::ThresholdPa
 
 // optional .caffe.WindowDataParameter window_data_param = 20;
 inline bool V1LayerParameter::has_window_data_param() const {
-  return (_has_bits_[1] & 0x00000100u) != 0;
+  return (_has_bits_[1] & 0x00000080u) != 0;
 }
 inline void V1LayerParameter::set_has_window_data_param() {
-  _has_bits_[1] |= 0x00000100u;
+  _has_bits_[1] |= 0x00000080u;
 }
 inline void V1LayerParameter::clear_has_window_data_param() {
-  _has_bits_[1] &= ~0x00000100u;
+  _has_bits_[1] &= ~0x00000080u;
 }
 inline void V1LayerParameter::clear_window_data_param() {
   if (window_data_param_ != NULL) window_data_param_->::caffe::WindowDataParameter::Clear();
@@ -33360,13 +33038,13 @@ inline void V1LayerParameter::set_allocated_window_data_param(::caffe::WindowDat
 
 // optional .caffe.TransformationParameter transform_param = 36;
 inline bool V1LayerParameter::has_transform_param() const {
-  return (_has_bits_[1] & 0x00000200u) != 0;
+  return (_has_bits_[1] & 0x00000100u) != 0;
 }
 inline void V1LayerParameter::set_has_transform_param() {
-  _has_bits_[1] |= 0x00000200u;
+  _has_bits_[1] |= 0x00000100u;
 }
 inline void V1LayerParameter::clear_has_transform_param() {
-  _has_bits_[1] &= ~0x00000200u;
+  _has_bits_[1] &= ~0x00000100u;
 }
 inline void V1LayerParameter::clear_transform_param() {
   if (transform_param_ != NULL) transform_param_->::caffe::TransformationParameter::Clear();
@@ -33401,13 +33079,13 @@ inline void V1LayerParameter::set_allocated_transform_param(::caffe::Transformat
 
 // optional .caffe.LossParameter loss_param = 42;
 inline bool V1LayerParameter::has_loss_param() const {
-  return (_has_bits_[1] & 0x00000400u) != 0;
+  return (_has_bits_[1] & 0x00000200u) != 0;
 }
 inline void V1LayerParameter::set_has_loss_param() {
-  _has_bits_[1] |= 0x00000400u;
+  _has_bits_[1] |= 0x00000200u;
 }
 inline void V1LayerParameter::clear_has_loss_param() {
-  _has_bits_[1] &= ~0x00000400u;
+  _has_bits_[1] &= ~0x00000200u;
 }
 inline void V1LayerParameter::clear_loss_param() {
   if (loss_param_ != NULL) loss_param_->::caffe::LossParameter::Clear();
@@ -33442,13 +33120,13 @@ inline void V1LayerParameter::set_allocated_loss_param(::caffe::LossParameter* l
 
 // optional .caffe.V0LayerParameter layer = 1;
 inline bool V1LayerParameter::has_layer() const {
-  return (_has_bits_[1] & 0x00000800u) != 0;
+  return (_has_bits_[1] & 0x00000400u) != 0;
 }
 inline void V1LayerParameter::set_has_layer() {
-  _has_bits_[1] |= 0x00000800u;
+  _has_bits_[1] |= 0x00000400u;
 }
 inline void V1LayerParameter::clear_has_layer() {
-  _has_bits_[1] &= ~0x00000800u;
+  _has_bits_[1] &= ~0x00000400u;
 }
 inline void V1LayerParameter::clear_layer() {
   if (layer_ != NULL) layer_->::caffe::V0LayerParameter::Clear();
@@ -34840,11 +34518,6 @@ template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ParamSpec_DimCheckMode>() {
   return ::caffe::ParamSpec_DimCheckMode_descriptor();
 }
-template <> struct is_proto_enum< ::caffe::FocalLossParameter_Type> : ::google::protobuf::internal::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::caffe::FocalLossParameter_Type>() {
-  return ::caffe::FocalLossParameter_Type_descriptor();
-}
 template <> struct is_proto_enum< ::caffe::ResizeParameter_Resize_mode> : ::google::protobuf::internal::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::ResizeParameter_Resize_mode>() {
@@ -34864,11 +34537,6 @@ template <> struct is_proto_enum< ::caffe::LossParameter_NormalizationMode> : ::
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::LossParameter_NormalizationMode>() {
   return ::caffe::LossParameter_NormalizationMode_descriptor();
-}
-template <> struct is_proto_enum< ::caffe::BatchNormParameter_Engine> : ::google::protobuf::internal::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::caffe::BatchNormParameter_Engine>() {
-  return ::caffe::BatchNormParameter_Engine_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::ConvolutionParameter_Engine> : ::google::protobuf::internal::true_type {};
 template <>
@@ -34919,11 +34587,6 @@ template <> struct is_proto_enum< ::caffe::MultiBoxLossParameter_MiningType> : :
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::caffe::MultiBoxLossParameter_MiningType>() {
   return ::caffe::MultiBoxLossParameter_MiningType_descriptor();
-}
-template <> struct is_proto_enum< ::caffe::MultiBoxLossParameter_Type> : ::google::protobuf::internal::true_type {};
-template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::caffe::MultiBoxLossParameter_Type>() {
-  return ::caffe::MultiBoxLossParameter_Type_descriptor();
 }
 template <> struct is_proto_enum< ::caffe::PoolingParameter_PoolMethod> : ::google::protobuf::internal::true_type {};
 template <>
