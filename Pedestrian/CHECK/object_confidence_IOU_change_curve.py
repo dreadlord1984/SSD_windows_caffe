@@ -128,7 +128,7 @@ def draw_curve(data_mat):
             total_prior_num += num
         fig, axes = plt.subplots(nrows=2, figsize=(8, 12))
         strand_names = 'prior box distribution:%d' % total_prior_num
-        yalbel_names = 'area: ' + '%.4f' % area_thresholds[pl] + ' prioe box num'
+        yalbel_names = 'area: ' + '%.4f' % area_thresholds[pl] + ' prior box num'
         labels = [IOU_thresholds[i] for i in s_ids]
         ppl.bar(axes[0], s_ids, area_prior_num[pl],
                 annotate=True,width = 0.4,

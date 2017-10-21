@@ -173,7 +173,7 @@ Supported chart types:""" % (len(get_supported_chart_types()) - 1,
 def is_valid_chart_type(chart_type):
     return chart_type >= 0 and chart_type < len(get_supported_chart_types())
 
-colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Brown', 'Violet']
+colors = ['Black', 'Blue', 'Cyan', 'LightPink', 'Red', 'Purple', 'Gold', 'Chartreuse','Gray', 'Chocolate']
 
 if __name__ == '__main__':
     #print_help()
@@ -186,18 +186,20 @@ if __name__ == '__main__':
         print 'Path must ends with png' % path_to_png
         sys.exit()
 
-    path_to_logs = ["COMPARE2/alpha75_gamma2_D_new/alpha75_gamma2_D_new.log"]  # log文件
-    for path_to_log in path_to_logs:
-        if not os.path.exists(path_to_log):
-            print 'Path does not exist: %s' % path_to_log
-            sys.exit()
-        if not path_to_log.endswith(get_log_file_suffix()):
-            print 'Log file must end in %s.' % get_log_file_suffix()
-            print_help()
-    # plot_chart accpets multiple path_to_logs
-    plot_chart(0, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/focal/gamma3_D.log"]  # log文件
+    # path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N3D1E4/add_prior_gamma2_D_new_P5N3D1E4.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(0, chart_type, path_to_png, path_to_logs)
+
+
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N35D1E4/add_prior_gamma2_D_new_P5N35D1E4.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -208,7 +210,7 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(1, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE/focal/gamma4_D.log"]  # log文件
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N4D1E4/add_prior_gamma2_D_new_P5N4D1E4.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -219,40 +221,40 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(2, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE2/gamma2_D_new/gamma2_D_new.log"]  # log文件
-    for path_to_log in path_to_logs:
-        if not os.path.exists(path_to_log):
-            print 'Path does not exist: %s' % path_to_log
-            sys.exit()
-        if not path_to_log.endswith(get_log_file_suffix()):
-            print 'Log file must end in %s.' % get_log_file_suffix()
-            print_help()
-    ## plot_chart accpets multiple path_to_logs
-    plot_chart(3, chart_type, path_to_png, path_to_logs)
+    # path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N5D1E4/add_prior_gamma2_D_new_P5N5D1E4.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(3, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE2/gamma3_D_new/gamma3_D_new.log"]  # log文件
-    for path_to_log in path_to_logs:
-        if not os.path.exists(path_to_log):
-            print 'Path does not exist: %s' % path_to_log
-            sys.exit()
-        if not path_to_log.endswith(get_log_file_suffix()):
-            print 'Log file must end in %s.' % get_log_file_suffix()
-            print_help()
-    ## plot_chart accpets multiple path_to_logs
-    plot_chart(4, chart_type, path_to_png, path_to_logs)
+    # path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P45N3D1E4/add_prior_gamma2_D_new_P45N3D1E4.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(4, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE2/gamma4_D_new/gamma4_D_new.log"]  # log文件
-    for path_to_log in path_to_logs:
-        if not os.path.exists(path_to_log):
-            print 'Path does not exist: %s' % path_to_log
-            sys.exit()
-        if not path_to_log.endswith(get_log_file_suffix()):
-            print 'Log file must end in %s.' % get_log_file_suffix()
-            print_help()
-    ## plot_chart accpets multiple path_to_logs
-    plot_chart(5, chart_type, path_to_png, path_to_logs)
+    # path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P45N35D1E4/add_prior_gamma2_D_new_P45N35D1E4.log"]  # log文件
+    # for path_to_log in path_to_logs:
+    #     if not os.path.exists(path_to_log):
+    #         print 'Path does not exist: %s' % path_to_log
+    #         sys.exit()
+    #     if not path_to_log.endswith(get_log_file_suffix()):
+    #         print 'Log file must end in %s.' % get_log_file_suffix()
+    #         print_help()
+    # ## plot_chart accpets multiple path_to_logs
+    # plot_chart(5, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE2/gamma5_D_new/gamma5_D_new.log"]  # log文件
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N35D2E4/add_prior_gamma2_D_new_P5N35D2E4.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -263,7 +265,19 @@ if __name__ == '__main__':
     ## plot_chart accpets multiple path_to_logs
     plot_chart(6, chart_type, path_to_png, path_to_logs)
 
-    path_to_logs = ["COMPARE2/alpha90_gamma2_D_new/alpha90_gamma2_D_new.log"]  # log文件
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N35D15E4/add_prior_gamma2_D_new_P5N35D15E4.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(7, chart_type, path_to_png, path_to_logs)
+
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N4D2E4/add_prior_gamma2_D_new_P5N4D2E4.log"]  # log文件
     for path_to_log in path_to_logs:
         if not os.path.exists(path_to_log):
             print 'Path does not exist: %s' % path_to_log
@@ -272,18 +286,21 @@ if __name__ == '__main__':
             print 'Log file must end in %s.' % get_log_file_suffix()
             print_help()
     ## plot_chart accpets multiple path_to_logs
-    plot_chart(7, chart_type, path_to_png, path_to_logs)
+    plot_chart(8, chart_type, path_to_png, path_to_logs)
 
-    # path_to_logs = ["COMPARE2/alpha75_gamma2_D_new/alpha75_gamma2_D_new.log"]  # log文件
-    # for path_to_log in path_to_logs:
-    #     if not os.path.exists(path_to_log):
-    #         print 'Path does not exist: %s' % path_to_log
-    #         sys.exit()
-    #     if not path_to_log.endswith(get_log_file_suffix()):
-    #         print 'Log file must end in %s.' % get_log_file_suffix()
-    #         print_help()
-    # ## plot_chart accpets multiple path_to_logs
-    # plot_chart(8, chart_type, path_to_png, path_to_logs)
+    path_to_logs = ["COMPARE2/add_prior_gamma2_D_new_P5N4D15E4/add_prior_gamma2_D_new_P5N4D15E4.log"]  # log文件
+    for path_to_log in path_to_logs:
+        if not os.path.exists(path_to_log):
+            print 'Path does not exist: %s' % path_to_log
+            sys.exit()
+        if not path_to_log.endswith(get_log_file_suffix()):
+            print 'Log file must end in %s.' % get_log_file_suffix()
+            print_help()
+    ## plot_chart accpets multiple path_to_logs
+    plot_chart(9, chart_type, path_to_png, path_to_logs)
+
 
     plt.savefig(path_to_png)
+
     plt.show()
+

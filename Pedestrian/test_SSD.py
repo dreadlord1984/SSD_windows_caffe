@@ -68,8 +68,8 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deploy2.prototxt'
-model_weights = 'View\\COMPARE\\gamma2_D_new\\gamma2_D_new_iter_200000.caffemodel'
+model_def = 'View\\COMPARE2\\DSOD300\\deploy.prototxt'
+model_weights = 'View\\COMPARE2\\DSOD300\\DSOD300_iter_30000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\"
 imgList = "Data_0922/val.txt"
 
@@ -85,8 +85,8 @@ transformer.set_raw_scale('data', 255)  # the reference model operates on images
 transformer.set_channel_swap('data', (2,1,0))  # the reference model has channels in BGR order instead of RGB
 
 # set net to batch size of 1
-resize_width = 384
-resize_height = 256
+resize_width = 300
+resize_height = 300
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 TPs = 0 # 正检

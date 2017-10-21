@@ -49,11 +49,12 @@ def readXML(xml_name):
 """
 @function:将不同conf阈值下的TP、FP、FN结果保存
 @param param1: 测试列表文件
-@param param2: 检测结果列表文件
-@param param3: 待保存mat文件
+@param param2: 检测结果列表文件(无后缀）
+@output: 检测结果名+object.mat文件
 """
-def save_data(testList, resultList, recall_mat):
-    with open(testList) as fp1, open(resultList) as fp2:  # 对于每个测试图片
+def save_data(testList, resultList):
+    CR_mat = resultList.strip() + '_Object.mat'
+    with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
         for testFile in fp1:  # 每一行匹配数据 resultFile
             resultFile = fp2.readline()  # 每一行检测数据 priorFile
             img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
@@ -83,14 +84,14 @@ def save_data(testList, resultList, recall_mat):
                             break
                     for result_box in result_boxes:
                         if result_box[0] >= conf_thresholds[conf_i]:  # 属于该分类阈值下的检测结果
-                            if (computIOU(boxT, result_box[1]) > 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
+                            if (computIOU(boxT, result_box[1]) >= 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
                                 TP += 1  # 正确检测
                                 break
                     FN = 1 if TP == 0 else 0
                     all_change_group[area_index][conf_i]['FN'] += FN
                     all_change_group[area_index][conf_i]['TP'] += TP
 
-    scipy.io.savemat(recall_mat,{ 'all_change_group_Object': all_change_group})
+    scipy.io.savemat(CR_mat,{ 'all_change_group_Object': all_change_group})
 
 """
 @function:绘制PR曲线
@@ -100,7 +101,7 @@ def draw_curve(data_mat):
     plt.rcParams['figure.figsize'] = (9, 10)
     plt.rcParams['image.interpolation'] = 'nearest'
     plt.rcParams['image.cmap'] = 'gray'
-    data = scipy.io.loadmat(data_mat)
+    data = scipy.io.loadmat(data_mat + '_Object.mat')
     data = data['all_change_group_Object']
     for area_i in range(0, len(area_thresholds), 1):  # 判断area区间段
         recalls = []
@@ -144,9 +145,8 @@ for k in range(0, len(area_thresholds), 1):
         all_change_group[k].append({'TP': 0, 'FN': 0})
 
 if __name__ == "__main__":
-    save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              "COMPARE/0927/FL_gamma3_1_4-3Lr_iter_200000.txt", # PR_statistic.py中输出的目标检测结果
-              "COMPARE/0927/FL_gamma3_1_4-3Lr_iter_200000_Object.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+              "COMPARE2/add_prior_gamma2_D_new_P5N4D1E4/add_prior_gamma2_D_new_P5N4D1E4_iter_200000") # PR_statistic.py中输出的目标检测结果
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000_Object")
+    draw_curve("COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000")

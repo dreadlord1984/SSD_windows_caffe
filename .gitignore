@@ -111,4 +111,6 @@ MANIFEST-*
 /Pedestrian/CHECK/prior_with_gt_box_statistic.slides.html
 /Pedestrian/View/train.png
 /Pedestrian/View/*.mat
-/Pedestrian/Data_0810/*.xlsx
+/Pedestrian/Data_0731
+/Pedestrian/Data_0810
+/Pedestrian/Data_0731

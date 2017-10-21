@@ -39,13 +39,12 @@ def readXML(xml_name):
 """
 def save_data(priorList, resultList, data_mat, data_xlsx):
     with open(priorList) as fp1, open(resultList) as fp2:  # 对于每个测试图片
-        for priorFile in fp1:  # 每一行匹配数据 resultFile
-            resultFile = fp2.readline()  # 每一行检测数据 priorFile
+        for priorFile, resultFile in zip(fp1, fp2):  # 每一行匹配数据 resultFile
             prior_datas = priorFile.strip().split('\t')
             result_datas = resultFile.strip().split('\t')
             # img_name = ROOTDIR + prior_datas[0]
+            # print img_name.decode("gb2312")
             xml_name = ROOTDIR + prior_datas[1]
-            # print img_name
             # 1. 统计各个gt box面积占比区间box数量
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
             gt_boxes = []  # 样本所有gt box坐标 [[ratio_index, [xmin, ymin, xmax, ymax]]...]
@@ -63,7 +62,9 @@ def save_data(priorList, resultList, data_mat, data_xlsx):
             for i in range(0, prior_boxes_total, 1):
                 gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
                 IOU = float(prior_datas[7 * i + 4])
-                if IOU >= 0.5:
+###############################################################################################
+                if IOU >= 0.1:
+###############################################################################################
                     area_prior_num[gt_boxes[gt_box_index][0]] += 1
                     conf = float(result_datas[6 * i + 2])  # 分类置信度
                     for k in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
@@ -116,7 +117,7 @@ def draw_curve(data_mat, data_xlsx):
         total_prior_num += num
     fig, axes = plt.subplots(nrows=2, figsize=(8, 12))
     strand_names = ['ground truth distribution:%d' % total_gt_num, 'prior box distribution:%d' % total_prior_num]
-    yalbel_names = ['gt box num', '$IOU>0.5$ prioe box num']
+    yalbel_names = ['gt box num', '$IOU>0.1$ prioe box num']
     labels = [area_thresholds[i] for i in s_ids]
     for ax, strand_name, ylabel_name, statistic in zip(axes, strand_names, yalbel_names, gt_prior_statistic):
         ppl.bar(ax, s_ids, statistic,
@@ -157,7 +158,7 @@ def draw_curve(data_mat, data_xlsx):
     ax2 = ax1.twiny()
     # ax2.set_xlabel("prior boxes num")
     plt.xticks(s_ids, prior_num, rotation=10)
-    savename2 =  data_mat[:data_mat.rfind("\\")] + + "\\ALL_area_recall.png"
+    savename2 =  data_mat[:data_mat.rfind("\\")] + "\\ALL_area_recall.png"
     plt.savefig(savename2)
     plt.show()
 
@@ -181,9 +182,9 @@ for j in range(0, len(conf_thresholds), 1):
 
 
 if __name__ == "__main__":
-    # save_data("../Data_0825/IOU_ALL_image_List.txt",
-    #           "..\Data_0810\result_ALL_image_List.txt",
-    #           "..\Data_0810\object_confidence_change_curve.mat",
-    #           "...\Data_0810\object_confidence_change_curve.xlsx")
-    draw_curve("..\Data_0810\object_confidence_change_curve.mat",
-               "..\Data_0810\object_confidence_change_curve.xlsx")
+    save_data("..\\Data_0922\\IOU_ALL_image_List.txt",
+              "..\\View\\COMPARE2\\gamma2_D_new\\result_ALL_image_List.txt",
+              "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
+              "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")
+    # draw_curve("..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
+    #            "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")

@@ -368,6 +368,9 @@ message SolverParameter {
   }
   // DEPRECATED: use type instead of solver_type
   optional SolverType solver_type = 30 [default = SGD];
+  
+  // Overlap compute and communication for data parallel training
+  optional bool layer_wise_reduce = 45[default = true];
 }
 
 // A message that stores the solver snapshots
@@ -499,6 +502,7 @@ message LayerParameter {
   optional ConvolutionParameter convolution_param = 106;
   optional CropParameter crop_param = 144;
   optional DataParameter data_param = 107;
+  optional DenseBlockParameter denseblock_param = 147;
   optional DetectionEvaluateParameter detection_evaluate_param = 205;
   optional DetectionOutputParameter detection_output_param = 204;
   optional DropoutParameter dropout_param = 108;
@@ -543,6 +547,36 @@ message LayerParameter {
   optional VideoDataParameter video_data_param = 207;
   optional WindowDataParameter window_data_param = 129;
   optional FocalLossParameter focal_loss_param = 10632;
+}
+
+
+message DenseBlockParameter {
+  //if you don't use BC, BN-ReLU-Conv3 is one transition
+  //if you use BC, then BN-ReLU-Conv1-BN-ReLU-Conv3 is one transition
+  optional int32 numTransition = 1 [default = 40];
+  optional int32 initChannel = 2 [default = 16];
+  optional int32 growthRate = 3 [default = 12];
+  //Convolution related parameters
+  optional int32 pad_h = 4 [default = 1];
+  optional int32 pad_w = 5 [default = 1];
+  optional int32 conv_verticalStride = 6 [default = 1];
+  optional int32 conv_horizentalStride = 7 [default = 1];
+  optional int32 filter_H = 8 [default = 3];
+  optional int32 filter_W = 9 [default = 3];
+  optional FillerParameter Filter_Filler = 10;
+  //BN related parameters
+  optional FillerParameter BN_Scaler_Filler = 11;
+  optional FillerParameter BN_Bias_Filler = 12;
+  //Performance Related parameters
+  optional int32 gpuIdx = 15 [default = 0];
+  //Dropout related parameter
+  optional bool use_dropout = 16 [default = false];
+  optional float dropout_amount = 17 [default = 0];
+  optional bool use_BC = 18 [default = false];
+  //If it is not ultra space efficient, then it stores output data of conv1
+  optional bool BC_ultra_space_efficient = 19 [default = false];
+  optional int32 workspace_MB = 20 [default = 8];
+  optional float moving_average_fraction = 21 [default = 0.1];
 }
 
 // Focal Loss for Dense Object Detection
@@ -810,6 +844,15 @@ message BatchNormParameter {
   // Small value to add to the variance estimate so that we don't divide by
   // zero.
   optional float eps = 3 [default = 1e-5];
+  optional bool use_log = 4 [default = false];
+  optional FillerParameter scale_filler = 5;
+  optional FillerParameter bias_filler = 6;
+  enum Engine {
+    DEFAULT = 0;
+    CAFFE = 1;
+    CUDNN = 2;
+  }
+  optional Engine engine = 15 [default = DEFAULT];
 }
 
 message BiasParameter {
@@ -959,6 +1002,8 @@ message DataParameter {
   // Prefetch queue (Number of batches to prefetch to host memory, increase if
   // data access bandwidth varies).
   optional uint32 prefetch = 10 [default = 4];
+  optional bool random_order = 11 [default = true];
+  optional uint32 init_seed = 12 [default = 1234];
 }
 
 // Message that store parameters used by DetectionEvaluateLayer

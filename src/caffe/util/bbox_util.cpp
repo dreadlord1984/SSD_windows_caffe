@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include <stdio.h>
+#include <io.h>
 
 #include "boost/iterator/counting_iterator.hpp"
 
@@ -616,7 +617,7 @@ namespace caffe {
 		const vector<NormalizedBBox>& pred_bboxes, const int label,
 		const MatchType match_type, const float overlap_threshold,
 		const bool ignore_cross_boundary_bbox,
-		vector<int>* match_indices, vector<float>* match_overlaps) {
+		vector<int>* match_indices, vector<float>* match_overlaps, const int& index) {
 		int num_pred = pred_bboxes.size();
 		match_indices->clear();
 		match_indices->resize(num_pred, -1);
@@ -662,10 +663,94 @@ namespace caffe {
 		}
 
 		// Bipartite matching.
-		vector<int> gt_pool;
+		vector<int> gt_pool, gt_pool_for_add;
 		for (int i = 0; i < num_gt; ++i) {
 			gt_pool.push_back(i);
+			gt_pool_for_add.push_back(i);
 		}
+#ifdef SMALL_PRIOR
+		/**********************************************************************************************/
+		std::ofstream  outfile1;
+		outfile1.open("gt_num1.txt", ios::out | ios::app);
+		outfile1 << gt_pool.size() << std::endl;
+		outfile1.close();
+
+		if (gt_pool.size() > 0) {//为每个gt_box寻找最大匹配，然后按需求处理gt box
+			// Find the most overlapped gt and cooresponding predictions.
+			for (int p = 0; p < gt_pool.size(); ++p) {
+				int j = gt_pool[p];
+				int max_idx = -1;
+				int max_gt_idx = -1;
+				float max_overlap = -1;
+				for (map<int, map<int, float> >::iterator it = overlaps.begin();
+					it != overlaps.end(); ++it) {
+					int i = it->first;
+					//if ((*match_indices)[i] != -1) {
+					//	// The prediction already has matched ground truth or is ignored.
+					//	continue;
+					//}
+					// Find the maximum overlapped pair.
+					if (it->second[j] > max_overlap) {
+						// If the prediction has not been matched to any ground truth,
+						// and the overlap is larger than maximum overlap, update.
+						max_idx = i;
+						max_gt_idx = j;
+						max_overlap = it->second[j];
+					}
+				}
+				if (max_overlap < 0.1 || max_overlap >= 0.5)
+				{
+					// Erase the ground truth.
+					gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+					p--;
+				}
+			}
+		}
+		std::ofstream  outfile2;
+		outfile2.open("gt_num2.txt", ios::out | ios::app);
+		outfile2 << gt_pool.size() << std::endl;
+		outfile2.close();
+
+		if (gt_pool.size() > 0) {//为每个gt box寻找所有大于0小于0.5的匹配
+			std::ofstream  outfile;
+			outfile.open("temp2.txt", ios::out | ios::app);
+			// Find the most overlapped gt and cooresponding predictions.
+			for (int p = 0; p < gt_pool.size(); ++p) {
+				int j = gt_pool[p];
+				int max_idx = -1;
+				int max_gt_idx = -1;
+				float max_overlap = -1;
+				for (map<int, map<int, float> >::iterator it = overlaps.begin();
+					it != overlaps.end(); ++it) {
+					int i = it->first;
+					//if ((*match_indices)[i] != -1) {
+					//	// The prediction already has matched ground truth or is ignored.
+					//	continue;
+					//}
+					// Find the maximum overlapped pair.
+					if (it->second[j] >= 0.1) {
+						// If the prediction has not been matched to any ground truth,
+						// and the overlap is larger than maximum overlap, update.
+						max_idx = i;
+						max_gt_idx = j;
+						max_overlap = it->second[j];
+						outfile << "small " << max_overlap << " "
+							<< max_idx << " "
+							<< pred_bboxes[max_idx].xmin() << " "
+							<< pred_bboxes[max_idx].ymin() << " "
+							<< pred_bboxes[max_idx].xmax() << " "
+							<< pred_bboxes[max_idx].ymax() << " "
+							<< index << " " << max_gt_idx << std::endl;
+					}
+				}
+			}
+			outfile.close();
+		}
+		/**********************************************************************************************/
+
+#endif// SMALL_PRIOR
+
+		// 1. 先为每个 gt box 找在最大匹配（这个最大匹配IOU可能大于0.5也可能小于0.5）
 		while (gt_pool.size() > 0) {
 			// Find the most overlapped gt and cooresponding predictions.
 			int max_idx = -1;
@@ -695,17 +780,54 @@ namespace caffe {
 				}
 			}
 			if (max_idx == -1) {
-				// Cannot find good match.
+				// a.如果找不到匹配.
 				break;
 			}
-			else {
+#ifdef ADD_PRIOR_BOX
+			else if (max_overlap < 0.15){
+				// b.对于最大匹配IOU<0.1的,删除
+				// Erase the ground truth.
+				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+			}
+			else if (max_overlap >= overlap_threshold){
+				// c.对于最大匹配IOU>=0.5的,找一个最大匹配
+				CHECK_EQ((*match_indices)[max_idx], -1);
+				(*match_indices)[max_idx] = gt_indices[max_gt_idx];
+				(*match_overlaps)[max_idx] = max_overlap;
+				// Erase the ground truth.
+				gt_pool_for_add.erase(std::find(gt_pool_for_add.begin(), gt_pool_for_add.end(), max_gt_idx));
+				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+			}
+			else{
+				// d.对于最大匹配IOU<0.5的,找一组最大匹配
+				// 这里存在两种情况,一种gt被完全包含，一种gt被部分包含
+				for (map<int, map<int, float> >::iterator it = overlaps.begin();
+					it != overlaps.end(); ++it) {
+					int pre_i = it->first;
+					if ((*match_indices)[pre_i] != -1) {
+						// The prediction already has matched ground truth or is ignored.
+						continue;
+					}
+					if (it->second[max_gt_idx] >= max_overlap - 0.0001) {
+						CHECK_EQ((*match_indices)[pre_i], -1);
+						(*match_indices)[pre_i] = gt_indices[max_gt_idx];
+						(*match_overlaps)[pre_i] = max_overlap;
+					}
+				}
+				// Erase the ground truth.
+				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
+			}
+#else
+			else{
 				CHECK_EQ((*match_indices)[max_idx], -1);
 				(*match_indices)[max_idx] = gt_indices[max_gt_idx];
 				(*match_overlaps)[max_idx] = max_overlap;
 				// Erase the ground truth.
 				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
 			}
+#endif // ADD_PRIOR_BOX
 		}
+
 
 		switch (match_type) {
 		case MultiBoxLossParameter_MatchType_BIPARTITE:
@@ -713,6 +835,57 @@ namespace caffe {
 			break;
 		case MultiBoxLossParameter_MatchType_PER_PREDICTION:
 			// Get most overlaped for the rest prediction bboxes.
+#ifdef ADD_PRIOR_BOX
+			for (map<int, map<int, float> >::iterator it = overlaps.begin();
+				it != overlaps.end(); ++it) {
+				int i = it->first;
+				if ((*match_indices)[i] != -1) {
+					// The prediction already has matched ground truth or is ignored.
+					continue;
+				}
+				int max_gt_idx = -1;
+				float max_overlap = -1;
+				for (int j = 0; j < num_gt; ++j) {
+					if (it->second.find(j) == it->second.end()) {
+						// No overlap between the i-th prediction and j-th ground truth.
+						continue;
+					}
+					// Find the maximum overlapped pair.
+					float overlap = it->second[j];
+					if (overlap > max_overlap) {
+						// If the prediction has not been matched to any ground truth,
+						// and the overlap is larger than maximum overlap, update.
+						max_gt_idx = j;
+						max_overlap = overlap;
+					}
+				}
+				std::vector<int>::iterator finder = std::find(gt_pool_for_add.begin(), gt_pool_for_add.end(), max_gt_idx);
+				if (max_overlap >= overlap_threshold && max_gt_idx != -1) {
+					// Found a matched ground truth.
+					CHECK_EQ((*match_indices)[i], -1);
+					(*match_indices)[i] = gt_indices[max_gt_idx];
+					(*match_overlaps)[i] = max_overlap;
+				}
+				else if (finder != gt_pool_for_add.end() && max_overlap >= 0.4 && max_gt_idx != -1)
+				{
+					// 该pred_bboxes不存在大于overlap_threshold的匹配
+					// 1. 最大IOU匹配大于等于阈值（0.4）
+					// 2. gt box被部分包含
+					// 满足上面条件，则将该prior box作为该gt box的最终匹配
+					if (pred_bboxes[i].xmin() > gt_bboxes[max_gt_idx].xmin()
+						|| pred_bboxes[i].ymin() > gt_bboxes[max_gt_idx].ymin()
+						|| pred_bboxes[i].xmax() < gt_bboxes[max_gt_idx].xmax()
+						|| pred_bboxes[i].ymax() < gt_bboxes[max_gt_idx].ymax())
+					{
+						// Found a matched ground truth.
+						CHECK_EQ((*match_indices)[i], -1);
+						(*match_indices)[i] = gt_indices[max_gt_idx];
+						(*match_overlaps)[i] = max_overlap;
+					}
+				}
+			}
+
+#else
 			for (map<int, map<int, float> >::iterator it = overlaps.begin();
 				it != overlaps.end(); ++it) {
 				int i = it->first;
@@ -743,6 +916,8 @@ namespace caffe {
 					(*match_overlaps)[i] = max_overlap;
 				}
 			}
+
+#endif // ADD_PRIOR_BOX
 			break;
 		default:
 			LOG(FATAL) << "Unknown matching type.";
@@ -779,6 +954,14 @@ namespace caffe {
 			multibox_loss_param.ignore_cross_boundary_bbox();
 		// Find the matches.
 		int num = all_loc_preds.size();
+
+#ifdef SMALL_PRIOR
+		/**********************************************************************************************/
+		if (_access("temp2.txt", 0) != -1) // 如果临时文件存在，删除！
+			remove("temp2.txt");
+		/**********************************************************************************************/
+#endif // SMALL_PRIOR
+
 		for (int i = 0; i < num; ++i) {
 			map<int, vector<int> > match_indices;
 			map<int, vector<float> > match_overlaps;
@@ -806,7 +989,7 @@ namespace caffe {
 						all_loc_preds[i].find(label)->second, &loc_bboxes);
 					MatchBBox(gt_bboxes, loc_bboxes, label, match_type,
 						overlap_threshold, ignore_cross_boundary_bbox,
-						&match_indices[label], &match_overlaps[label]);
+						&match_indices[label], &match_overlaps[label], i);
 				}
 			}
 			else {
@@ -816,7 +999,7 @@ namespace caffe {
 				const int label = -1;
 				MatchBBox(gt_bboxes, prior_bboxes, label, match_type, overlap_threshold,
 					ignore_cross_boundary_bbox, &temp_match_indices,
-					&temp_match_overlaps);
+					&temp_match_overlaps, i);
 				if (share_location) {
 					match_indices[label] = temp_match_indices;
 					match_overlaps[label] = temp_match_overlaps;
@@ -872,7 +1055,8 @@ namespace caffe {
 
 	inline bool IsEligibleMining(const MiningType mining_type, const int match_idx,
 		const float match_overlap, const float neg_overlap) {
-		if (mining_type == MultiBoxLossParameter_MiningType_MAX_NEGATIVE) {
+		if (mining_type == MultiBoxLossParameter_MiningType_MAX_NEGATIVE ||
+			mining_type == MultiBoxLossParameter_MiningType_NONE) {
 			return match_idx == -1 && match_overlap < neg_overlap;
 		}
 		else if (mining_type == MultiBoxLossParameter_MiningType_HARD_EXAMPLE) {
@@ -916,6 +1100,37 @@ namespace caffe {
 		const float fl_beta = multibox_loss_param.fl_beta();
 		/*****************************************************************************/
 		if (mining_type == MultiBoxLossParameter_MiningType_NONE) {
+			/*****************************************************************************/
+			const float neg_overlap = multibox_loss_param.neg_overlap();
+			for (int i = 0; i < num; ++i) {
+				map<int, vector<int> >& match_indices = (*all_match_indices)[i];
+				const map<int, vector<float> >& match_overlaps = all_match_overlaps[i];
+				for (map<int, vector<int> >::iterator it = match_indices.begin();
+					it != match_indices.end(); ++it) {
+					const int label = it->first;
+					int pos = 0, neg = 0, ignore = 0;
+					// Get potential indices and loss pairs.
+					vector<pair<float, int> > loss_indices;
+					for (int m = 0; m < match_indices[label].size(); ++m) {
+						if (match_indices[label][m] > -1)
+						{
+							//是正样本
+							++pos;
+						}
+						else if (IsEligibleMining(mining_type, match_indices[label][m],
+							match_overlaps.find(label)->second[m], neg_overlap)) {
+							//是负样本 
+							++neg;
+						}
+						else{
+							//是待忽略样本
+							match_indices[label][m] = -2;
+							++ignore;
+						}
+					}
+				}
+			}
+			/*****************************************************************************/
 			return;
 		}
 		const LocLossType loc_loss_type = multibox_loss_param.loc_loss_type();
@@ -931,7 +1146,7 @@ namespace caffe {
 			nms_threshold = multibox_loss_param.nms_param().nms_threshold();
 			top_k = multibox_loss_param.nms_param().top_k();
 		}
-		const int sample_size = multibox_loss_param.sample_size();
+		const int sample_size = multibox_loss_param.sample_size();// multibox_loss_param.sample_size()
 		// Compute confidence losses based on matching results.
 		vector<vector<float> > all_conf_loss;
 #ifdef CPU_ONLY
@@ -1649,7 +1864,7 @@ namespace caffe {
 		}
 		do_neg_mining = mining_type != MultiBoxLossParameter_MiningType_NONE;
 		const ConfLossType conf_loss_type = multibox_loss_param.conf_loss_type();
-		int count = 0;
+		int count = 0;// 样本序号，从0开始
 		for (int i = 0; i < num; ++i) {
 			if (all_gt_bboxes.find(i) != all_gt_bboxes.end()) {
 				// Save matched (positive) bboxes scores and labels.
@@ -1659,7 +1874,12 @@ namespace caffe {
 					const vector<int>& match_index = it->second;
 					CHECK_EQ(match_index.size(), num_priors);
 					for (int j = 0; j < num_priors; ++j) {
-						if (match_index[j] <= -1) {
+						if (match_index[j] == -1) { //match_index[j] <= -1
+							continue;
+						}
+						else if (match_index[j] == -2)
+						{
+							conf_gt_data[j] = -1;
 							continue;
 						}
 						const int gt_label = map_object_to_agnostic ?
@@ -1673,11 +1893,11 @@ namespace caffe {
 						case MultiBoxLossParameter_ConfLossType_LOGISTIC:
 							conf_gt_data[idx * num_classes + gt_label] = 1;
 							break;
-						/*****************************************************************************/
+							/*****************************************************************************/
 						case MultiBoxLossParameter_ConfLossType_FocalLoss:
 							conf_gt_data[idx] = gt_label;
 							break;
-						/*****************************************************************************/
+							/*****************************************************************************/
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";
 						}
@@ -1707,11 +1927,11 @@ namespace caffe {
 								conf_gt_data[count * num_classes + background_label_id] = 1;
 							}
 							break;
-						/*****************************************************************************/
+							/*****************************************************************************/
 						case MultiBoxLossParameter_ConfLossType_FocalLoss:
 							conf_gt_data[count] = background_label_id;
 							break;
-						/*****************************************************************************/
+							/*****************************************************************************/
 						default:
 							LOG(FATAL) << "Unknown conf loss type.";
 						}

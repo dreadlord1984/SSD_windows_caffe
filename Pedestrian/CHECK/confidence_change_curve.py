@@ -16,8 +16,7 @@ from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 """
 def save_data(priorList, resultList, data_xlsx):
     with open(priorList) as fp1, open(resultList) as fp2: # 对于每个测试图片
-        for resultFile in fp2: # 每一行匹配数据 resultFile
-            priorFile = fp1.readline() # 每一行检测数据 priorFile
+        for priorFile, resultFile in zip(fp1, fp2):  # 每一行数据 resultFile
             prior_datas = priorFile.strip().split('\t')
             result_datas = resultFile.strip().split('\t')
 

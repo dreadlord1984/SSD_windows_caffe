@@ -105,9 +105,9 @@ namespace caffe {
 			layer_param.set_name(this->layer_param_.name() + "_softmax_conf");
 			layer_param.set_type("SoftmaxWithLoss");
 			layer_param.add_loss_weight(Dtype(1.));
-
 			layer_param.mutable_loss_param()->set_normalization(
 				LossParameter_NormalizationMode_NONE);
+
 
 
 			SoftmaxParameter* softmax_param = layer_param.mutable_softmax_param();
@@ -145,6 +145,8 @@ namespace caffe {
 			layer_param.add_loss_weight(Dtype(1.));
 			layer_param.mutable_loss_param()->set_normalization(
 				LossParameter_NormalizationMode_NONE);
+			layer_param.mutable_loss_param()->set_ignore_label(-1);
+
 			FocalLossParameter *focal_loss_param = layer_param.mutable_focal_loss_param();
 			focal_loss_param->set_alpha(multibox_loss_param.fl_alpha());
 			focal_loss_param->set_gamma(multibox_loss_param.fl_gamma());
@@ -316,15 +318,13 @@ namespace caffe {
 						<< not_match_gt_bbox.xmin() << " "
 						<< not_match_gt_bbox.ymin() << " "
 						<< not_match_gt_bbox.xmax() << " "
-						<< not_match_gt_bbox.ymax() << endl;
+						<< not_match_gt_bbox.ymax() << " "
+						<< not_match_gt_bbox.size() << endl;
 				}
 			}
 		}
 		/**********************************************************************************************/
 #endif // BOX_LIST
-
-
-
 
 		num_matches_ = 0;
 		int num_negs = 0;

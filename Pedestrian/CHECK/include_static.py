@@ -438,7 +438,7 @@ def statistical_analysis(input_excel):
 
     # 2. 将上面0.1<=maxIOU<0.5部分的gt box按照是否被prior box完全包含进行划分显示
     # 显示gt box
-    fig, axes = plt.subplots(nrows=2, figsize=(8, 12))
+    fig, axes = plt.subplots(ncols=2, figsize=(16, 8))
     gt_data2 = pd.DataFrame(pd.read_excel(input_excel, 'Sheet2'))
     gt_grade2 = gt_data2.groupby('status')['gt_num'].agg(sum)
     name2 = [u'include gt', u'uninclude gt']
@@ -512,13 +512,13 @@ if __name__ == "__main__":
     # save_max_data("../Data_0922/eliminate_greater0.5_less0.1_image_list.txt",
     #           "../Data_0922/eliminate_greater0.5_less0.1_max_image_list.txt")
 
-    # 2. 对于只保留的最大匹配后剩下的样本中，一个样本一行，统计完和不完全包含gt box的匹配
+    # 2. 对于只保留的最大匹配后剩下的样本中，一个样本一行，统计完全和不完全包含gt box的匹配
     # save_include_data("../Data_0922/eliminate_greater0.5_less0.1_max_image_list.txt",
     #           "../Data_0922/include_gt.txt", "../Data_0922/uninclude_gt.txt")
 
     # 3. 测试对于去掉存在大于0.5和小于0.1的匹配后剩下的样本的最大匹配
-    test_list("../Data_0922/eliminate_greater0.5_less0.1_max_image_list.txt",
-              "../Data_0922/eliminate_greater0.5_less0.1_detect_result.txt")
+    # test_list("../Data_0922/eliminate_greater0.5_less0.1_max_image_list.txt",
+    #           "../Data_0922/eliminate_greater0.5_less0.1_detect_result.txt")
 
     # 4. 一个目标一行，统计来自底层（高层higher_layer_prior_box >=）中完全包含gt box的匹配的IOU
     # save_lower_layer_prior_box("../Data_0922/include_gt.txt",
@@ -531,5 +531,5 @@ if __name__ == "__main__":
     # show_lower_layer_gt_area("../Data_0922/uninclude_gt.txt")
 
     # 7. 读取excel表绘制统计
-    # statistical_analysis('../Data_0922/prior_data.xlsx')
+    statistical_analysis('../Data_0922/prior_data.xlsx')
 

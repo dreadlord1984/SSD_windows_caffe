@@ -1918,7 +1918,7 @@ layer {
   }
   multibox_loss_param {
     loc_loss_type: SMOOTH_L1
-    conf_loss_type: FocalLoss #SOFTMAX LOGISTIC FocalLoss 
+    conf_loss_type: SOFTMAX #SOFTMAX LOGISTIC FocalLoss 
     
     fl_alpha: 1.0
     fl_gamma:  2.0

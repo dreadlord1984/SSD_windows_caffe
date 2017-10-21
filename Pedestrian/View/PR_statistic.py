@@ -70,9 +70,9 @@ def computIOU(A, B):
     return iou
 
 model_def = '../deploy2.prototxt' # 检测网络
-model_weights = 'COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000.caffemodel' # 训练好的模型
+model_weights = 'COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
-imgList = "..\\Data_0825\\val.txt" # 样本列表
+imgList = "..\\Data_0922\\val.txt" # 样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights
@@ -97,8 +97,9 @@ FNs = 0 # 漏检
 result_file = model_weights.strip().split('.caffemodel')[0]+'.txt'
 if  os.path.exists(result_file):
     os.remove(result_file)
-output = open(result_file, 'w')
+
 for imgFile in open(imgList).readlines():  # 对于每个测试图片
+    output = open(result_file, 'a')
     img_name = ROOTDIR + imgFile.strip().split('.jpg ')[0]
     xml_name = ROOTDIR + imgFile.strip().split('.jpg ')[1]
     output.write(imgFile.strip().split('.jpg ')[0])
@@ -128,12 +129,6 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     top_xmax = det_xmax[top_indices]
     top_ymax = det_ymax[top_indices]
 
-    # colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist()
-
-    # plt.imshow(image)
-    # currentAxis = plt.gca()
-
-    # detectBoxes = []
     output.write('\t')
     output.write(str(top_conf.shape[0]))
     for i in xrange(top_conf.shape[0]): # 对每个检测到的目标
@@ -157,7 +152,6 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
         label_name = top_labels[i]
 
     output.write('\n')
-
-output.close()
+    output.close()
 
 

@@ -49,15 +49,16 @@ def readXML(xml_name):
 """
 @function:将不同conf阈值下的TP、FP、FN结果保存
 @param param1: 测试列表文件
-@param param2: 检测结果列表文件
-@param param3: 待保存mat文件
+@param param2: 检测结果列表文件(无后缀）
+@output: 检测结果同名的mat文件，记录FP,TP,FN
 """
-def save_data(testList, resultList, recall_mat):
+def save_data(testList, resultList):
+    PR_mat = resultList.strip() + '.mat'
     num = 0
-    with open(testList) as fp1, open(resultList) as fp2:  # 对于每个测试图片
+    with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
         for testFile in fp1:  # 每一行匹配数据 resultFile
             resultFile = fp2.readline()  # 每一行检测数据 priorFile
-            img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
+            # img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
             xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1]
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
 
@@ -87,7 +88,7 @@ def save_data(testList, resultList, recall_mat):
                 for boxT in true_boxes:
                     for result_box in result_boxes:
                         if result_box[0] >= conf_thresholds[conf_i]:  # 属于该分类阈值下的检测结果
-                            if (computIOU(boxT, result_box[1]) > 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
+                            if (computIOU(boxT, result_box[1]) >= 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
                                 TP += 1  # 正确检测
                                 break
                 FN = len(true_boxes) - TP # 漏检
@@ -95,7 +96,7 @@ def save_data(testList, resultList, recall_mat):
                 all_change_group[conf_i]['FP'] += FP
                 all_change_group[conf_i]['FN'] += FN
 
-    scipy.io.savemat(recall_mat,{ 'all_change_group': all_change_group})
+    scipy.io.savemat(PR_mat,{ 'all_change_group': all_change_group})
 
 """
 @function:绘制PR曲线
@@ -212,12 +213,12 @@ s_ids = np.arange(len(conf_thresholds))
 
 
 if __name__ == "__main__":
-    # save_data("../Data_0825/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-    #           "COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000.txt", # PR_statistic.py中输出的目标检测结果
-    #           "COMPARE/NONE_A75G20_S_D/NONE_A75G20_S_D_fix_n_iter_200000.mat") # P待输出的统计结果，即不同conf阈值下的TP、FP、FN
+    save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+              "COMPARE2/add_prior_gamma2_D_new_P5N4D1E4/add_prior_gamma2_D_new_P5N4D1E4_iter_200000") # PR_statistic.py中输出的目标检测结果
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve(2,
-            "COMPARE\\NONE_A75G20_S_D\\NONE_A75G20_S_D_fix_n_iter_200000",
-            "COMPARE\\0927\\FL_gamma3_1_4-3Lr_iter_200000"
+    draw_curve(3,
+            "COMPARE2\\gamma2_D_new\\gamma2_D_new_iter_200000",
+            "COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000",
+            "COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4\\add_prior_gamma2_D_new_P5N4D15E4_iter_200000"
             )

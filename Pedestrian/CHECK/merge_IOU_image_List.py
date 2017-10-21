@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import xml.etree.cElementTree as et
+import matplotlib
 import matplotlib.pyplot as plt
 import linecache
+import prettyplotlib as ppl
 
 """
 @function:计算两个box的IOU
@@ -94,8 +96,8 @@ def copyList(IOUList, imageList, outList):
 @function:将匹配合并结果显示，红色框是ground truth box, 绿色框是 prior box
 @param param1: 合并输出列表文件
 """
-def showList(IOU_small_List):
-    for boxData in open(IOU_small_List).readlines():  # 对于每个box
+def showList(IOU_all_List):
+    for boxData in open(IOU_all_List).readlines():  # 对于每个box
         data = boxData.strip().split('\t')
         full_image_path = ROOTDIR + data[0]
         img = plt.imread(full_image_path)
@@ -136,7 +138,7 @@ def showList(IOU_small_List):
         # 显示
         for i in range(0, len(gt_boxes_set), 1):
             dispaly_box = group_prior_box[i]
-            for k in range(0, 1, 1):
+            for k in range(0, len(dispaly_box), 1):
                 display_txt = '%.4f' % ( dispaly_box[k][0])
                 currentAxis.add_patch(plt.Rectangle((dispaly_box[k][1], dispaly_box[k][2]),
                                                     dispaly_box[k][3] - dispaly_box[k][1], dispaly_box[k][4] - dispaly_box[k][2],
@@ -146,10 +148,61 @@ def showList(IOU_small_List):
         # break
     print "end"
 
+def statistic(IOU_all_List):
+    with open(IOU_all_List) as f:
+        for line in f:
+            prior_datas = line.strip().split('\t')
+            prior_boxes_total = int(prior_datas[2])
+
+            gt_set = set('x')
+            for i in range(0, prior_boxes_total, 1):
+                gt_box_index = (prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+                gt_set.add(gt_box_index)
+            gt_set.remove('x')
+
+            gt_group = {}
+            for gt_index in gt_set:
+                gt_group[gt_index] = 0
+
+            for i in range(0, prior_boxes_total, 1):
+                gt_box_index = (prior_datas[7 * i + 9])
+                gt_group[gt_box_index] += 1
+
+            for gt_index in gt_set:
+                prior_box_num = gt_group[gt_index]
+                for i in range(0, len(prior_nums), 1):  # 判断IOU区间段
+                    if (prior_box_num <= prior_nums[i]):
+                        prior_group[i] += 1
+                        break
+                else:
+                    print prior_box_num
+                    print prior_datas[0].decode("gb2312")
+
+    matplotlib.rcParams['figure.figsize'] = (8, 6)  # 设定显示大小
+    fig, ax = plt.subplots(1)
+    labels = [prior_nums[i] for i in s_ids]
+    anno_area2s = [('%d' % a) for a in prior_group[s_ids]]
+    total = np.sum(prior_group)
+    ppl.bar(ax, np.arange(len(prior_group)), prior_group[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
+    plt.xticks(rotation=25)
+    ax.set_title('(gt total %d)' % total)
+    ax.set_xlabel('prior box num')
+    ax.set_ylabel('gt num')
+    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\priorNum.png"
+    plt.savefig(savename)
+    plt.show()
+
+
 batch_size = 32
 colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
+prior_nums = np.linspace(1,40,40,dtype=np.int32)
+prior_group  = np.zeros(prior_nums.size,dtype=np.int32)
+s_ids = np.arange(prior_nums.size)
 
 if __name__ == "__main__":
-    # copyList("../Data_0922/val_eliminate_greater0.5_less0.1.txt", "../Data_0922/val_lmdb_list.txt", "../Data_0922/val_eliminate_greater0.5_less0.1_image_list.txt")
-    showList("../Data_0922/val_eliminate_greater0.5_less0.1_image_list.txt")
+    # copyList("../View/COMPARE2/gamma2_D_new/IOU_ALL.txt",
+    # "../Data_0922/train_lmdb_list.txt",
+    # "../View/COMPARE2/gamma2_D_new/IOU_ALL_image_List.txt")
+    # showList("../Data_0922/IOU_ALL_image_List.txt")
+    statistic("..\\View\\COMPARE2\\gamma2_D_new\\IOU_ALL_image_List.txt")
