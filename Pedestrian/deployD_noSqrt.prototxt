@@ -825,10 +825,10 @@ layer {
   bottom : "conv6_1"
 }
 layer {
-  name: "conv6_2a"
+  name: "conv6_2"
   type: "Convolution"
   bottom: "conv6_1"
-  top: "conv6_2a"
+  top: "conv6_2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -841,7 +841,7 @@ layer {
     num_output: 512
     pad: 1
     kernel_size: 3
-    stride: 1
+    stride: 2
     weight_filler {
       type: "xavier"
     }
@@ -854,45 +854,34 @@ layer {
 layer {
   name: "conv6_2_relu"
   type: "ReLU"
-  bottom: "conv6_2a"
-  top: "conv6_2a"
+  bottom: "conv6_2"
+  top: "conv6_2"
 }
 layer {
-  name: "pool6a"
-  type: "Pooling"
-  bottom: "conv6_2a"
-  top: "pool6a"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
-    stride: 2
-  }
-}
-layer {
-  name : "conv6_2a_bn"
+  name : "conv6_2_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "pool6a"
-  bottom : "pool6a"
+  top : "conv6_2"
+  bottom : "conv6_2"
 }
 layer {
-  name : "conv6_2a_bn"
+  name : "conv6_2_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "pool6a"
-  bottom : "pool6a"
+  top : "conv6_2"
+  bottom : "conv6_2"
 }
 layer {
-  name: "conv7_1a"
+  name: "conv7_1"
   type: "Convolution"
-  bottom: "pool6a"
-  top: "conv7_1a"
+  bottom: "conv6_2"
+  top: "conv7_1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -916,36 +905,36 @@ layer {
   }
 }
 layer {
-  name: "conv7_1a_relu"
+  name: "conv7_1_relu"
   type: "ReLU"
-  bottom: "conv7_1a"
-  top: "conv7_1a"
+  bottom: "conv7_1"
+  top: "conv7_1"
 }
 layer {
-  name : "conv7_1a_bn"
+  name : "conv7_1_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "conv7_1a"
-  bottom : "conv7_1a"
+  top : "conv7_1"
+  bottom : "conv7_1"
 }
 layer {
-  name : "conv7_1a_bn"
+  name : "conv7_1_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "conv7_1a"
-  bottom : "conv7_1a"
+  top : "conv7_1"
+  bottom : "conv7_1"
 }
 layer {
-  name: "conv7_2a"
+  name: "conv7_2"
   type: "Convolution"
-  bottom: "conv7_1a"
-  top: "conv7_2a"
+  bottom: "conv7_1"
+  top: "conv7_2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -958,7 +947,7 @@ layer {
     num_output: 256
     pad: 1
     kernel_size: 3
-    stride: 1
+    stride: 2
     weight_filler {
       type: "xavier"
     }
@@ -969,49 +958,36 @@ layer {
   }
 }
 layer {
-  name: "conv7_2a_relu"
+  name: "conv7_2_relu"
   type: "ReLU"
-  bottom: "conv7_2a"
-  top: "conv7_2a"
+  bottom: "conv7_2"
+  top: "conv7_2"
 }
-
 layer {
-  name: "pool7a"
-  type: "Pooling"
-  bottom: "conv7_2a"
-  top: "pool7a"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
-    stride: 2
-  }
-}
-
-layer {
-  name : "conv7_2a_bn"
+  name : "conv7_2_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "pool7a"
-  bottom : "pool7a"
+  top : "conv7_2"
+  bottom : "conv7_2"
 }
 layer {
-  name : "conv7_2a_bn"
+  name : "conv7_2_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "pool7a"
-  bottom : "pool7a"
+  top : "conv7_2"
+  bottom : "conv7_2"
 }
 layer {
-  name: "conv8_1a"
+  name: "conv8_1"
   type: "Convolution"
-  bottom: "pool7a"
-  top: "conv8_1a"
+  bottom: "conv7_2"
+  top: "conv8_1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -1035,36 +1011,36 @@ layer {
   }
 }
 layer {
-  name: "conv8_1a_relu"
+  name: "conv8_1_relu"
   type: "ReLU"
-  bottom: "conv8_1a"
-  top: "conv8_1a"
+  bottom: "conv8_1"
+  top: "conv8_1"
 }
 layer {
-  name : "conv8_1a_bn"
+  name : "conv8_1_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "conv8_1a"
-  bottom : "conv8_1a"
+  top : "conv8_1"
+  bottom : "conv8_1"
 }
 layer {
-  name : "conv8_1a_bn"
+  name : "conv8_1_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "conv8_1a"
-  bottom : "conv8_1a"
+  top : "conv8_1"
+  bottom : "conv8_1"
 }
 layer {
-  name: "conv8_2a"
+  name: "conv8_2"
   type: "Convolution"
-  bottom: "conv8_1a"
-  top: "conv8_2a"
+  bottom: "conv8_1"
+  top: "conv8_2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -1077,7 +1053,7 @@ layer {
     num_output: 256
     pad: 1
     kernel_size: 3
-    stride: 1
+    stride: 2
     weight_filler {
       type: "xavier"
     }
@@ -1088,49 +1064,36 @@ layer {
   }
 }
 layer {
-  name: "conv8_2a_relu"
+  name: "conv8_2_relu"
   type: "ReLU"
-  bottom: "conv8_2a"
-  top: "conv8_2a"
+  bottom: "conv8_2"
+  top: "conv8_2"
 }
-
 layer {
-  name: "pool8a"
-  type: "Pooling"
-  bottom: "conv8_2a"
-  top: "pool8a"
-  pooling_param {
-    pool: MAX
-    kernel_size: 2
-    stride: 2
-  }
-}
-
-layer {
-  name : "conv8_2a_bn"
+  name : "conv8_2_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "pool8a"
-  bottom : "pool8a"
+  top : "conv8_2"
+  bottom : "conv8_2"
 }
 layer {
-  name : "conv8_2a_bn"
+  name : "conv8_2_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "pool8a"
-  bottom : "pool8a"
+  top : "conv8_2"
+  bottom : "conv8_2"
 }
 layer {
-  name: "pool8"
+  name: "pool6"
   type: "Pooling"
-  bottom: "pool8a"
-  top: "pool8"
+  bottom: "conv8_2"
+  top: "pool6"
   pooling_param {
     pool: AVE
     global_pooling: true
@@ -1169,7 +1132,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1229,7 +1192,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1333,7 +1296,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1376,7 +1339,7 @@ layer {
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
     min_size: 25.0
-	max_size: 51
+	  max_size: 51
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1403,7 +1366,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1464,7 +1427,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1567,7 +1530,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1626,7 +1589,7 @@ layer {
 layer {
   name: "conv6_2_mbox_loc_1"
   type: "Convolution"
-  bottom: "pool6a"
+  bottom: "conv6_2"
   top: "conv6_2_mbox_loc_1"
   param {
     lr_mult: 1
@@ -1637,7 +1600,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1675,7 +1638,7 @@ layer {
 layer {
   name: "conv6_2_mbox_conf_0"
   type: "Convolution"
-  bottom: "pool6a"
+  bottom: "conv6_2"
   top: "conv6_2_mbox_conf_0"
   param {
     lr_mult: 1
@@ -1698,7 +1661,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1801,7 +1764,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1838,7 +1801,7 @@ layer {
 layer {
   name: "conv6_2_mbox_priorbox_1"
   type: "PriorBox"
-  bottom: "pool6a"
+  bottom: "conv6_2"
   bottom: "data"
   top: "conv6_2_mbox_priorbox_1"
   prior_box_param {
@@ -1859,7 +1822,7 @@ layer {
 layer {
   name: "conv7_2_mbox_loc_1"
   type: "Convolution"
-  bottom: "pool7a"
+  bottom: "conv7_2"
   top: "conv7_2_mbox_loc_1"
   param {
     lr_mult: 1
@@ -1870,7 +1833,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1908,7 +1871,7 @@ layer {
 layer {
   name: "conv7_2_mbox_conf_0"
   type: "Convolution"
-  bottom: "pool7a"
+  bottom: "conv7_2"
   top: "conv7_2_mbox_conf_0"
   param {
     lr_mult: 1
@@ -1931,7 +1894,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -2034,7 +1997,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2071,7 +2034,7 @@ layer {
 layer {
   name: "conv7_2_mbox_priorbox_1"
   type: "PriorBox"
-  bottom: "pool7a"
+  bottom: "conv7_2"
   bottom: "data"
   top: "conv7_2_mbox_priorbox_1"
   prior_box_param {
@@ -2092,7 +2055,7 @@ layer {
 layer {
   name: "conv8_2_mbox_loc_1"
   type: "Convolution"
-  bottom: "pool8a"
+  bottom: "conv8_2"
   top: "conv8_2_mbox_loc_1"
   param {
     lr_mult: 1
@@ -2103,7 +2066,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2141,7 +2104,7 @@ layer {
 layer {
   name: "conv8_2_mbox_conf_0"
   type: "Convolution"
-  bottom: "pool8a"
+  bottom: "conv8_2"
   top: "conv8_2_mbox_conf_0"
   param {
     lr_mult: 1
@@ -2164,7 +2127,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -2267,7 +2230,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2304,7 +2267,7 @@ layer {
 layer {
   name: "conv8_2_mbox_priorbox_1"
   type: "PriorBox"
-  bottom: "pool8a"
+  bottom: "conv8_2"
   bottom: "data"
   top: "conv8_2_mbox_priorbox_1"
   prior_box_param {
@@ -2323,10 +2286,10 @@ layer {
   }
 }
 layer {
-  name: "pool8_mbox_loc_1"
+  name: "pool6_mbox_loc_1"
   type: "Convolution"
-  bottom: "pool8"
-  top: "pool8_mbox_loc_1"
+  bottom: "pool6"
+  top: "pool6_mbox_loc_1"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -2336,7 +2299,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2351,10 +2314,10 @@ layer {
 
 }
 layer {
-  name: "pool8_mbox_loc_perm_1"
+  name: "pool6_mbox_loc_perm_1"
   type: "Permute"
-  bottom: "pool8_mbox_loc_1"
-  top: "pool8_mbox_loc_perm_1"
+  bottom: "pool6_mbox_loc_1"
+  top: "pool6_mbox_loc_perm_1"
   permute_param {
     order: 0
     order: 2
@@ -2363,19 +2326,19 @@ layer {
   }
 }
 layer {
-  name: "pool8_mbox_loc_flat_1"
+  name: "pool6_mbox_loc_flat_1"
   type: "Flatten"
-  bottom: "pool8_mbox_loc_perm_1"
-  top: "pool8_mbox_loc_flat_1"
+  bottom: "pool6_mbox_loc_perm_1"
+  top: "pool6_mbox_loc_flat_1"
   flatten_param {
     axis: 1
   }
 }
 layer {
-  name: "pool8_mbox_conf_0"
+  name: "pool6_mbox_conf_0"
   type: "Convolution"
-  bottom: "pool8"
-  top: "pool8_mbox_conf_0"
+  bottom: "pool6"
+  top: "pool6_mbox_conf_0"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -2397,43 +2360,43 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
-  name: "pool8_mbox_conf_0_relu"
+  name: "pool6_mbox_conf_0_relu"
   type: "ReLU"
-  bottom: "pool8_mbox_conf_0"
-  top: "pool8_mbox_conf_0"
+  bottom: "pool6_mbox_conf_0"
+  top: "pool6_mbox_conf_0"
 }
 
 layer {
-  name : "pool8_mbox_conf_0_bn"
+  name : "pool6_mbox_conf_0_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "pool8_mbox_conf_0"
-  bottom : "pool8_mbox_conf_0"
+  top : "pool6_mbox_conf_0"
+  bottom : "pool6_mbox_conf_0"
 }
 
 layer {
-  name : "pool8_mbox_conf_0_bn"
+  name : "pool6_mbox_conf_0_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "pool8_mbox_conf_0"
-  bottom : "pool8_mbox_conf_0"
+  top : "pool6_mbox_conf_0"
+  bottom : "pool6_mbox_conf_0"
 }
 
 layer {
-  name: "pool8_mbox_conf_2"
+  name: "pool6_mbox_conf_2"
   type: "Convolution"
-  bottom: "pool8_mbox_conf_0"
-  top: "pool8_mbox_conf_2"
+  bottom: "pool6_mbox_conf_0"
+  top: "pool6_mbox_conf_2"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -2458,39 +2421,39 @@ layer {
 }
 
 layer {
-  name: "pool8_mbox_conf_2_relu"
+  name: "pool6_mbox_conf_2_relu"
   type: "ReLU"
-  bottom: "pool8_mbox_conf_2"
-  top: "pool8_mbox_conf_2"
+  bottom: "pool6_mbox_conf_2"
+  top: "pool6_mbox_conf_2"
 }
 
 layer {
-  name : "pool8_mbox_conf_2_bn"
+  name : "pool6_mbox_conf_2_bn"
   type : "BatchNorm"  include { phase: TRAIN}
   batch_norm_param {
     use_global_stats: false 
     moving_average_fraction: 0.95
   }
-  top : "pool8_mbox_conf_2"
-  bottom : "pool8_mbox_conf_2"
+  top : "pool6_mbox_conf_2"
+  bottom : "pool6_mbox_conf_2"
 }
 
 layer {
-  name : "pool8_mbox_conf_2_bn"
+  name : "pool6_mbox_conf_2_bn"
   type : "BatchNorm"  include { phase: TEST}
   batch_norm_param {
     use_global_stats: true 
     moving_average_fraction: 0.95
   }
-  top : "pool8_mbox_conf_2"
-  bottom : "pool8_mbox_conf_2"
+  top : "pool6_mbox_conf_2"
+  bottom : "pool6_mbox_conf_2"
 }
 
 layer {
-  name: "pool8_mbox_conf_3"
+  name: "pool6_mbox_conf_3"
   type: "Convolution"
-  bottom: "pool8_mbox_conf_2"
-  top: "pool8_mbox_conf_3"
+  bottom: "pool6_mbox_conf_2"
+  top: "pool6_mbox_conf_3"
   param {
     lr_mult: 1
     decay_mult: 1
@@ -2500,7 +2463,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2514,10 +2477,10 @@ layer {
   }
 }
 layer {
-  name: "pool8_mbox_conf_perm_1"
+  name: "pool6_mbox_conf_perm_1"
   type: "Permute"
-  bottom: "pool8_mbox_conf_3"
-  top: "pool8_mbox_conf_perm_1"
+  bottom: "pool6_mbox_conf_3"
+  top: "pool6_mbox_conf_perm_1"
   permute_param {
     order: 0
     order: 2
@@ -2526,20 +2489,20 @@ layer {
   }
 }
 layer {
-  name: "pool8_mbox_conf_flat_1"
+  name: "pool6_mbox_conf_flat_1"
   type: "Flatten"
-  bottom: "pool8_mbox_conf_perm_1"
-  top: "pool8_mbox_conf_flat_1"
+  bottom: "pool6_mbox_conf_perm_1"
+  top: "pool6_mbox_conf_flat_1"
   flatten_param {
     axis: 1
   }
 }
 layer {
-  name: "pool8_mbox_priorbox_1"
+  name: "pool6_mbox_priorbox_1"
   type: "PriorBox"
-  bottom: "pool8"
+  bottom: "pool6"
   bottom: "data"
-  top: "pool8_mbox_priorbox_1"
+  top: "pool6_mbox_priorbox_1"
   prior_box_param {
     min_size: 230.0
     max_size: 276.0
@@ -2563,7 +2526,7 @@ layer {
   bottom: "conv6_2_mbox_loc_flat_1"
   bottom: "conv7_2_mbox_loc_flat_1"
   bottom: "conv8_2_mbox_loc_flat_1"
-  bottom: "pool8_mbox_loc_flat_1"
+  bottom: "pool6_mbox_loc_flat_1"
   top: "mbox_loc_1"
   concat_param {
     axis: 1
@@ -2577,7 +2540,7 @@ layer {
   bottom: "conv6_2_mbox_conf_flat_1"
   bottom: "conv7_2_mbox_conf_flat_1"
   bottom: "conv8_2_mbox_conf_flat_1"
-  bottom: "pool8_mbox_conf_flat_1"
+  bottom: "pool6_mbox_conf_flat_1"
   top: "mbox_conf_1"
   concat_param {
     axis: 1
@@ -2591,7 +2554,7 @@ layer {
   bottom: "conv6_2_mbox_priorbox_1"
   bottom: "conv7_2_mbox_priorbox_1"
   bottom: "conv8_2_mbox_priorbox_1"
-  bottom: "pool8_mbox_priorbox_1"
+  bottom: "pool6_mbox_priorbox_1"
   top: "mbox_priorbox_1"
   concat_param {
     axis: 2

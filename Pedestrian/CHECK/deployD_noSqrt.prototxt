@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_deploy"
+name: "SqueezeNet_Pedestrian_SSD_384x256_deploy(add_all_classification, delete sqrt(min*max) default box)"
 input: "data"
 input_shape {
   dim: 1
@@ -1132,7 +1132,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 48
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1192,7 +1192,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1296,7 +1296,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1338,10 +1338,8 @@ layer {
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
-    min_size: 20
-	min_size: 30
-	max_size: 51
-	max_size: 60
+    min_size: 25.0
+	  max_size: 51
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1368,7 +1366,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1380,6 +1378,7 @@ layer {
       value: 0
     }
   }
+
 }
 layer {
   name: "fc7_mbox_loc_perm_1"
@@ -1428,7 +1427,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1531,7 +1530,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1574,7 +1573,7 @@ layer {
   top: "fc7_mbox_priorbox_1"
   prior_box_param {
     min_size: 51.0
-	max_size: 97
+    max_size: 97.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1601,7 +1600,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1613,6 +1612,7 @@ layer {
       value: 0
     }
   }
+
 }
 layer {
   name: "conv6_2_mbox_loc_perm_1"
@@ -1661,7 +1661,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1764,7 +1764,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1806,7 +1806,7 @@ layer {
   top: "conv6_2_mbox_priorbox_1"
   prior_box_param {
     min_size: 97.0
-	max_size: 138
+    max_size: 138.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1833,7 +1833,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1845,6 +1845,7 @@ layer {
       value: 0
     }
   }
+
 }
 layer {
   name: "conv7_2_mbox_loc_perm_1"
@@ -1893,7 +1894,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1996,7 +1997,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2038,7 +2039,7 @@ layer {
   top: "conv7_2_mbox_priorbox_1"
   prior_box_param {
     min_size: 138.0
-	max_size: 184
+    max_size: 184.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -2065,7 +2066,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2077,6 +2078,7 @@ layer {
       value: 0
     }
   }
+
 }
 layer {
   name: "conv8_2_mbox_loc_perm_1"
@@ -2125,7 +2127,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -2228,7 +2230,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2270,7 +2272,7 @@ layer {
   top: "conv8_2_mbox_priorbox_1"
   prior_box_param {
     min_size: 184.0
-	max_size: 230
+    max_size: 230.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -2297,7 +2299,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2309,6 +2311,7 @@ layer {
       value: 0
     }
   }
+
 }
 layer {
   name: "pool6_mbox_loc_perm_1"
@@ -2357,7 +2360,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -2460,7 +2463,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2502,7 +2505,7 @@ layer {
   top: "pool6_mbox_priorbox_1"
   prior_box_param {
     min_size: 230.0
-	max_size: 250
+    max_size: 276.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -2603,11 +2606,11 @@ layer {
     share_location: true
     background_label_id: 0
     nms_param {
-      nms_threshold: 0.45
-      top_k: 400
+      nms_threshold: 1
+      top_k: -1
     }
     code_type: CENTER_SIZE
     #keep_top_k: 200
-    confidence_threshold: 0.01 # NMSÊ±ÅÅÐòÉ¸Ñ¡ãÐÖµ
+    #confidence_threshold: 0.01 # NMS时排序筛选阈值
   }
 }

@@ -55,9 +55,8 @@ def readXML(xml_name):
 def save_data(testList, resultList):
     CR_mat = resultList.strip() + '_Object.mat'
     with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
-        for testFile in fp1:  # 每一行匹配数据 resultFile
-            resultFile = fp2.readline()  # 每一行检测数据 priorFile
-            img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
+        for testFile, resultFile in zip(fp1, fp2):
+            # img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
             xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1]
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
 
@@ -73,21 +72,19 @@ def save_data(testList, resultList):
                 result_boxes.append([conf,[xmin, ymin, xmax, ymax]])
 
             for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
-                TP = 0  # 正检
-                FP = 0  # 误检
                 for boxT in true_boxes:
-                    TP = 0  # 正检
-                    FN = 0  # 漏检
                     for area_i in range(0, len(area_thresholds), 1):  # 判断area区间段
                         if (boxT[4] <= area_thresholds[area_i]):
                             area_index = area_i
                             break
+
+                    TP = 0  # 正检
                     for result_box in result_boxes:
                         if result_box[0] >= conf_thresholds[conf_i]:  # 属于该分类阈值下的检测结果
                             if (computIOU(boxT, result_box[1]) >= 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
                                 TP += 1  # 正确检测
                                 break
-                    FN = 1 if TP == 0 else 0
+                    FN = 1 if TP == 0 else 0 # 漏检
                     all_change_group[area_index][conf_i]['FN'] += FN
                     all_change_group[area_index][conf_i]['TP'] += TP
 
@@ -95,7 +92,7 @@ def save_data(testList, resultList):
 
 """
 @function:绘制PR曲线
-@param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果,...
+@param param1: 模型统计结果
 """
 def draw_curve(data_mat):
     plt.rcParams['figure.figsize'] = (9, 10)
@@ -133,7 +130,6 @@ def draw_curve(data_mat):
 
 # colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Chartreuse','Gray', 'Chocolate']
-lw = 2
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
 all_change_group = []  # 初始化
@@ -146,7 +142,7 @@ for k in range(0, len(area_thresholds), 1):
 
 if __name__ == "__main__":
     save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              "COMPARE2/add_prior_gamma2_D_new_P5N4D1E4/add_prior_gamma2_D_new_P5N4D1E4_iter_200000") # PR_statistic.py中输出的目标检测结果
+              "COMPARE2/add_prior_gamma2_D_new_P5N35D15E4_noSqrt/add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000") # PR_statistic.py中输出的目标检测结果
 
-    # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000")
+    # 绘制统计结果
+    draw_curve("COMPARE2\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000")

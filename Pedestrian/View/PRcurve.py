@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import numpy as np
 import matplotlib.pyplot as plt
-from itertools import cycle
 import scipy.io
 import xml.etree.cElementTree as et
 # setup plot details
@@ -56,10 +55,8 @@ def save_data(testList, resultList):
     PR_mat = resultList.strip() + '.mat'
     num = 0
     with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
-        for testFile in fp1:  # 每一行匹配数据 resultFile
-            resultFile = fp2.readline()  # 每一行检测数据 priorFile
-            # img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
-            xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1]
+        for testFile, resultFile in zip(fp1, fp2):
+            xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1] # xml文件完整路径
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
 
             result_datas = resultFile.strip().split('\t')
@@ -73,10 +70,10 @@ def save_data(testList, resultList):
                 ymax = int(result_datas[5 * i + 6])
                 result_boxes.append([conf,[xmin, ymin, xmax, ymax]])
 
-            for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
+            for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值（从小到大排列的）
                 TP = 0  # 正检
                 FP = 0  # 误检
-                FN = 0  # 漏检
+
                 for result_box in result_boxes:  # 对每个result box
                     not_match = 0
                     if result_box[0] >= conf_thresholds[conf_i]: # 属于该分类阈值下的检测结果
@@ -92,6 +89,7 @@ def save_data(testList, resultList):
                                 TP += 1  # 正确检测
                                 break
                 FN = len(true_boxes) - TP # 漏检
+
                 all_change_group[conf_i]['TP'] += TP
                 all_change_group[conf_i]['FP'] += FP
                 all_change_group[conf_i]['FN'] += FN
@@ -100,18 +98,17 @@ def save_data(testList, resultList):
 
 """
 @function:绘制PR曲线
-@param param1: 模型结果数量，模型一结果，模型二结果, 模型三结果,...
+@param param1: 统计结果mat文件（不限制数量）
 """
-def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_4 = 0,
-               data_mat_5 = 0, data_mat_6 = 0, data_mat_7 = 0, data_mat_8 = 0):
-    fig, axes = plt.subplots(nrows=1, figsize=(8, 8))
-    if recall_num == 1:
-        data = scipy.io.loadmat(data_mat_1)
+def draw_curve(*curves):
+    fig, axes = plt.subplots(nrows=1, figsize=(10, 8))
+    for curve_i, curve_name in enumerate(curves):
+        data = scipy.io.loadmat(curve_name)
         data = data['all_change_group'][0]
         Ps = []
         recalls = []
         precisions = []
-        data_name = data_mat_1.split('\\')[-1]
+        data_name = curve_name.split('\\')[-1]
         for conf_i in range(0, len(conf_thresholds), 1):
             TP = float(data[conf_i]['TP'])
             FP = float(data[conf_i]['FP'])
@@ -126,65 +123,14 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
             Ps.append(P)
             recalls.append(recall)
             precisions.append(precision)
-        axes.plot(recalls, precisions, lw=2, color='HotPink',
-                     label='val')  # 绘制每一条recall曲线
+        axes.plot(recalls, precisions, lw=2, color=colors[curve_i],
+                          label=data_name )  # 绘制每一条recall曲线
+        plt.plot(recalls, precisions, 'o', color=colors[curve_i])
         for conf_i in range(0, len(conf_thresholds), 1):
             plt.annotate(conf_thresholds[conf_i], xy=(recalls[conf_i], precisions[conf_i]),
                          xytext=(recalls[conf_i], precisions[conf_i]),
                          # arrowprops=dict(facecolor="r", headlength=3, headwidth=3, width=1)
                          )
-        plt.plot(recalls, precisions, 'ro')
-    else:
-        for curve_i in range(0, recall_num, 1):
-            if curve_i==0:
-                data_name_all = data_mat_1
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i==1:
-                data_name_all = data_mat_2
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i==2:
-                data_name_all = data_mat_3
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i == 3:
-                data_name_all = data_mat_4
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i == 4:
-                data_name_all = data_mat_5
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i == 5:
-                data_name_all = data_mat_6
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i == 6:
-                data_name_all = data_mat_7
-                data_name = data_name_all.split('\\')[-1]
-            elif curve_i == 7:
-                data_name_all = data_mat_8
-                data_name = data_name_all.split('\\')[-1]
-            data = scipy.io.loadmat(data_name_all)
-            data = data['all_change_group'][0]
-            recalls = []
-            precisions = []
-            for conf_i in range(0, len(conf_thresholds), 1):
-                #conf_i = 4
-                TP = float(data[conf_i]['TP'])
-                FP = float(data[conf_i]['FP'])
-                FN = float(data[conf_i]['FN'])
-                if TP == 0:
-                    recall = 0
-                    precision = 0
-                else:
-                    recall = TP / (TP + FN)
-                    precision = TP / (TP + FP)
-                recalls.append(recall)
-                precisions.append(precision)
-            axes.plot(recalls, precisions, lw=2, color=colors[curve_i],
-                      label=data_name )  # 绘制每一条recall曲线
-            plt.plot(recalls, precisions, 'o', color=colors[curve_i])
-            for conf_i in range(0, len(conf_thresholds), 1):
-                plt.annotate(conf_thresholds[conf_i], xy=(recalls[conf_i], precisions[conf_i]),
-                             xytext=(recalls[conf_i], precisions[conf_i]),color = colors[curve_i],
-                             # arrowprops=dict(facecolor="r", headlength=3, headwidth=3, width=1)
-                             )
     plt.legend(loc="lower left")
     #画对角线
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
@@ -200,8 +146,8 @@ def draw_curve(recall_num, data_mat_1, data_mat_2 = 0, data_mat_3 = 0, data_mat_
 
 
 # colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
-colors = ['Red', 'Blue', 'DeepSkyBlue', 'Cyan', 'ForestGreen',
-          'HotPink', 'Black', 'Purple', 'Gold', 'Brown', 'Violet']
+colors = ['Red', 'Blue', 'DeepSkyBlue', 'ForestGreen', 'HotPink',
+          'Black', 'Purple', 'Gold', 'Brown', 'Violet', 'Cyan']
 lw = 2
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
@@ -213,12 +159,13 @@ s_ids = np.arange(len(conf_thresholds))
 
 
 if __name__ == "__main__":
-    save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              "COMPARE2/add_prior_gamma2_D_new_P5N4D1E4/add_prior_gamma2_D_new_P5N4D1E4_iter_200000") # PR_statistic.py中输出的目标检测结果
+    # save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+    #           "COMPARE2/add_prior_gamma2_D_new_P5N4D15E4_noSqrt/add_prior_gamma2_D_new_P5N4D15E4_noSqrt_iter_200000") # PR_statistic.py中输出的目标检测结果
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve(3,
+    draw_curve(
             "COMPARE2\\gamma2_D_new\\gamma2_D_new_iter_200000",
-            "COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000",
-            "COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4\\add_prior_gamma2_D_new_P5N4D15E4_iter_200000"
+            "COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4\\add_prior_gamma2_D_new_P5N4D15E4_iter_200000",
+            "COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt_iter_200000",
+            "COMPARE2\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000"
             )

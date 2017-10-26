@@ -3,14 +3,8 @@ import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
 import numpy as np
-import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
 import os
-
-plt.rcParams['figure.figsize'] = (10, 10)
-plt.rcParams['image.interpolation'] = 'nearest'
-plt.rcParams['image.cmap'] = 'gray'
-
 
 import caffe
 caffe.set_device(0)
@@ -18,12 +12,6 @@ caffe.set_mode_gpu()
 
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
-
-# load PASCAL VOC labels
-labelmap_file = 'labelmap_VehicleFull.prototxt'
-file = open(labelmap_file, 'r')
-labelmap = caffe_pb2.LabelMap()
-text_format.Merge(str(file.read()), labelmap)
 
 def get_labelname(labelmap, labels):
     num_labels = len(labelmap.item)
@@ -69,8 +57,14 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = '../deploy2.prototxt' # 检测网络
-model_weights = 'COMPARE2\\add_prior_gamma2_D_new_P5N4D1E4\\add_prior_gamma2_D_new_P5N4D1E4_iter_200000.caffemodel' # 训练好的模型
+# load PASCAL VOC labels
+labelmap_file = 'labelmap_VehicleFull.prototxt'
+file = open(labelmap_file, 'r')
+labelmap = caffe_pb2.LabelMap()
+text_format.Merge(str(file.read()), labelmap)
+
+model_def = '..\\deployD_noSqrt.prototxt' # 检测网络y有非极大值抑制过程
+model_weights = 'COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt_iter_200000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
 imgList = "..\\Data_0922\\val.txt" # 样本列表
 
