@@ -26,15 +26,15 @@ def computIOU(A, B):
 """
 @function:从xml文件中读取box信息
 @param param1: xml文件
-@return: boxes
+@return: boxes(with area_ratio), width, height
 """
 def readXML(xml_name):
     tree = et.parse(xml_name) #打开xml文档
     # 得到文档元素对象
     root = tree.getroot()
     size = root.find('size')  # 找到root节点下的size节点
-    # width = size.find('width').text  # 子节点下节点width的值
-    # height = size.find('height').text  # 子节点下节点height的值
+    width = int(size.find('width').text)  # 子节点下节点width的值
+    height = int(size.find('height').text)  # 子节点下节点height的值
 
     boundingBox = []
     for object in root.findall('object'):  # 找到root节点下的所有object节点
@@ -43,8 +43,10 @@ def readXML(xml_name):
         ymin = bndbox.find('ymin').text
         xmax = bndbox.find('xmax').text
         ymax = bndbox.find('ymax').text
-        boundingBox.append([int(xmin), int(ymin), int(xmax), int(ymax)])
-    return boundingBox
+        area_ratio = float((int(xmax) - int(xmin)) * (int(ymax) - int(ymin))) / (width * height)
+        boundingBox.append([int(xmin), int(ymin), int(xmax), int(ymax), area_ratio])
+    return boundingBox, width, height
+
 
 """
 @function:将匹配结果按照训练顺序和训练样本名进行合并
@@ -103,10 +105,10 @@ def showList(IOU_all_List):
         img = plt.imread(full_image_path)
         plt.imshow(img)
         currentAxis = plt.gca()
-        width = img.shape[1]
-        height = img.shape[0]
+        # width = img.shape[1]
+        # height = img.shape[0]
         full_xml_path = ROOTDIR + data[1]
-        true_boxes = readXML(full_xml_path)
+        true_boxes,width,height = readXML(full_xml_path)
         print full_xml_path.decode("gb2312")
 
         for boxT in true_boxes:
@@ -148,10 +150,16 @@ def showList(IOU_all_List):
         # break
     print "end"
 
+"""
+@function:1.绘制进入训练的prior box matching的情况
+@function:2.绘制进入训练的gt box和area的情况
+@param param1: 合并输出列表文件
+"""
 def statistic(IOU_all_List):
     with open(IOU_all_List) as f:
         for line in f:
             prior_datas = line.strip().split('\t')
+            # print prior_datas[0].decode("gbk")
             prior_boxes_total = int(prior_datas[2])
 
             gt_set = set('x')
@@ -178,7 +186,19 @@ def statistic(IOU_all_List):
                     print prior_box_num
                     print prior_datas[0].decode("gb2312")
 
-    matplotlib.rcParams['figure.figsize'] = (8, 6)  # 设定显示大小
+            full_xml_path = ROOTDIR + prior_datas[1]
+            true_boxes, width, height = readXML(full_xml_path)
+            for gt_index in gt_set:
+                area = true_boxes[int(gt_index)][4]
+                for i in range(0, len(area_thresholds), 1):  # 判断area区间段
+                    if (area <= area_thresholds[i]):
+                        area_group[i] += 1
+                        break
+                else:
+                    print area
+
+
+    matplotlib.rcParams['figure.figsize'] = (24, 6)  # 设定显示大小
     fig, ax = plt.subplots(1)
     labels = [prior_nums[i] for i in s_ids]
     anno_area2s = [('%d' % a) for a in prior_group[s_ids]]
@@ -186,10 +206,24 @@ def statistic(IOU_all_List):
     ppl.bar(ax, np.arange(len(prior_group)), prior_group[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
     plt.xticks(rotation=25)
     ax.set_title('(gt total %d)' % total)
-    ax.set_xlabel('prior box num')
+    ax.set_xlabel('matching num')
     ax.set_ylabel('gt num')
-    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\priorNum.png"
+    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\matchNum.png"
     plt.savefig(savename)
+
+    matplotlib.rcParams['figure.figsize'] = (8, 7)  # 设定显示大小
+    fig, ax = plt.subplots(1)
+    labels = [area_thresholds[i] for i in s_ids2]
+    anno_area2s = [('%d' % a) for a in area_group[s_ids2]]
+    total = np.sum(area_group)
+    ppl.bar(ax, np.arange(len(area_group)), area_group[s_ids2], annotate=anno_area2s, grid='y', xticklabels=labels)
+    plt.xticks(rotation=25)
+    ax.set_title('(gt total %d)' % total)
+    ax.set_xlabel('gt area')
+    ax.set_ylabel('gt num')
+    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\gtNum.png"
+    plt.savefig(savename)
+
     plt.show()
 
 
@@ -198,11 +232,14 @@ colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 prior_nums = np.linspace(1,40,40,dtype=np.int32)
 prior_group  = np.zeros(prior_nums.size,dtype=np.int32)
+area_thresholds = np.array([0.0025, 0.005, 0.01, 0.015, 0.02, 0.04, 0.08, 0.1, 0.25, 1.0],dtype=np.float64) # area 区间
+area_group  = np.zeros(area_thresholds.size,dtype=np.int32)
 s_ids = np.arange(prior_nums.size)
+s_ids2 = np.arange(area_thresholds.size)
 
 if __name__ == "__main__":
-    # copyList("../View/COMPARE2/gamma2_D_new/IOU_ALL.txt",
+    # copyList("../View/COMPARE2/add_prior_gamma2_D1_new_P5N4D15E4_noSqrt/IOU_ALL.txt",
     # "../Data_0922/train_lmdb_list.txt",
-    # "../View/COMPARE2/gamma2_D_new/IOU_ALL_image_List.txt")
+    # "../View/COMPARE2/add_prior_gamma2_D1_new_P5N4D15E4_noSqrt/IOU_ALL_image_List.txt")
     # showList("../Data_0922/IOU_ALL_image_List.txt")
-    statistic("..\\View\\COMPARE2\\gamma2_D_new\\IOU_ALL_image_List.txt")
+    statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1_new_P5N4D15E4_noSqrt\\IOU_ALL_image_List.txt")

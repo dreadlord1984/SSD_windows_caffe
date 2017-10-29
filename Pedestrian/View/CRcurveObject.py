@@ -25,7 +25,7 @@ def computIOU(A, B):
 """
 @function:从xml文件中读取box信息
 @param param1: xml文件
-@return: boxes
+@return: boxes(with area_ratio), width, height
 """
 def readXML(xml_name):
     tree = et.parse(xml_name) #打开xml文档
@@ -142,7 +142,7 @@ for k in range(0, len(area_thresholds), 1):
 
 if __name__ == "__main__":
     save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              "COMPARE2/add_prior_gamma2_D_new_P5N35D15E4_noSqrt/add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000") # PR_statistic.py中输出的目标检测结果
+              "COMPARE2/add_prior_gamma2_D1_new_P5N35D15E4_noSqrt/add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000") # PR_statistic.py中输出的目标检测结果
 
     # 绘制统计结果
-    draw_curve("COMPARE2\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000")
+    draw_curve("COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000")

@@ -8,7 +8,7 @@ layer {
     phase: TRAIN
   }
   transform_param {
-    mirror: false
+    mirror: true
     mean_value: 104
     mean_value: 117
     mean_value: 123
@@ -28,14 +28,92 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0731/train_lmdb"
-    batch_size: 10
+    source: "E:/tyang/Pedestrian/Data_0825/train_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
       max_sample: 1
       max_trials: 1
+    }
+	batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.1
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.3
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.5
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.9
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        max_jaccard_overlap: 1
+      }
+      max_sample: 1
+      max_trials: 50
     }
     label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
   }
@@ -1911,11 +1989,15 @@ layer {
   propagate_down: false
   propagate_down: false
   loss_param {
-    normalization: VALID
+    normalization: VALID # FULL VALID BATCH_SIZE NONE
   }
   multibox_loss_param {
     loc_loss_type: SMOOTH_L1
-    conf_loss_type: SOFTMAX
+	
+    conf_loss_type: FocalLoss #SOFTMAX LOGISTIC FocalLoss 
+    fl_alpha: 0.75
+    fl_gamma:  2.0
+	
     loc_weight: 1.0
     num_classes: 2
     share_location: true
@@ -1923,16 +2005,12 @@ layer {
     overlap_threshold: 0.5
     use_prior_for_matching: true
     background_label_id: 0
-	  #ignore_label_id: 13
+	#ignore_label_id: 13
     use_difficult_gt: true
     #do_neg_mining: true
     neg_pos_ratio: 3.0
     neg_overlap: 0.5
     code_type: CENTER_SIZE
-		mining_type: HARD_EXAMPLE
-		nms_param {
-      nms_threshold: 0.3
-      top_k: 64
-    }
+	mining_type: NONE #HARD_EXAMPLE MAX_NEGATIVE NONE
   }
 }

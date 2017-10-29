@@ -1132,7 +1132,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1366,7 +1366,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1414,7 +1414,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1483,7 +1483,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1531,7 +1531,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1600,7 +1600,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1648,7 +1648,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1717,7 +1717,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1765,7 +1765,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1834,7 +1834,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1882,7 +1882,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 12
+    num_output: 10
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2029,7 +2029,7 @@ layer {
       top_k: 400
     }
     code_type: CENTER_SIZE
-    #keep_top_k: 200
+    keep_top_k: 200
     confidence_threshold: 0.1
   }
 }

@@ -63,8 +63,8 @@ file = open(labelmap_file, 'r')
 labelmap = caffe_pb2.LabelMap()
 text_format.Merge(str(file.read()), labelmap)
 
-model_def = '..\\deployD_noSqrt.prototxt' # 检测网络y有非极大值抑制过程
-model_weights = 'COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt_iter_200000.caffemodel' # 训练好的模型
+model_def = '..\\deployD1_noSqrt.prototxt' # 检测网络y有非极大值抑制过程
+model_weights = 'COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
 imgList = "..\\Data_0922\\val.txt" # 样本列表
 
@@ -125,6 +125,9 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
 
     output.write('\t')
     output.write(str(top_conf.shape[0]))
+    if top_conf.shape[0] < 1:
+        print img_name.decode("gbk")
+
     for i in xrange(top_conf.shape[0]): # 对每个检测到的目标
         not_match = 0
         xmin = int(round(top_xmin[i] * image.shape[1]))

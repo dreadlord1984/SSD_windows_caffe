@@ -37,4 +37,4 @@ group = np.zeros(thresholds.size,dtype=np.int32)
 matplotlib.rcParams['figure.figsize'] = (8, 6)  # 设定显示大小
 
 if __name__ == "__main__":
-    draw_curve("..\\Data_0922\\IOU_ALL.txt")
+    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt")

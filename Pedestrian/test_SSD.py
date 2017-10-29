@@ -68,13 +68,13 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deploy2_noSqrt.prototxt'
-model_weights = 'View\\COMPARE2\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
+model_def = 'deploy_noSqrt.prototxt'
+model_weights = 'View\\COMPARE2\\add_prior_gamma2_new_P5N35D15E4_noSqrt\\add_prior_gamma2_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\"
 imgList = "Data_0922/val.txt"
 
 net = caffe.Net(model_def,      # defines the structure of the model
-                model_weights,  # contains the trained weights
+                model_weights,  # contains the trained weights4
                 caffe.TEST)     # use test mode (e.g., don't perform dropout)
 
 # input preprocessing: 'data' is the name of the input blob == net.inputs[0]

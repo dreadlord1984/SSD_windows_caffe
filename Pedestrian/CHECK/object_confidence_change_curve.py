@@ -182,9 +182,9 @@ for j in range(0, len(conf_thresholds), 1):
 
 
 if __name__ == "__main__":
-    save_data("..\\Data_0922\\IOU_ALL_image_List.txt",
-              "..\\View\\COMPARE2\\gamma2_D_new\\result_ALL_image_List.txt",
-              "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
-              "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")
-    # draw_curve("..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
-    #            "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")
+    # save_data("..\\Data_0922\\IOU_ALL_image_List.txt",
+    #           "..\\View\\COMPARE2\\gamma2_D_new\\result_ALL_image_List.txt",
+    #           "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
+    #           "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")
+    draw_curve("..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.mat",
+               "..\\View\\COMPARE2\\gamma2_D_new\\object_confidence_change_curve.xlsx")
