@@ -184,7 +184,7 @@ def statistic(IOU_all_List):
                         break
                 else:
                     print prior_box_num
-                    print prior_datas[0].decode("gb2312")
+                    print prior_datas[0].decode("gbk")
 
             full_xml_path = ROOTDIR + prior_datas[1]
             true_boxes, width, height = readXML(full_xml_path)
@@ -238,8 +238,8 @@ s_ids = np.arange(prior_nums.size)
 s_ids2 = np.arange(area_thresholds.size)
 
 if __name__ == "__main__":
-    # copyList("../View/COMPARE2/add_prior_gamma2_D1_new_P5N4D15E4_noSqrt/IOU_ALL.txt",
+    # copyList("../View/COMPARE2/add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt/IOU_ALL.txt",
     # "../Data_0922/train_lmdb_list.txt",
-    # "../View/COMPARE2/add_prior_gamma2_D1_new_P5N4D15E4_noSqrt/IOU_ALL_image_List.txt")
+    # "../View/COMPARE2/add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt/IOU_ALL_image_List.txt")
     # showList("../Data_0922/IOU_ALL_image_List.txt")
-    statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1_new_P5N4D15E4_noSqrt\\IOU_ALL_image_List.txt")
+    statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt")

@@ -63,7 +63,7 @@
     <ClCompile>
       <DisableSpecificWarnings>4661;4005;4812;4715;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>GLOG_NO_ABBREVIATED_SEVERITIES;_DEBUG;BOX_LIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>GLOG_NO_ABBREVIATED_SEVERITIES;_DEBUG;ADD_PRIOR_BOX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
@@ -89,7 +89,7 @@
       <DisableSpecificWarnings>4661;4005;4812;4715;%(DisableSpecificWarnings)</DisableSpecificWarnings>
       <AdditionalIncludeDirectories>$(ProjectDir)\..\..\src\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;USE_OPENCV;GLOG_NO_ABBREVIATED_SEVERITIES;ADD_PRIOR_BOX;BOX_LIST;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;USE_OPENCV;GLOG_NO_ABBREVIATED_SEVERITIES;ADD_PRIOR_BOX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Lib>
       <AdditionalOptions>/ignore:4221 %(AdditionalOptions)</AdditionalOptions>
@@ -211,6 +211,10 @@
     <ClCompile Include="..\..\src\caffe\util\signal_handler.cpp" />
     <ClCompile Include="..\..\src\caffe\util\upgrade_proto.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\focal_loss_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\roi_pooling_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\psroi_pooling_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\box_annotator_ohem_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\softmax_loss_ohem_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\caffe\blob.hpp" />
@@ -329,6 +333,10 @@
     <ClInclude Include="..\..\include\caffe\util\signal_handler.h" />
     <ClInclude Include="..\..\include\caffe\util\upgrade_proto.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\focal_loss_layer.hpp" />
+    <ClInclude Include="..\..\include\caffe\layers\roi_pooling_layer.hpp" />
+    <ClInclude Include="..\..\include\caffe\layers\psroi_pooling_layer.hpp" />
+    <ClInclude Include="..\..\include\caffe\layers\softmax_loss_ohem_layer.hpp" />
+    <ClInclude Include="..\..\include\caffe\layers\box_annotator_ohem_layer.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(CpuOnlyBuild)'=='false'">
     <CudaCompile Include="..\..\src\caffe\layers\absval_layer.cu" />
@@ -401,6 +409,10 @@
     <CudaCompile Include="..\..\src\caffe\layers\focal_loss_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\layers\smooth_L1_loss_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\util\bbox_util.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\roi_pooling_layer.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\psroi_pooling_layer.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\box_annotator_ohem_layer.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\softmax_loss_ohem_layer.cu" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <Import Project="$(SolutionDir)\CommonSettings.targets" />

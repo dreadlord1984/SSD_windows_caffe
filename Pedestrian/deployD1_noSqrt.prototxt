@@ -1339,11 +1339,11 @@ layer {
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
     min_size: 25.0
-	max_size: 51
+		max_size: 51
     aspect_ratio: 0.25
-	aspect_ratio: 0.5
-	aspect_ratio: 0.75
-	aspect_ratio: 1.25
+		aspect_ratio: 0.5
+		aspect_ratio: 0.75
+		aspect_ratio: 1.25
     flip: false
     clip: true
     variance: 0.1

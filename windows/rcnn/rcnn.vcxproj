@@ -14,11 +14,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGUID>{CE6BBC46-9EFC-4029-9065-85A023866AFB}</ProjectGUID>
+    <ProjectGUID>{8FBE275E-745A-451B-ADE9-98C042F9835A}</ProjectGUID>
     <Keyword>Win32Proj</Keyword>
     <Platform>x64</Platform>
-    <RootNamespace>caffe</RootNamespace>
-    <NuGetPackageImportStamp>750513d1</NuGetPackageImportStamp>
+    <RootNamespace>rcnn</RootNamespace>
+    <NuGetPackageImportStamp>82610725</NuGetPackageImportStamp>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -34,10 +34,15 @@
     <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
-  <ImportGroup Label="ExtensionSettings" />
-  <ImportGroup Label="PropertySheets" Condition="Exists('$(SolutionDir)\CommonSettings.props')">
-    <Import Project="..\CommonSettings.props" />
+  <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="Exists('$(SolutionDir)\CommonSettings.props')">
+    <Import Project="$(SolutionDir)\CommonSettings.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>C:\NugetPackages\OpenCV.2.4.10\build\native\include;C:\NugetPackages\OpenCV.2.4.10\build\native\include\opencv;C:\NugetPackages\OpenCV.2.4.10\build\native\include\opencv2;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\NugetPackages\OpenCV.2.4.10\build\native\lib\x64\v120\Debug;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Link>
       <AdditionalDependencies>libcaffe.lib;$(CudaDependencies);%(AdditionalDependencies)</AdditionalDependencies>
@@ -47,7 +52,7 @@
       <Command>"$(ScriptsDir)\FixGFlagsNaming.cmd" "$(OutDir)" $(Configuration)</Command>
     </PostBuildEvent>
     <ClCompile>
-      <PreprocessorDefinitions>%(PreprocessorDefinitions);CAFFE_VERSION=1.0.0-rc3;ADD_PRIOR_BOX</PreprocessorDefinitions>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -59,13 +64,9 @@
       <Command>"$(ScriptsDir)\FixGFlagsNaming.cmd" "$(OutDir)" $(Configuration)</Command>
     </PostBuildEvent>
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>NDEBUG;USE_OPENCV;ADD_PRIOR_BOX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\tools\caffe.cpp" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\libcaffe\libcaffe.vcxproj">
       <Project>{a9acef83-7b63-4574-a554-89ce869ea141}</Project>
@@ -75,6 +76,16 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Faster_rcnn.h" />
+    <ClInclude Include="head.h" />
+    <ClInclude Include="mdatatype.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="targetver.h" />
+    <ClCompile Include="fasterrcnn_vs2013.cpp" />
+    <ClCompile Include="Faster_rcnn.cpp" />
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -98,7 +109,7 @@
     <Import Project="..\..\..\NugetPackages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets" Condition="Exists('..\..\..\NugetPackages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" />
     <Import Project="..\..\..\NugetPackages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets" Condition="Exists('..\..\..\NugetPackages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" />
     <Import Project="..\..\..\NugetPackages\boost_regex-vc120.1.59.0.0\build\native\boost_regex-vc120.targets" Condition="Exists('..\..\..\NugetPackages\boost_regex-vc120.1.59.0.0\build\native\boost_regex-vc120.targets')" />
-  </ImportGroup>
+</ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Enable NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
@@ -122,5 +133,5 @@
     <Error Condition="!Exists('..\..\..\NugetPackages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\NugetPackages\LevelDB-vc120.1.2.0.0\build\native\LevelDB-vc120.targets'))" />
     <Error Condition="!Exists('..\..\..\NugetPackages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\NugetPackages\lmdb-v120-clean.0.9.14.0\build\native\lmdb-v120-clean.targets'))" />
     <Error Condition="!Exists('..\..\..\NugetPackages\boost_regex-vc120.1.59.0.0\build\native\boost_regex-vc120.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\NugetPackages\boost_regex-vc120.1.59.0.0\build\native\boost_regex-vc120.targets'))" />
-  </Target>
+</Target>
 </Project>

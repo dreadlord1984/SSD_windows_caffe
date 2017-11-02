@@ -663,7 +663,7 @@ namespace caffe {
 		}
 
 		// Bipartite matching.
-		vector<int> gt_pool, gt_pool_for_add;
+		vector<int> gt_pool, gt_pool_for_add, gt_pool_again;
 		for (int i = 0; i < num_gt; ++i) {
 			gt_pool.push_back(i);
 			gt_pool_for_add.push_back(i);
@@ -779,6 +779,7 @@ namespace caffe {
 					}
 				}
 			}
+
 			if (max_idx == -1) {
 				// a.如果找不到匹配.
 				break;
@@ -800,7 +801,7 @@ namespace caffe {
 			}
 			else{
 				// d.对于最大匹配IOU<0.5的,找一组最大匹配
-				// 这里存在两种情况,一种gt被完全包含，一种gt被部分包含
+				gt_pool_again.push_back(max_gt_idx);
 				for (map<int, map<int, float> >::iterator it = overlaps.begin();
 					it != overlaps.end(); ++it) {
 					int pre_i = it->first;
@@ -814,6 +815,7 @@ namespace caffe {
 						(*match_overlaps)[pre_i] = max_overlap;
 					}
 				}
+
 				// Erase the ground truth.
 				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
 			}
@@ -828,6 +830,57 @@ namespace caffe {
 #endif // ADD_PRIOR_BOX
 		}
 
+#ifdef ADD_PRIOR_BOX
+		while (gt_pool_again.size() > 0)
+		{
+			//换个姿势再来一次 -_-!
+			// 找次大的匹配
+			int max_idx = -1;
+			int max_gt_idx = -1;
+			float max_overlap = -1;
+			for (map<int, map<int, float> >::iterator it = overlaps.begin();
+				it != overlaps.end(); ++it) {
+				int i = it->first;
+				if ((*match_indices)[i] != -1) {
+					// The prediction already has matched ground truth or is ignored.
+					continue;
+				}
+				for (int p = 0; p < gt_pool_again.size(); ++p) {
+					int j = gt_pool_again[p];
+					if (it->second.find(j) == it->second.end()) {
+						// No overlap between the i-th prediction and j-th ground truth.
+						continue;
+					}
+					// Find the maximum overlapped pair.
+					if (it->second[j] > max_overlap) {
+						// If the prediction has not been matched to any ground truth,
+						// and the overlap is larger than maximum overlap, update.
+						max_idx = i;
+						max_gt_idx = j;
+						max_overlap = it->second[j];
+					}
+				}
+			}
+
+			// e.找次大的一组匹配
+			for (map<int, map<int, float> >::iterator it = overlaps.begin();
+				it != overlaps.end(); ++it) {
+				int pre_i = it->first;
+				if ((*match_indices)[pre_i] != -1) {
+					// The prediction already has matched ground truth or is ignored.
+					continue;
+				}
+				if (it->second[max_gt_idx] >= max_overlap - 0.0001) {
+					CHECK_EQ((*match_indices)[pre_i], -1);
+					(*match_indices)[pre_i] = gt_indices[max_gt_idx];
+					(*match_overlaps)[pre_i] = max_overlap;
+				}
+
+			}
+			gt_pool_again.erase(std::find(gt_pool_again.begin(), gt_pool_again.end(), max_gt_idx));
+		}
+		
+#endif // ADD_PRIOR_BOX
 
 		switch (match_type) {
 		case MultiBoxLossParameter_MatchType_BIPARTITE:
