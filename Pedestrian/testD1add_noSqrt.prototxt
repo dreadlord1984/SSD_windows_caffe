@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_test(add_conv4_3_classification, delete sqrt(min*max) default box)"
+name: "SqueezeNet_Pedestrian_SSD_384x256_test(add_conv4_3_classification, delete sqrt(min*max) default box, add min_size)"
 layer {
   name: "data"
   type: "AnnotatedData"
@@ -20,14 +20,14 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0922/val_lmdb"
-    batch_size: 4
+    source: "./val_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "E:/caffe-master_/Pedestrian/labelmap_VehicleFull.prototxt"
+    label_map_file: "../labelmap_VehicleFull.prototxt"
   }
 }
 

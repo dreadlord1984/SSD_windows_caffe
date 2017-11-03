@@ -46,6 +46,7 @@
     <ClCompile>
       <DisableSpecificWarnings>4003</DisableSpecificWarnings>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Level3</WarningLevel>
+      <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ADD_PRIOR_BOX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <PreBuildEvent>
       <Command>"$(ScriptsDir)\MatlabPreBuild.cmd" "$(SolutionDir)" "$(OutDir)"</Command>

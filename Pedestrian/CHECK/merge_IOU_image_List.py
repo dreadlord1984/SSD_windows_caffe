@@ -5,6 +5,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import linecache
 import prettyplotlib as ppl
+import os
 
 """
 @function:计算两个box的IOU
@@ -208,7 +209,7 @@ def statistic(IOU_all_List):
     ax.set_title('(gt total %d)' % total)
     ax.set_xlabel('matching num')
     ax.set_ylabel('gt num')
-    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\matchNum.png"
+    savename = os.path.dirname(IOU_all_List) + "\\matchNum.png"
     plt.savefig(savename)
 
     matplotlib.rcParams['figure.figsize'] = (8, 7)  # 设定显示大小
@@ -221,7 +222,7 @@ def statistic(IOU_all_List):
     ax.set_title('(gt total %d)' % total)
     ax.set_xlabel('gt area')
     ax.set_ylabel('gt num')
-    savename = IOU_all_List[:IOU_all_List.rfind("\\")] + "\\gtNum.png"
+    savename = os.path.dirname(IOU_all_List) + "\\gtNum.png"
     plt.savefig(savename)
 
     plt.show()

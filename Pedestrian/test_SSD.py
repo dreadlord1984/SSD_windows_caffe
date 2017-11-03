@@ -72,7 +72,7 @@ model_def = 'deployD1add_noSqrt.prototxt'
 model_weights = \
     'View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\' \
     'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
-ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\"
+ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
 imgList = "Data_0922/val.txt"
 
 net = caffe.Net(model_def,      # defines the structure of the model

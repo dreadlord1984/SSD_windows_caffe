@@ -65,11 +65,10 @@ def save_max_data(input_image_list, output_image_list):
 
         boxes_total = int(data[2])
         # 1. 统计gt box序号
-        gt_boxes_set = set('x')
+        gt_boxes_set = set()
         for i in range(0, boxes_total, 1):
             gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
             gt_boxes_set.add(gt_box_index)
-        gt_boxes_set.remove('x')
 
         # 2. 将prior box按照gt box序号分组
         group_prior_box = [[] for x in gt_boxes_set]
@@ -160,7 +159,7 @@ def save_include_data(input_image_list, output_include_list, output_uninclude_li
             uninclude_prior_boxes = []
             prior_boxes_total = int(prior_datas[2])
 
-            gt_index_set = set('x')
+            gt_index_set = set()
             for i in range(0, prior_boxes_total, 1):
                 prior_box_index = int(prior_datas[7 * i + 3])  # 当前匹配proir box序号（从0开始）
                 prior_box_IOU = prior_datas[7 * i + 4] # 当前匹配proir box序号（从0开始）
@@ -172,10 +171,9 @@ def save_include_data(input_image_list, output_include_list, output_uninclude_li
                     include_prior_boxes.append([prior_box_index, prior_box_IOU, prior_box_coordinates, gt_box_index])
                 else:
                     uninclude_prior_boxes.append([prior_box_index, prior_box_IOU, prior_box_coordinates, gt_box_index])
-            gt_index_set.remove('x')
 
             # 3. 统计输出完全包含gt box的include_prior_boxes
-            include_gt_boxes_set = set('x')
+            include_gt_boxes_set = set()
             if (len(include_prior_boxes) > 0):
                 include_prior_num += len(include_prior_boxes)
                 fout.write(( img_name + '\t' + xml_name + '\t' + str(len(include_prior_boxes)) ))
@@ -187,10 +185,10 @@ def save_include_data(input_image_list, output_include_list, output_uninclude_li
                                 + str(include_prior_boxes[k][2][2]) + '\t' + str(include_prior_boxes[k][2][3]) + '\t'
                                 + str(include_prior_boxes[k][3]) ))
                 fout.write('\n')
-            include_gt_boxes_set.remove('x')
+
             include_gt_num += len(include_gt_boxes_set)
             # 4. 统计部分包含gt box的uninclude_prior_boxes
-            uninclude_gt_boxes_set = set('x')
+            uninclude_gt_boxes_set = set()
             if (len(uninclude_prior_boxes) > 0):
                 uninclude_prior_num += len(uninclude_prior_boxes)
                 fout2.write((img_name + '\t' + xml_name + '\t' + str(len(uninclude_prior_boxes))))
@@ -202,7 +200,6 @@ def save_include_data(input_image_list, output_include_list, output_uninclude_li
                                 + str(uninclude_prior_boxes[k][2][2]) + '\t' + str(uninclude_prior_boxes[k][2][3]) + '\t'
                                 + str(uninclude_prior_boxes[k][3])))
                 fout2.write('\n')
-            uninclude_gt_boxes_set.remove('x')
             uninclude_gt_num += len(uninclude_gt_boxes_set)
 
         fout.close()
@@ -337,8 +334,8 @@ def show_lower_layer_gt_area(input_include_list):
 
             # 2. 记录被底层prior box完全包含的gt box序号
             prior_boxes_total = int(prior_datas[2])
-            include_gt_boxes_set_in = set('x')
-            include_gt_boxes_set_out = set('x')
+            include_gt_boxes_set_in = set()
+            include_gt_boxes_set_out = set()
             for i in range(0, prior_boxes_total, 1):
                 prior_box_index = int(prior_datas[7 * i + 3])  # 当前匹配proir box序号（从0开始）
                 gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
@@ -347,8 +344,6 @@ def show_lower_layer_gt_area(input_include_list):
                 else:
                     include_gt_boxes_set_out.add(gt_box_index)
 
-            include_gt_boxes_set_in.remove('x')  # 来着底层
-            include_gt_boxes_set_out.remove('x') # 来自非底层
             # include_gt_boxes_set = include_gt_boxes_set_out - include_gt_boxes_set_in # 从非底层中去掉来自底层
 
             # 3. 统计被包含的gt box面积分布

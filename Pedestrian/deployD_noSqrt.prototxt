@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_deploy"
+name: "SqueezeNet_Pedestrian_SSD_384x256_deploy(add_all_classification)"
 input: "data"
 input_shape {
   dim: 1

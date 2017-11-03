@@ -1,4 +1,6 @@
-cd E:\caffe-master_\windows\test_SSD
-E:
-E:\caffe-master_\Build\x64\Release2\test_ssd.exe -confidence_threshold 0.4  E:\caffe-master_\Pedestrian\deploy4.prototxt E:\caffe-master_\Pedestrian\FL_gamma3_1_Priorbox4-3_iter_190000.caffemodel	 E:\caffe-master_\Pedestrian\Data_0825\val.txt
+pause
+..\\Build\\x64\\Release\\test_ssd.exe -confidence_threshold 0.4 ^
+.\\deployD1_noSqrt.prototxt ^
+.\\add_prior_gamma2_D1_new_P5N4D15E4_noSqrt_iter_200000.caffemodel ^
+.\\Data_0922\val.txt
 pause

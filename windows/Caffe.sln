@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libcaffe", "libcaffe\libcaffe.vcxproj", "{A9ACEF83-7B63-4574-A554-89CE869EA141}"
 EndProject
@@ -78,6 +78,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "read_xml", "read_xml\read_xml.vcxproj", "{E371A119-1273-4773-8DE0-A35C9BB73AE4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pridict_save", "pridict_save\pridict_save.vcxproj", "{22A4E0EA-89E9-4378-8711-37B22B3136D8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rcnn", "rcnn\rcnn.vcxproj", "{8FBE275E-745A-451B-ADE9-98C042F9835A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -169,6 +171,10 @@ Global
 		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Debug|x64.Build.0 = Debug|x64
 		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Release|x64.ActiveCfg = Release|x64
 		{22A4E0EA-89E9-4378-8711-37B22B3136D8}.Release|x64.Build.0 = Release|x64
+		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Debug|x64.ActiveCfg = Debug|x64
+		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Debug|x64.Build.0 = Debug|x64
+		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Release|x64.ActiveCfg = Release|x64
+		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

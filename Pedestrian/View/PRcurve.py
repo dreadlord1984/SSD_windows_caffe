@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import scipy.io
 import xml.etree.cElementTree as et
+import os
 # setup plot details
 
 """
@@ -53,7 +54,6 @@ def readXML(xml_name):
 """
 def save_data(testList, resultList):
     PR_mat = resultList.strip() + '.mat'
-    num = 0
     with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
         for testFile, resultFile in zip(fp1, fp2):
             xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1] # xml文件完整路径
@@ -108,7 +108,7 @@ def draw_curve(*curves):
         Ps = []
         recalls = []
         precisions = []
-        data_name = curve_name.split('\\')[-1]
+        data_name = os.path.basename(curve_name)[:-12]# 图例名称
         for conf_i in range(0, len(conf_thresholds), 1):
             TP = float(data[conf_i]['TP'])
             FP = float(data[conf_i]['FP'])
@@ -159,14 +159,14 @@ s_ids = np.arange(len(conf_thresholds))
 
 
 if __name__ == "__main__":
-    save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              'COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\'
-              'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000') # PR_statistic.py中输出的目标检测结果
+    # save_data("../Data_0922/val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+    #           'COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\'
+    #           'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000') # PR_statistic.py中输出的目标检测结果
 
     # 曲线数量+各个曲线对应的统计结果文件
     draw_curve(
             "COMPARE2\\gamma2_D_new\\gamma2_D_new_iter_200000",
             # "COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4\\add_prior_gamma2_D_new_P5N4D15E4_iter_200000",
             "COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000",
-            "COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000"
+            # "COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000"
             )

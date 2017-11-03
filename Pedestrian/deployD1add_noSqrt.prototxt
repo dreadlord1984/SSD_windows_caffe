@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_deploy"
+name: "SqueezeNet_Pedestrian_SSD_384x256_deploy(add_conv4_3_classification, delete sqrt(min*max) default box),add min_size"
 input: "data"
 input_shape {
   dim: 1

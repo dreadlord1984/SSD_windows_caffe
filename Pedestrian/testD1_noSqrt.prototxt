@@ -20,14 +20,14 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0922/val_lmdb"
-    batch_size: 4
+    source: "./val_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "E:/caffe-master_/Pedestrian/labelmap_VehicleFull.prototxt"
+    label_map_file: "../labelmap_VehicleFull.prototxt"
   }
 }
 
@@ -2127,6 +2127,6 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    #name_size_file: "E:/caffe-master_/Pedestrian/Data_0922/val_name_size.txt"
+    #name_size_file: "./val_name_size.txt"
   }
 }

@@ -1,3 +1,4 @@
+#注意：由于这里是用于统计分析，所以mirror: false且不需要样本随机裁剪
 name: "SqueezeNet_Pedestrian_SSD_384x256_train"
 layer {
   name: "data"
@@ -28,8 +29,8 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0731/train_lmdb"
-    batch_size: 10
+    source: "../Data_0731/train_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {

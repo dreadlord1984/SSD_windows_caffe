@@ -28,8 +28,8 @@ layer {
     }
   }
   data_param {
-    source: "E:/tyang/Pedestrian/Data_0922/train_lmdb"
-    batch_size: 32
+    source: "./train_lmdb"
+    batch_size: 16
     backend: LMDB
   }
   annotated_data_param {
@@ -121,7 +121,7 @@ layer {
       max_sample: 1
       max_trials: 50
     }
-    label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
+    label_map_file: "../labelmap_VehicleFull.prototxt"
   }
 }
 

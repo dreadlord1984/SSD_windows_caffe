@@ -1,3 +1,4 @@
+#注意：由于这里是用于统计分析，所以mirror: false且不需要样本随机裁剪
 name: "SqueezeNet_Pedestrian_SSD_384x256_train(add_all_classification, delete sqrt(min*max) default box)"
 layer {
   name: "data"
@@ -28,7 +29,7 @@ layer {
     }
   }
   data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0922/train_lmdb"
+    source: "../Data_0922/train_lmdb"
     batch_size: 10
     backend: LMDB
   }
@@ -37,7 +38,7 @@ layer {
       max_sample: 1
       max_trials: 1
     }
-    label_map_file: "E:/caffe-master_/Pedestrian/labelmap_VehicleFull.prototxt"
+    label_map_file: "../labelmap_VehicleFull.prototxt"
   }
 }
 
