@@ -1,7 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
-reload(sys)
-sys.setdefaultencoding('utf8')
 import numpy as np
 import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
@@ -68,10 +65,10 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deployD1add_noSqrt.prototxt'
+model_def = 'deployD1_noSqrt.prototxt'
 model_weights = \
-    'View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\' \
-    'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
+    'View\\COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\' \
+    'add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
 imgList = "Data_0922/val.txt"
 
@@ -103,7 +100,9 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     transformed_image = transformer.preprocess('data', image)
     net.blobs['data'].data[...] = transformed_image
     # Forward pass.
+    print img_name.decode("gbk")
     detections = net.forward()['detection_out']
+
 
     # Parse the outputs.
     det_label = detections[0,0,:,1]

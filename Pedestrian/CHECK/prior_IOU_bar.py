@@ -3,7 +3,7 @@ import numpy as np
 import pylab as plt
 import matplotlib
 import prettyplotlib as ppl
-
+import os
 
 """
 @function:绘制所有IOU区间段的匹配数量直方图
@@ -27,7 +27,7 @@ def draw_curve(dataList):
     ax.set_title('(prior vs IOU, prior box: %d)' %total)
     ax.set_xlabel('IOU')
     ax.set_ylabel('prior boxes num')
-    savename = dataList[:dataList.rfind("\\")] + "\\prior_IOU.png"
+    savename = os.path.dirname(dataList) + "\\prior_IOU.png"
     plt.savefig(savename)
     plt.show()
 
@@ -37,4 +37,4 @@ group = np.zeros(thresholds.size,dtype=np.int32)
 matplotlib.rcParams['figure.figsize'] = (8, 6)  # 设定显示大小
 
 if __name__ == "__main__":
-    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt")
+    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D_new_P5N4D15E4_noSqrt\\IOU_ALL.txt")

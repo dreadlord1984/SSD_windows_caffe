@@ -1132,7 +1132,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 100 #24
+    num_output: 40 #24
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1412,7 +1412,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 50 #12
+    num_output: 20 #12
     pad: 1
     kernel_size: 3
     stride: 1
@@ -2148,6 +2148,6 @@ layer {
     }
     code_type: CENTER_SIZE
     keep_top_k: 200
-    confidence_threshold: 0.1
+    confidence_threshold: 0.01
   }
 }
