@@ -393,6 +393,38 @@
     <ClCompile Include="..\..\src\caffe\layers\softmax_loss_ohem_layer.cpp">
       <Filter>src\layers</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_anchor_target_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_proposal_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_proposal_target_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_roi_data_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_vid_data_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\roi_mask_pooling_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\smooth_L1_loss_layer2.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_bbox.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_bbox_transform.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_config.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_file.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_param.cpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_vis.cpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\frcnn_anchor_target_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\frcnn_proposal_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\frcnn_proposal_target_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\frcnn_roi_data_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\frcnn_vid_data_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\roi_mask_pooling_layer.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\smooth_L1_loss_layer2.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\util\frcnn_gpu_nms.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\util\frcnn_helper.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\util\frcnn_param.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\util\frcnn_utils.hpp" />
+    <ClCompile Include="..\..\include\caffe\FRCNN\util\frcnn_vis.hpp" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_anchor_target_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_proposal_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_proposal_target_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_roi_data_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\frcnn_vid_data_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\roi_mask_pooling_layer.cu" />
+    <ClCompile Include="..\..\src\caffe\FRCNN\smooth_L1_loss_layer2.cu" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\caffe\proto\caffe.pb.h">
@@ -952,6 +984,7 @@
     <CudaCompile Include="..\..\src\caffe\layers\softmax_loss_ohem_layer.cu">
       <Filter>cu\layers</Filter>
     </CudaCompile>
+    <CudaCompile Include="..\..\src\caffe\FRCNN\util\frcnn_nms_kernel.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

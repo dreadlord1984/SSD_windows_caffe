@@ -368,8 +368,6 @@ message SolverParameter {
   }
   // DEPRECATED: use type instead of solver_type
   optional SolverType solver_type = 30 [default = SGD];
-  // Overlap compute and communication for data parallel training
-  optional bool layer_wise_reduce = 45 [default = true];
 }
 
 // A message that stores the solver snapshots
@@ -549,22 +547,6 @@ message LayerParameter {
   optional SmoothL1LossParameter smooth_l1_loss_param = 148;
   optional PSROIPoolingParameter psroi_pooling_param = 149;
   optional BoxAnnotatorOHEMParameter box_annotator_ohem_param = 150;
-  // Add For Faster RCNN
-  optional ROIMaskPoolingParameter roi_mask_pooling_param = 152;
-}
-
-// Add For Faster RCNN
-message ROIMaskPoolingParameter {
-  // Pad, kernel size, and stride are all given as a single value for equal
-  // dimensions in height and width or as Y, X pairs.
-  optional uint32 pooled_h = 1 [default = 0]; // The pooled output height
-  optional uint32 pooled_w = 2 [default = 0]; // The pooled output width
-  // Multiplicative spatial scale factor to translate ROI coords from their
-  // input scale to the scale used when pooling
-  optional float spatial_scale = 3 [default = 1];
-  optional int32 half_part = 4 [default = 0];
-  optional float roi_scale = 5 [default = 1];
-  optional float mask_scale = 6 [default = 0];
 }
 
 // Focal Loss for Dense Object Detection
@@ -1782,9 +1764,6 @@ message WindowDataParameter {
   optional bool cache_images = 12 [default = false];
   // append root_folder to locate images
   optional string root_folder = 13 [default = ""];
-  
-   // Add For FRCNN config file path
-  optional string config = 20 [default = ""];
 }
 
 message SPPParameter {

@@ -81,6 +81,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pridict_save", "pridict_sav
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rcnn", "rcnn\rcnn.vcxproj", "{8FBE275E-745A-451B-ADE9-98C042F9835A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test_RCNN", "test_RCNN\test_RCNN.vcxproj", "{A3A6E0D4-6587-4921-991F-299B65EBF847}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -175,6 +177,10 @@ Global
 		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Debug|x64.Build.0 = Debug|x64
 		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Release|x64.ActiveCfg = Release|x64
 		{8FBE275E-745A-451B-ADE9-98C042F9835A}.Release|x64.Build.0 = Release|x64
+		{A3A6E0D4-6587-4921-991F-299B65EBF847}.Debug|x64.ActiveCfg = Debug|x64
+		{A3A6E0D4-6587-4921-991F-299B65EBF847}.Debug|x64.Build.0 = Debug|x64
+		{A3A6E0D4-6587-4921-991F-299B65EBF847}.Release|x64.ActiveCfg = Release|x64
+		{A3A6E0D4-6587-4921-991F-299B65EBF847}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
