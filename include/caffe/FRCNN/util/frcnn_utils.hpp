@@ -325,7 +325,7 @@ float get_scale_factor(int width, int height, int short_size, int max_long_size)
 // config
 typedef std::map<string, string> str_map;
 
-str_map parse_json_config(const string file_path);
+str_map parse_json_config(const string& file_path);
 
 string extract_string(string target_key, str_map& default_map);
 

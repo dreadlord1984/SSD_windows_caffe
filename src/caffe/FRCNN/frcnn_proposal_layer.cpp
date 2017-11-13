@@ -124,7 +124,7 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   }
   
   DLOG(ERROR) << "========== after clip and remove size < threshold box " << (int)sort_vector.size();
-  /*
+  
   std::sort(sort_vector.begin(), sort_vector.end(), std::greater<sort_pair>());
   const int n_anchors = std::min((int)sort_vector.size(), rpn_pre_nms_top_n);
   sort_vector.erase(sort_vector.begin() + n_anchors, sort_vector.end());
@@ -154,9 +154,9 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   }
   
   DLOG(ERROR) << "rpn number after nms: " <<  box_final.size();
-  */
-
   
+
+  /*
   const int n_anchors =(int)sort_vector.size();
   //std::cout << "n="<<n_anchors;
   std::vector<Point4f<Dtype> > box_final;
@@ -169,7 +169,7 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
       scores_.push_back(sort_vector[i].first);
       }
   }
-  
+  */
   DLOG(ERROR) << "========== copy to top";
   top[0]->Reshape(box_final.size(), 5, 1, 1);
   Dtype *top_data = top[0]->mutable_cpu_data();

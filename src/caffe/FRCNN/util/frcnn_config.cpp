@@ -24,11 +24,15 @@ std::vector<std::string> split(const std::string &s, char delim) {
   return elems;
 }
 
-str_map parse_json_config(const std::string file_path) {
-  std::ifstream ifs(file_path.c_str());
-  std::map<std::string, std::string> json_map;
-  boost::property_tree::ptree pt;
-  boost::property_tree::read_json(ifs, pt);
+str_map parse_json_config(const std::string& file_path) {
+	/*std::ifstream ifs(file_path.c_str());
+	std::map<std::string, std::string> json_map;
+	boost::property_tree::ptree pt;
+	boost::property_tree::read_json(ifs, pt);*/
+	
+	std::map<std::string, std::string> json_map;
+	boost::property_tree::ptree pt;
+	boost::property_tree::read_json(file_path, pt);
 
   boost::property_tree::basic_ptree<std::string, std::string>::const_iterator
       iter = pt.begin();
