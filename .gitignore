@@ -110,11 +110,10 @@ MANIFEST-*
 *.props
 
 
-/Pedestrian/View/train.png
-/Pedestrian/View/*.mat
 /Pedestrian/Data_0731
 /Pedestrian/Data_0810
 /Pedestrian/Data_0731
 /Pedestrian/Data_0922
+/Pedestrian/View/COMPARE0
 /Pedestrian/View/COMPARE
 /Pedestrian/View/COMPARE2
