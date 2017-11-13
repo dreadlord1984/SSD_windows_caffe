@@ -67,12 +67,13 @@ Makefile.config
 *.binaryproto
 *leveldb
 *lmdb
+
 #pridict_save/*
 *.txt
-Data_0810
 *.log
 *.train
 *.test
+
 # build, distribute, and bins (+ python proto bindings)
 build
 .build_debug/*
@@ -107,12 +108,13 @@ MANIFEST-*
 *.opensdf
 *.pdb
 *.props
-/data/mnist
-/Pedestrian/CHECK/prior_with_gt_box_statistic.slides.html
+
+
 /Pedestrian/View/train.png
 /Pedestrian/View/*.mat
 /Pedestrian/Data_0731
 /Pedestrian/Data_0810
 /Pedestrian/Data_0731
+/Pedestrian/Data_0922
 /Pedestrian/View/COMPARE
-/Pedestrian/squeezeNet_trainHOME.bat
+/Pedestrian/View/COMPARE2
