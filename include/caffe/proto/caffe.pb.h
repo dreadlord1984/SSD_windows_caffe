@@ -116,6 +116,7 @@ class ScaleParameter;
 class SigmoidParameter;
 class SliceParameter;
 class SmoothL1LossParameter;
+class SmoothL1LossDParameter;
 class SoftmaxParameter;
 class TanHParameter;
 class TileParameter;
@@ -4805,6 +4806,15 @@ class LayerParameter : public ::google::protobuf::Message {
   inline ::caffe::BoxAnnotatorOHEMParameter* release_box_annotator_ohem_param();
   inline void set_allocated_box_annotator_ohem_param(::caffe::BoxAnnotatorOHEMParameter* box_annotator_ohem_param);
 
+  // optional .caffe.SmoothL1LossDParameter smooth_l1_lossD_param = 151;
+  inline bool has_smooth_l1_lossd_param() const;
+  inline void clear_smooth_l1_lossd_param();
+  static const int kSmoothL1LossDParamFieldNumber = 151;
+  inline const ::caffe::SmoothL1LossDParameter& smooth_l1_lossd_param() const;
+  inline ::caffe::SmoothL1LossDParameter* mutable_smooth_l1_lossd_param();
+  inline ::caffe::SmoothL1LossDParameter* release_smooth_l1_lossd_param();
+  inline void set_allocated_smooth_l1_lossd_param(::caffe::SmoothL1LossDParameter* smooth_l1_lossd_param);
+
   // optional .caffe.ROIMaskPoolingParameter roi_mask_pooling_param = 152;
   inline bool has_roi_mask_pooling_param() const;
   inline void clear_roi_mask_pooling_param();
@@ -4942,6 +4952,8 @@ class LayerParameter : public ::google::protobuf::Message {
   inline void clear_has_psroi_pooling_param();
   inline void set_has_box_annotator_ohem_param();
   inline void clear_has_box_annotator_ohem_param();
+  inline void set_has_smooth_l1_lossd_param();
+  inline void clear_has_smooth_l1_lossd_param();
   inline void set_has_roi_mask_pooling_param();
   inline void clear_has_roi_mask_pooling_param();
 
@@ -5019,6 +5031,7 @@ class LayerParameter : public ::google::protobuf::Message {
   ::caffe::SmoothL1LossParameter* smooth_l1_loss_param_;
   ::caffe::PSROIPoolingParameter* psroi_pooling_param_;
   ::caffe::BoxAnnotatorOHEMParameter* box_annotator_ohem_param_;
+  ::caffe::SmoothL1LossDParameter* smooth_l1_lossd_param_;
   ::caffe::ROIMaskPoolingParameter* roi_mask_pooling_param_;
   int phase_;
   friend void  protobuf_AddDesc_caffe_2eproto();
@@ -12934,6 +12947,85 @@ class SmoothL1LossParameter : public ::google::protobuf::Message {
 
   void InitAsDefaultInstance();
   static SmoothL1LossParameter* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class SmoothL1LossDParameter : public ::google::protobuf::Message {
+ public:
+  SmoothL1LossDParameter();
+  virtual ~SmoothL1LossDParameter();
+
+  SmoothL1LossDParameter(const SmoothL1LossDParameter& from);
+
+  inline SmoothL1LossDParameter& operator=(const SmoothL1LossDParameter& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const SmoothL1LossDParameter& default_instance();
+
+  void Swap(SmoothL1LossDParameter* other);
+
+  // implements Message ----------------------------------------------
+
+  SmoothL1LossDParameter* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const SmoothL1LossDParameter& from);
+  void MergeFrom(const SmoothL1LossDParameter& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional float sigma = 1 [default = 1];
+  inline bool has_sigma() const;
+  inline void clear_sigma();
+  static const int kSigmaFieldNumber = 1;
+  inline float sigma() const;
+  inline void set_sigma(float value);
+
+  // @@protoc_insertion_point(class_scope:caffe.SmoothL1LossDParameter)
+ private:
+  inline void set_has_sigma();
+  inline void clear_has_sigma();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  float sigma_;
+  friend void  protobuf_AddDesc_caffe_2eproto();
+  friend void protobuf_AssignDesc_caffe_2eproto();
+  friend void protobuf_ShutdownFile_caffe_2eproto();
+
+  void InitAsDefaultInstance();
+  static SmoothL1LossDParameter* default_instance_;
 };
 // -------------------------------------------------------------------
 
@@ -22598,15 +22690,56 @@ inline void LayerParameter::set_allocated_box_annotator_ohem_param(::caffe::BoxA
   // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.box_annotator_ohem_param)
 }
 
-// optional .caffe.ROIMaskPoolingParameter roi_mask_pooling_param = 152;
-inline bool LayerParameter::has_roi_mask_pooling_param() const {
+// optional .caffe.SmoothL1LossDParameter smooth_l1_lossD_param = 151;
+inline bool LayerParameter::has_smooth_l1_lossd_param() const {
   return (_has_bits_[2] & 0x00000080u) != 0;
 }
-inline void LayerParameter::set_has_roi_mask_pooling_param() {
+inline void LayerParameter::set_has_smooth_l1_lossd_param() {
   _has_bits_[2] |= 0x00000080u;
 }
-inline void LayerParameter::clear_has_roi_mask_pooling_param() {
+inline void LayerParameter::clear_has_smooth_l1_lossd_param() {
   _has_bits_[2] &= ~0x00000080u;
+}
+inline void LayerParameter::clear_smooth_l1_lossd_param() {
+  if (smooth_l1_lossd_param_ != NULL) smooth_l1_lossd_param_->::caffe::SmoothL1LossDParameter::Clear();
+  clear_has_smooth_l1_lossd_param();
+}
+inline const ::caffe::SmoothL1LossDParameter& LayerParameter::smooth_l1_lossd_param() const {
+  // @@protoc_insertion_point(field_get:caffe.LayerParameter.smooth_l1_lossD_param)
+  return smooth_l1_lossd_param_ != NULL ? *smooth_l1_lossd_param_ : *default_instance_->smooth_l1_lossd_param_;
+}
+inline ::caffe::SmoothL1LossDParameter* LayerParameter::mutable_smooth_l1_lossd_param() {
+  set_has_smooth_l1_lossd_param();
+  if (smooth_l1_lossd_param_ == NULL) smooth_l1_lossd_param_ = new ::caffe::SmoothL1LossDParameter;
+  // @@protoc_insertion_point(field_mutable:caffe.LayerParameter.smooth_l1_lossD_param)
+  return smooth_l1_lossd_param_;
+}
+inline ::caffe::SmoothL1LossDParameter* LayerParameter::release_smooth_l1_lossd_param() {
+  clear_has_smooth_l1_lossd_param();
+  ::caffe::SmoothL1LossDParameter* temp = smooth_l1_lossd_param_;
+  smooth_l1_lossd_param_ = NULL;
+  return temp;
+}
+inline void LayerParameter::set_allocated_smooth_l1_lossd_param(::caffe::SmoothL1LossDParameter* smooth_l1_lossd_param) {
+  delete smooth_l1_lossd_param_;
+  smooth_l1_lossd_param_ = smooth_l1_lossd_param;
+  if (smooth_l1_lossd_param) {
+    set_has_smooth_l1_lossd_param();
+  } else {
+    clear_has_smooth_l1_lossd_param();
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.LayerParameter.smooth_l1_lossD_param)
+}
+
+// optional .caffe.ROIMaskPoolingParameter roi_mask_pooling_param = 152;
+inline bool LayerParameter::has_roi_mask_pooling_param() const {
+  return (_has_bits_[2] & 0x00000100u) != 0;
+}
+inline void LayerParameter::set_has_roi_mask_pooling_param() {
+  _has_bits_[2] |= 0x00000100u;
+}
+inline void LayerParameter::clear_has_roi_mask_pooling_param() {
+  _has_bits_[2] &= ~0x00000100u;
 }
 inline void LayerParameter::clear_roi_mask_pooling_param() {
   if (roi_mask_pooling_param_ != NULL) roi_mask_pooling_param_->::caffe::ROIMaskPoolingParameter::Clear();
@@ -31711,6 +31844,34 @@ inline void SmoothL1LossParameter::set_sigma(float value) {
   set_has_sigma();
   sigma_ = value;
   // @@protoc_insertion_point(field_set:caffe.SmoothL1LossParameter.sigma)
+}
+
+// -------------------------------------------------------------------
+
+// SmoothL1LossDParameter
+
+// optional float sigma = 1 [default = 1];
+inline bool SmoothL1LossDParameter::has_sigma() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void SmoothL1LossDParameter::set_has_sigma() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void SmoothL1LossDParameter::clear_has_sigma() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void SmoothL1LossDParameter::clear_sigma() {
+  sigma_ = 1;
+  clear_has_sigma();
+}
+inline float SmoothL1LossDParameter::sigma() const {
+  // @@protoc_insertion_point(field_get:caffe.SmoothL1LossDParameter.sigma)
+  return sigma_;
+}
+inline void SmoothL1LossDParameter::set_sigma(float value) {
+  set_has_sigma();
+  sigma_ = value;
+  // @@protoc_insertion_point(field_set:caffe.SmoothL1LossDParameter.sigma)
 }
 
 // -------------------------------------------------------------------

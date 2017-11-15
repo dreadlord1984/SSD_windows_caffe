@@ -1,1 +1,1 @@
-./ object.txt shuffle --anno_type="just_shuffle"  --shuffle=true
+./ Path_Images.txt shuffle --anno_type="just_shuffle"  --shuffle=true

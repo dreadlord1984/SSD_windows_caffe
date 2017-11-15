@@ -10,7 +10,7 @@
 namespace caffe {
 
 template <typename Dtype>
-void SmoothL1LossLayer<Dtype>::LayerSetUp(
+void SmoothL1LossDLayer<Dtype>::LayerSetUp(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   SmoothL1LossParameter loss_param = this->layer_param_.smooth_l1_loss_param();
   sigma2_ = loss_param.sigma() * loss_param.sigma();
@@ -22,7 +22,7 @@ void SmoothL1LossLayer<Dtype>::LayerSetUp(
 }
 
 template <typename Dtype>
-void SmoothL1LossLayer<Dtype>::Reshape(
+void SmoothL1LossDLayer<Dtype>::Reshape(
   const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
   LossLayer<Dtype>::Reshape(bottom, top);
   CHECK_EQ(bottom[0]->channels(), bottom[1]->channels());
@@ -49,22 +49,22 @@ void SmoothL1LossLayer<Dtype>::Reshape(
 }
 
 template <typename Dtype>
-void SmoothL1LossLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+void SmoothL1LossDLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
   NOT_IMPLEMENTED;
 }
 
 template <typename Dtype>
-void SmoothL1LossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
+void SmoothL1LossDLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
   NOT_IMPLEMENTED;
 }
 
 #ifdef CPU_ONLY
-STUB_GPU(SmoothL1LossLayer);
+STUB_GPU(SmoothL1LossDLayer);
 #endif
 
-INSTANTIATE_CLASS(SmoothL1LossLayer);
-REGISTER_LAYER_CLASS(SmoothL1Loss);
+INSTANTIATE_CLASS(SmoothL1LossDLayer);
+REGISTER_LAYER_CLASS(SmoothL1LossD);
 
 }  // namespace caffe

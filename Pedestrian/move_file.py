@@ -35,35 +35,35 @@ def readXML(xml_name):
 '''
 step 1: 将验证集列表中图片和标签文件移动到目的文件夹
 '''
-# source_dir = '\\\\192.168.1.186\\PedestrianData\\'
-# dst_dir = 'D:\\Other_Dataets\\Pedestrian\\CHECK\\'
-# imge_list = 'Data_0922\\train.txt'
-#
-# with open(imge_list) as fp1:
-#     for line in fp1:  # 每一行匹配数据 resultFile
-#         img_name = source_dir + line.strip().split('.jpg ')[0] +'.jpg'
-#         xml_name = source_dir + line.strip().split('.jpg ')[1]
-#         dst_img_dir = dst_dir + os.path.dirname(line.strip().split('.jpg ')[0])
-#         dst_xml_dir = dst_dir + os.path.dirname(line.strip().split('.jpg ')[1])
-#         if not os.path.exists(img_name):
-#             print 'Path does not exist: {}'.format(img_name).decode("gbk")
-#         if not os.path.exists(xml_name):
-#             print 'Path does not exist: {}'.format(xml_name).decode("gbk")
-#         if not os.path.exists(dst_img_dir):
-#             os.makedirs(dst_img_dir)
-#         if not os.path.exists(dst_xml_dir):
-#             os.makedirs(dst_xml_dir)
-#         shutil.copy(img_name, dst_img_dir)
-#         shutil.copy(xml_name, dst_xml_dir)
-#
-#
-#         # image = cv2.imread(img_name)
-#         # true_boxes, W, H = readXML(xml_name)
-#         # for box in true_boxes:
-#         #     cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
-#         #
-#         # cv2.imshow('show', image)
-#         # cv2.waitKey(0)
+source_dir = '\\\\192.168.1.186\\PedestrianData\\'
+dst_dir = 'D:\\Other_Dataets\\Pedestrian\\Vedio\\'
+imge_list = 'Data_0922\\val_vedio.txt'
+
+with open(imge_list) as fp1:
+    for line in fp1:  # 每一行匹配数据 resultFile
+        img_name = source_dir + line.strip().split('.jpg ')[0] +'.jpg'
+        xml_name = source_dir + line.strip().split('.jpg ')[1]
+        dst_img_dir = dst_dir + os.path.dirname(line.strip().split('.jpg ')[0])
+        dst_xml_dir = dst_dir + os.path.dirname(line.strip().split('.jpg ')[1])
+        if not os.path.exists(img_name):
+            print 'Path does not exist: {}'.format(img_name).decode("gbk")
+        if not os.path.exists(xml_name):
+            print 'Path does not exist: {}'.format(xml_name).decode("gbk")
+        if not os.path.exists(dst_img_dir):
+            os.makedirs(dst_img_dir)
+        if not os.path.exists(dst_xml_dir):
+            os.makedirs(dst_xml_dir)
+        # shutil.copy(img_name, dst_img_dir)
+        shutil.move(xml_name, dst_xml_dir)
+
+
+        # image = cv2.imread(img_name)
+        # true_boxes, W, H = readXML(xml_name)
+        # for box in true_boxes:
+        #     cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
+        #
+        # cv2.imshow('show', image)
+        # cv2.waitKey(0)
 
 '''
 step 2: 将Vedio文件夹下图片对应的ini标注文件拷贝到对应_af文件夹下
@@ -92,36 +92,36 @@ step 3: 将其他文件夹下的xml文件转换为txt文件
 替换 Path_Images.txt中 D:\Other_Dataets\Pedestrian\CHECK\Data_0922\Annotations
 txt保存格式： xmin ymin xmax ymax 1.0
 '''
-source_dir_root = 'D:\\Other_Dataets\\Pedestrian\\CHECK\\Data_0922\Annotations\\'
-dst_dir_root = 'E:\\C++\\PedestrianFilter\\Predict\\'
-imge_list = 'Path_Images.txt'
-
-with open(os.path.join(source_dir_root, imge_list)) as fp1:
-    for line in fp1:  # 每一行匹配数据 resultFile
-        source_xml_name = source_dir_root + line.strip()
-        if not os.path.exists(source_xml_name):
-            print 'Path does not exist: {}'.format(source_xml_name).decode("gbk")
-        xml_name, extension = os.path.splitext(line)
-        true_boxes, W, H = readXML(source_xml_name)
-
-        # source_img_name = dst_dir_root + xml_name + '.jpg'
-        # if not os.path.exists(source_img_name):
-        #     print 'Path does not exist: {}'.format(source_img_name).decode("gbk")
-
-        # image = cv2.imread(source_img_name)
-        # for box in true_boxes:
-        #     cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
-        #
-        # cv2.imshow('show', image)
-        # cv2.waitKey(0)
-
-        dir_name, filename = os.path.split(xml_name)
-        dst_dir = os.path.join(dst_dir_root, dir_name + '_af')
-        if not os.path.exists(dst_dir):
-            os.makedirs(dst_dir)
-        with open(os.path.join(dst_dir, filename+'.txt'),mode='w') as output:
-            for box in true_boxes:
-                output.write(str(box[0]) + ' ' + str(box[1]) + ' ' + str(box[2]) + ' ' + str(box[3]) + ' 1.0')
-                output.write('\n')
+# source_dir_root = 'D:\\Other_Dataets\\Pedestrian\\CHECK\\Data_0922\Annotations\\'
+# dst_dir_root = 'E:\\C++\\PedestrianFilter\\Predict\\'
+# imge_list = 'Path_Images.txt'
+#
+# with open(os.path.join(source_dir_root, imge_list)) as fp1:
+#     for line in fp1:  # 每一行匹配数据 resultFile
+#         source_xml_name = source_dir_root + line.strip()
+#         if not os.path.exists(source_xml_name):
+#             print 'Path does not exist: {}'.format(source_xml_name).decode("gbk")
+#         xml_name, extension = os.path.splitext(line)
+#         true_boxes, W, H = readXML(source_xml_name)
+#
+#         # source_img_name = dst_dir_root + xml_name + '.jpg'
+#         # if not os.path.exists(source_img_name):
+#         #     print 'Path does not exist: {}'.format(source_img_name).decode("gbk")
+#
+#         # image = cv2.imread(source_img_name)
+#         # for box in true_boxes:
+#         #     cv2.rectangle(image, (box[0], box[1]), (box[2], box[3]), (0, 0, 255), 1)
+#         #
+#         # cv2.imshow('show', image)
+#         # cv2.waitKey(0)
+#
+#         dir_name, filename = os.path.split(xml_name)
+#         dst_dir = os.path.join(dst_dir_root, dir_name + '_af')
+#         if not os.path.exists(dst_dir):
+#             os.makedirs(dst_dir)
+#         with open(os.path.join(dst_dir, filename+'.txt'),mode='w') as output:
+#             for box in true_boxes:
+#                 output.write(str(box[0]) + ' ' + str(box[1]) + ' ' + str(box[2]) + ' ' + str(box[3]) + ' 1.0')
+#                 output.write('\n')
 
 '''step 4: 利用复查合并代码'''

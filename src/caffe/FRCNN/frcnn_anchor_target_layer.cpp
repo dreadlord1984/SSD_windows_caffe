@@ -66,6 +66,7 @@ void FrcnnAnchorTargetLayer<Dtype>::Forward_cpu(
 
   const Dtype im_height = bottom_im_info[0];
   const Dtype im_width = bottom_im_info[1];
+  const Dtype sth = bottom_im_info[2];
 
   DLOG(ERROR) << "========== get gt boxes : " << bottom[1]->num();
   // gt boxes (x1, y1, x2, y2, label)

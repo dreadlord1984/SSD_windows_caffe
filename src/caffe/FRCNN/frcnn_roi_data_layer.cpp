@@ -84,28 +84,34 @@ void FrcnnRoiDataLayer<Dtype>::DataLayerSetUp(
   map<int, int> label_hist;
   label_hist.insert(std::make_pair(0, 0));
   roi_database_.clear();
-
+  
+  /***********************************************************************
+  * function: 从文件中读取图像data和gt_boxes
+  * image_database_cache_成对保存图像路径与图像
+  * roi_database_保存所有图像标签< <label, xmin, ymin, xmax, ymax> ...>
+  ***********************************************************************/
   DataPrepare data_load;
   while( data_load.load_WithDiff(infile) ) {
-    string image_path = data_load.GetImagePath(root_folder);
+    string image_path = data_load.GetImagePath(root_folder); // 图像路径
     //int image_index = data_load.GetImageIndex();
     image_database_.push_back(image_path);
-    lines_.push_back(image_database_.size()-1);
+    lines_.push_back(image_database_.size()-1); // 图像列表索引
     if (cache_images_) {
       Datum datum;
-      if (!ReadFileToDatum(image_path, &datum)) {
+      if (!ReadFileToDatum(image_path, &datum)) { // 图像
         LOG(ERROR) << "Could not open or find file " << image_path;
         return;
       }
-      image_database_cache_.push_back(std::make_pair(image_path, datum));
+      image_database_cache_.push_back(std::make_pair(image_path, datum)); // 所有图像路径与图像
     }
-    vector<vector<float> > rois = data_load.GetRois( false );
+	// false 表示难易程度为1的不会读入
+    vector<vector<float> > rois = data_load.GetRois( false ); // 图像标签(label, xmin, ymin, xmax, ymax)
     for (size_t i = 0; i < rois.size(); ++i) {
       int label = rois[i][DataPrepare::LABEL];
       label_hist.insert(std::make_pair(label, 0));
       label_hist[label]++;
     }
-    roi_database_.push_back(rois);
+    roi_database_.push_back(rois); // 所有图像标签
     if (lines_.size() % 1000 == 0) {
         LOG(INFO) << "num: " << lines_.size() << " " << image_path << " "
             << "rois to process: " << rois.size();

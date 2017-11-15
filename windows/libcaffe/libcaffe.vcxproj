@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\src\caffe\layers\sigmoid_layer.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\silence_layer.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\slice_layer.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\smooth_L1_loss_layer.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\softmax_layer.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\softmax_loss_layer.cpp" />
     <ClCompile Include="..\..\src\caffe\layers\split_layer.cpp" />
@@ -306,7 +307,8 @@
     <ClInclude Include="..\..\include\caffe\layers\sigmoid_cross_entropy_loss_layer.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\sigmoid_layer.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\silence_layer.hpp" />
-    <ClInclude Include="..\..\include\caffe\layers\slice_layer.hpp" />
+    <ClCompile Include="..\..\src\caffe\layers\slice_layer.cpp" />
+    <ClInclude Include="..\..\include\caffe\layers\smooth_L1_loss_layer.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\softmax_layer.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\softmax_loss_layer.hpp" />
     <ClInclude Include="..\..\include\caffe\layers\split_layer.hpp" />
@@ -430,6 +432,7 @@
     <CudaCompile Include="..\..\src\caffe\layers\permute_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\layers\recurrent_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\layers\focal_loss_layer.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\smooth_L1_loss_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\util\bbox_util.cu" />
     <CudaCompile Include="..\..\src\caffe\layers\roi_pooling_layer.cu" />
     <CudaCompile Include="..\..\src\caffe\layers\psroi_pooling_layer.cu" />

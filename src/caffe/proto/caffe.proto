@@ -550,6 +550,7 @@ message LayerParameter {
   optional PSROIPoolingParameter psroi_pooling_param = 149;
   optional BoxAnnotatorOHEMParameter box_annotator_ohem_param = 150;
   // Add For Faster RCNN
+  optional SmoothL1LossDParameter smooth_l1_lossD_param = 151;
   optional ROIMaskPoolingParameter roi_mask_pooling_param = 152;
 }
 
@@ -1695,6 +1696,12 @@ message SliceParameter {
 }
 
 message SmoothL1LossParameter {
+  // SmoothL1Loss(x) =
+  //   0.5 * (sigma * x) ** 2    -- if x < 1.0 / sigma / sigma
+  //   |x| - 0.5 / sigma / sigma -- otherwise
+  optional float sigma = 1 [default = 1];
+}
+message SmoothL1LossDParameter {
   // SmoothL1Loss(x) =
   //   0.5 * (sigma * x) ** 2    -- if x < 1.0 / sigma / sigma
   //   |x| - 0.5 / sigma / sigma -- otherwise

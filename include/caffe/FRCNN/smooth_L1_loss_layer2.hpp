@@ -1,7 +1,7 @@
 // Xuanyi Dong Add Copy Faster R-CNN 
 // 2016.01.06
-#ifndef CAFFE_SMOOTH_L1_LAYER_HPP_
-#define CAFFE_SMOOTH_L1_LAYER_HPP_
+#ifndef CAFFE_SMOOTH_L1_LAYER2_HPP_
+#define CAFFE_SMOOTH_L1_LAYER2_HPP_
 
 #include <cfloat>
 #include <string>
@@ -17,22 +17,22 @@
 namespace caffe {
 
 template <typename Dtype>
-class SmoothL1LossLayer : public LossLayer<Dtype> {
+class SmoothL1LossDLayer : public LossLayer<Dtype> {
 public:
-    explicit SmoothL1LossLayer(const LayerParameter& param)
+    explicit SmoothL1LossDLayer(const LayerParameter& param)
         : LossLayer<Dtype>(param), diff_() {}
     virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
             const vector<Blob<Dtype>*>& top);
     virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
             const vector<Blob<Dtype>*>& top);
 
-    virtual inline const char* type() const { return "SmoothL1Loss"; }
+    virtual inline const char* type() const { return "SmoothL1Loss2"; }
 
     virtual inline int ExactNumBottomBlobs() const { return -1; }
     virtual inline int MinBottomBlobs() const { return 2; }
     virtual inline int MaxBottomBlobs() const { return 4; }
     /**
-     * Unlike most loss layers, in the SmoothL1LossLayer we can backpropagate
+     * Unlike most loss layers, in the SmoothL1LossDLayer we can backpropagate
      * to both inputs -- override to return true and always allow force_backward.
      */
     virtual inline bool AllowForceBackward(const int bottom_index) const {
@@ -59,4 +59,4 @@ protected:
 
 }
 
-#endif // CAFFE_SMOOTH_L1_LAYER_HPP_
+#endif // CAFFE_SMOOTH_L1_LAYER2_HPP_
