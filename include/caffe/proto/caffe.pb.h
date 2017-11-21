@@ -6644,6 +6644,18 @@ class AnnotatedDataParameter : public ::google::protobuf::Message {
   inline ::std::string* release_label_map_file();
   inline void set_allocated_label_map_file(::std::string* label_map_file);
 
+  // optional string config = 4;
+  inline bool has_config() const;
+  inline void clear_config();
+  static const int kConfigFieldNumber = 4;
+  inline const ::std::string& config() const;
+  inline void set_config(const ::std::string& value);
+  inline void set_config(const char* value);
+  inline void set_config(const char* value, size_t size);
+  inline ::std::string* mutable_config();
+  inline ::std::string* release_config();
+  inline void set_allocated_config(::std::string* config);
+
   // optional .caffe.AnnotatedDatum.AnnotationType anno_type = 3;
   inline bool has_anno_type() const;
   inline void clear_anno_type();
@@ -6655,6 +6667,8 @@ class AnnotatedDataParameter : public ::google::protobuf::Message {
  private:
   inline void set_has_label_map_file();
   inline void clear_has_label_map_file();
+  inline void set_has_config();
+  inline void clear_has_config();
   inline void set_has_anno_type();
   inline void clear_has_anno_type();
 
@@ -6664,6 +6678,7 @@ class AnnotatedDataParameter : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::google::protobuf::RepeatedPtrField< ::caffe::BatchSampler > batch_sampler_;
   ::std::string* label_map_file_;
+  ::std::string* config_;
   int anno_type_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
@@ -24738,15 +24753,91 @@ inline void AnnotatedDataParameter::set_allocated_label_map_file(::std::string* 
   // @@protoc_insertion_point(field_set_allocated:caffe.AnnotatedDataParameter.label_map_file)
 }
 
-// optional .caffe.AnnotatedDatum.AnnotationType anno_type = 3;
-inline bool AnnotatedDataParameter::has_anno_type() const {
+// optional string config = 4;
+inline bool AnnotatedDataParameter::has_config() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void AnnotatedDataParameter::set_has_anno_type() {
+inline void AnnotatedDataParameter::set_has_config() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void AnnotatedDataParameter::clear_has_anno_type() {
+inline void AnnotatedDataParameter::clear_has_config() {
   _has_bits_[0] &= ~0x00000004u;
+}
+inline void AnnotatedDataParameter::clear_config() {
+  if (config_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    config_->clear();
+  }
+  clear_has_config();
+}
+inline const ::std::string& AnnotatedDataParameter::config() const {
+  // @@protoc_insertion_point(field_get:caffe.AnnotatedDataParameter.config)
+  return *config_;
+}
+inline void AnnotatedDataParameter::set_config(const ::std::string& value) {
+  set_has_config();
+  if (config_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    config_ = new ::std::string;
+  }
+  config_->assign(value);
+  // @@protoc_insertion_point(field_set:caffe.AnnotatedDataParameter.config)
+}
+inline void AnnotatedDataParameter::set_config(const char* value) {
+  set_has_config();
+  if (config_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    config_ = new ::std::string;
+  }
+  config_->assign(value);
+  // @@protoc_insertion_point(field_set_char:caffe.AnnotatedDataParameter.config)
+}
+inline void AnnotatedDataParameter::set_config(const char* value, size_t size) {
+  set_has_config();
+  if (config_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    config_ = new ::std::string;
+  }
+  config_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:caffe.AnnotatedDataParameter.config)
+}
+inline ::std::string* AnnotatedDataParameter::mutable_config() {
+  set_has_config();
+  if (config_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    config_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:caffe.AnnotatedDataParameter.config)
+  return config_;
+}
+inline ::std::string* AnnotatedDataParameter::release_config() {
+  clear_has_config();
+  if (config_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = config_;
+    config_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void AnnotatedDataParameter::set_allocated_config(::std::string* config) {
+  if (config_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete config_;
+  }
+  if (config) {
+    set_has_config();
+    config_ = config;
+  } else {
+    clear_has_config();
+    config_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:caffe.AnnotatedDataParameter.config)
+}
+
+// optional .caffe.AnnotatedDatum.AnnotationType anno_type = 3;
+inline bool AnnotatedDataParameter::has_anno_type() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void AnnotatedDataParameter::set_has_anno_type() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void AnnotatedDataParameter::clear_has_anno_type() {
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void AnnotatedDataParameter::clear_anno_type() {
   anno_type_ = 0;

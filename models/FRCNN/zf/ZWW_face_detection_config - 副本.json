@@ -1,0 +1,44 @@
+{
+ "batch_size": "128", # Minibatch size (number of regions of interest [ROIs])，保留
+
+ "fg_fraction": "0.25",  # 保留
+ "fg_thresh": "0.5",   fg阈值，# Overlap threshold for a ROI to be considered foreground (if >= FG_THRESH)，保留
+# Overlap threshold for a ROI to be considered background (class = 0 if overlap in [LO, HI))
+ "bg_thresh_hi": "0.5",bg最高阈值，保留
+ "bg_thresh_lo": "0",  bg最低阈值，保留
+
+#以下4个为bbx归一化的，保留
+ "bbox_normalize_targets": "1",
+ "bbox_inside_weights": "1.0, 1.0, 1.0, 1.0",    
+ "bbox_normalize_means": "0.0, 0.0, 0.0, 0.0",
+ "bbox_normalize_stds": "0.1, 0.1, 0.2, 0.2",
+
+ "rpn_nms_thresh": "0.7",  # NMS threshold used on RPN proposals，保留
+ "rpn_pre_nms_top_n": "12000",   #同下，保留
+ "rpn_post_nms_top_n": "2000",   #同下，保留
+ "rpn_min_size": "16",           #同下，保留
+   
+ "test_rpn_nms_thresh": "0.7", 
+ "test_rpn_pre_nms_top_n": "6000",      #测试nms前取排序后的个数，保留
+ "test_rpn_post_nms_top_n": "300",      #NMS后的个数，保留
+ "test_rpn_min_size": "16",             #rpn特征图的最小尺寸
+
+ "pixel_means": "87.9912902058, 92.7401237308, 100.856969725",   #图片均值
+ "rng_seed": "3", # 保留
+ "eps": "0.00000000000001", #无穷小
+ "inf": "100000000",        #无穷大
+
+ "feat_stride": "16",               #图片经过rpn后缩放的尺寸，经过4个stride为2后就缩小16倍
+ "anchors": "-22,   -5,     45,     28,    #anchors在原点的9个候选框坐标（xmin，ymin，xmax，ymax）
+	     -56,   -22,    79,    45,
+	     -124,  -56,    147,   79,
+	     -260,  -124,   283,   147,
+	     -12,   -12,    35,    35,
+	     -36,   -36,    59,    59,
+	     -84,   -84,    107,   107,
+	     -180,  -180,   203,   203,
+             -240,  -240,   260,   260",
+
+ "n_classes": "2",                   #种类，保留
+ "iter_test": "-1"
+}

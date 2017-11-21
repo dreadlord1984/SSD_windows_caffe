@@ -91,6 +91,7 @@ public:
   // ========================================
   static void load_param(const std::string default_config_path);
   static void print_param();
+  static void load_SSD_param(const std::string default_config_path);
 };
 
 }  // namespace detection

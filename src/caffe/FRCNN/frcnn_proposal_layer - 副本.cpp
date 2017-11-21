@@ -22,7 +22,6 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
   const vector<Blob<Dtype> *> &top) {
 
 #ifndef CPU_ONLY
-
   CUDA_CHECK(cudaMalloc(&anchors_, sizeof(float) * FrcnnParam::anchors.size()));
   CUDA_CHECK(cudaMemcpy(anchors_, &(FrcnnParam::anchors[0]),
                         sizeof(float) * FrcnnParam::anchors.size(), cudaMemcpyHostToDevice));
@@ -37,7 +36,7 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
   CUDA_CHECK(cudaMalloc(&gpu_keep_indices_, sizeof(int) * rpn_post_nms_top_n));
 
 #endif
-  top[0]->Reshape(1, 5, 1, 1); // rpn_rois
+  top[0]->Reshape(1, 5, 1, 1);
   if (top.size() > 1) {
     top[1]->Reshape(1, 1, 1, 1);
   }
@@ -51,24 +50,16 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   const Dtype *bottom_rpn_score = bottom[0]->cpu_data();  // rpn_cls_prob_reshape
   const Dtype *bottom_rpn_bbox = bottom[1]->cpu_data();   // rpn_bbox_pred
   const Dtype *bottom_im_info = bottom[2]->cpu_data();    // im_info
-  const int num = bottom[1]->num();// batch size
+  const int num = bottom[1]->num();
   const int channes = bottom[1]->channels();
   const int height = bottom[1]->height();
   const int width = bottom[1]->width();
-	/*cout << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
-		<< bottom[0]->width() << endl;
-	cout << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
-		<< bottom[1]->width() << endl;
-	cout << bottom[2]->num() << " " << bottom[2]->channels() << " " << bottom[2]->height() << " "
-		<< bottom[2]->width() << endl;*/
   CHECK(num == 1) << "only single item batches are supported";
   CHECK(channes % 4 == 0) << "rpn bbox pred channels should be divided by 4";
 
-  //////////////////////////////////////////////////////
-  const float im_height = 256;// bottom_im_info[0] -> 256
-  const float im_width = 384;// bottom_im_info[1] -> 384
-  const float zoom_scale = 1.0;// bottom_im_info[2] - > 1
-  //////////////////////////////////////////////////////
+  const float im_height = bottom_im_info[0];
+  const float im_width = bottom_im_info[1];
+
   int rpn_pre_nms_top_n;
   int rpn_post_nms_top_n;
   float rpn_nms_thresh;
@@ -82,7 +73,7 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
     rpn_pre_nms_top_n = FrcnnParam::test_rpn_pre_nms_top_n;
     rpn_post_nms_top_n = FrcnnParam::test_rpn_post_nms_top_n;
     rpn_nms_thresh = FrcnnParam::test_rpn_nms_thresh;
-    rpn_min_size = FrcnnParam::test_rpn_min_size; // 从输入图像到特征层的操作步长
+    rpn_min_size = FrcnnParam::test_rpn_min_size;
   }
   const int config_n_anchors = FrcnnParam::anchors.size() / 4;
   LOG_IF(ERROR, rpn_pre_nms_top_n <= 0 ) << "rpn_pre_nms_top_n : " << rpn_pre_nms_top_n;
@@ -97,7 +88,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   const Dtype min_size = bottom_im_info[2] * rpn_min_size;
 
   DLOG(ERROR) << "========== generate anchors";
-  // min_size = FrcnnParam::rpn_min_size限制
   for (int j = 0; j < height; j++) {
     for (int i = 0; i < width; i++) {
       for (int k = 0; k < config_n_anchors; k++) {
@@ -144,7 +134,7 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   //std::cout << "w="<<width;
   //std::cout << "h="<<height;
   
-  // apply nms 数量限制FrcnnParam::rpn_post_nms_top_n和阈值限制FrcnnParam::rpn_nms_thresh
+  // apply nms
   DLOG(ERROR) << "========== apply nms, pre nms number is : " << n_anchors;
   std::vector<Point4f<Dtype> > box_final;
   std::vector<Dtype> scores_;

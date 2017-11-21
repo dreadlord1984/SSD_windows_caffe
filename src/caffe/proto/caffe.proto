@@ -800,6 +800,7 @@ message AnnotatedDataParameter {
   optional string label_map_file = 2;
   // If provided, it will replace the AnnotationType stored in each
   // AnnotatedDatum.
+  optional string config = 4; //add for faster rcnn
   optional AnnotatedDatum.AnnotationType anno_type = 3;
 }
 

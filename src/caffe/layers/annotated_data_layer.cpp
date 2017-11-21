@@ -12,6 +12,10 @@
 #include "caffe/util/benchmark.hpp"
 #include "caffe/util/sampler.hpp"
 
+#include "caffe/FRCNN/frcnn_roi_data_layer.hpp"
+#include "caffe/FRCNN/util/frcnn_utils.hpp"
+#include "caffe/FRCNN/util/frcnn_param.hpp"
+
 namespace caffe {
 
 template <typename Dtype>
@@ -35,6 +39,14 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
     batch_samplers_.push_back(anno_data_param.batch_sampler(i));
   }
   label_map_file_ = anno_data_param.label_map_file();
+
+  config_ = anno_data_param.config();
+  if (config_ != "")
+  {
+	  Frcnn::FrcnnParam::load_SSD_param(config_);
+	  Frcnn::FrcnnParam::print_param();
+  }
+
   // Make sure dimension is consistent within batch.
   const TransformationParameter& transform_param =
     this->layer_param_.transform_param();

@@ -255,7 +255,7 @@ namespace caffe {
 		*/
 		//////////////////////////////////////////////////////////////////
 
-
+		//int default_box_num = 0;
 		int idx = 0;
 		for (int h = 0; h < layer_height; ++h) {
 			for (int w = 0; w < layer_width; ++w) {
@@ -266,6 +266,7 @@ namespace caffe {
 					int min_size_ = min_sizes_[s];
 
 					// first prior: aspect_ratio = 1, size = min_size
+					//default_box_num++;
 					box_width = box_height = min_size_;
 					// xmin
 					top_data[idx++] = (center_x - box_width / 2.) / img_width;
@@ -275,21 +276,30 @@ namespace caffe {
 					top_data[idx++] = (center_x + box_width / 2.) / img_width;
 					// ymax
 					top_data[idx++] = (center_y + box_height / 2.) / img_height;
+					/*cout << (-box_width / 2.) << " "
+						<< (- box_height / 2.) << " "
+						<< (box_width / 2.) << " "
+						<< (box_height / 2.) << endl;*/
 
-					//if (max_sizes_.size() > 0) {
-					//  CHECK_EQ(min_sizes_.size(), max_sizes_.size());
-					//  int max_size_ = max_sizes_[s];
-					//  // second prior: aspect_ratio = 1, size = sqrt(min_size * max_size)
-					//  box_width = box_height = sqrt(min_size_ * max_size_);
-					//  // xmin
-					//  top_data[idx++] = (center_x - box_width / 2.) / img_width;
-					//  // ymin
-					//  top_data[idx++] = (center_y - box_height / 2.) / img_height;
-					//  // xmax
-					//  top_data[idx++] = (center_x + box_width / 2.) / img_width;
-					//  // ymax
-					//  top_data[idx++] = (center_y + box_height / 2.) / img_height;
-					//}
+					/***********************************************************************
+					* note: ×¢ÊÍµô aspect_ratio = 1, size = sqrt(min_size * max_size)´ËÇé¿ö
+					***********************************************************************/
+					/*
+					if (max_sizes_.size() > 0) {
+					  CHECK_EQ(min_sizes_.size(), max_sizes_.size());
+					  int max_size_ = max_sizes_[s];
+					  // second prior: aspect_ratio = 1, size = sqrt(min_size * max_size)
+					  box_width = box_height = sqrt(min_size_ * max_size_);
+					  // xmin
+					  top_data[idx++] = (center_x - box_width / 2.) / img_width;
+					  // ymin
+					  top_data[idx++] = (center_y - box_height / 2.) / img_height;
+					  // xmax
+					  top_data[idx++] = (center_x + box_width / 2.) / img_width;
+					  // ymax
+					  top_data[idx++] = (center_y + box_height / 2.) / img_height;
+					}
+					*/
 
 					// rest of priors
 					for (int r = 0; r < aspect_ratios_.size(); ++r) {
@@ -299,6 +309,7 @@ namespace caffe {
 						}
 						box_width = min_size_ * sqrt(ar);
 						box_height = min_size_ / sqrt(ar);
+						//default_box_num++;
 						// xmin
 						top_data[idx++] = (center_x - box_width / 2.) / img_width;
 						// ymin
@@ -307,6 +318,10 @@ namespace caffe {
 						top_data[idx++] = (center_x + box_width / 2.) / img_width;
 						// ymax
 						top_data[idx++] = (center_y + box_height / 2.) / img_height;
+						/*cout << (-box_width / 2.) << " "
+							<< (-box_height / 2.) << " "
+							<< (box_width / 2.) << " "
+							<< (box_height / 2.) << endl;*/
 					}
 				}
 			}

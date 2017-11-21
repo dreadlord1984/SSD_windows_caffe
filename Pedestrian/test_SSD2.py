@@ -155,3 +155,14 @@ for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返
 # print 'TPs: %i FPs: %i FNs: %i'%(TPs, FPs, FNs)
 
 
+# layer {
+#   name: "rpn_loss_bbox"
+#   type: "SmoothL1LossD"
+#   bottom: "rpn_bbox_pred"
+#   bottom: "rpn_bbox_targets"
+#   bottom: "rpn_bbox_inside_weights"
+#   bottom: "rpn_bbox_outside_weights"
+#   top: "rpn_loss_bbox"
+#   loss_weight: 1
+#   smooth_l1_loss_param { sigma: 3.0 }
+# }

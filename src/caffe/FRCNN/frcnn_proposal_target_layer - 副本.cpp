@@ -24,29 +24,23 @@ void FrcnnProposalTargetLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bo
   LOG(INFO) << "FrcnnProposalTargetLayer :: " << config_n_classes_ << " classes";
   LOG(INFO) << "FrcnnProposalTargetLayer :: LayerSetUp";
   // sampled rois (0, x1, y1, x2, y2)
-  top[0]->Reshape(1, 5, 1, 1); // top: "rois": 给ROIPooling的bottom[1]
+  top[0]->Reshape(1, 5, 1, 1);
   // labels
-  top[1]->Reshape(1, 1, 1, 1); // top: "labels": 给Accuracy的bottom[1]和loss_cls的bottom[1]
+  top[1]->Reshape(1, 1, 1, 1);
   // bbox_targets
-  top[2]->Reshape(1, config_n_classes_ * 4, 1, 1); // top: "bbox_targets": 给loss_bbox的bottom[1]
+  top[2]->Reshape(1, config_n_classes_ * 4, 1, 1);
   // bbox_inside_weights
-  top[3]->Reshape(1, config_n_classes_ * 4, 1, 1); // top: "bbox_inside_weights": 给loss_bbox的bottom[2]
+  top[3]->Reshape(1, config_n_classes_ * 4, 1, 1);
   // bbox_outside_weights
-  top[4]->Reshape(1, config_n_classes_ * 4, 1, 1); // top: "bbox_outside_weights": 给loss_bbox的bottom[3]
+  top[4]->Reshape(1, config_n_classes_ * 4, 1, 1);
 }
 
 template <typename Dtype>
 void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype> *> &bottom, const vector<Blob<Dtype> *> &top) {
 
-	/*
-	bottom[0]: "rpn_rois" 维度：(box_final.size(), 5, 1, 1);
-	bottom[1]: "gt_boxes" 维度：(1, 1, gt_box.size(),8);
-	*/
-	cout << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
-		<< bottom[0]->width() << endl; 
   vector<Point4f<Dtype> > all_rois;
-  for (int i = 0; i < bottom[0]->num(); i++) {//对于每个anchor
+  for (int i = 0; i < bottom[0]->num(); i++) {
     all_rois.push_back(Point4f<Dtype>(
         bottom[0]->data_at(i,1,0,0),
         bottom[0]->data_at(i,2,0,0),
@@ -57,51 +51,16 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 
   vector<Point4f<Dtype> > gt_boxes;
   vector<int> gt_labels;
-
-  //////////////////////////////////////////////////////
-  /*
-  cout << bottom[1]->num() << endl; // gt box数量
   for (int i = 0; i < bottom[1]->num(); i++) {
-	  gt_boxes.push_back(Point4f<Dtype>(
-	  bottom[1]->data_at(i, 0, 0, 0),
-	  bottom[1]->data_at(i, 1, 0, 0),
-	  bottom[1]->data_at(i, 2, 0, 0),
-	  bottom[1]->data_at(i, 3, 0, 0)));
-	  gt_labels.push_back(bottom[1]->data_at(i, 4, 0, 0));
-
-	  cout << bottom[1]->data_at(i, 0, 0, 0) << " "
-	  << bottom[1]->data_at(i, 1, 0, 0) << " "
-	  << bottom[1]->data_at(i, 2, 0, 0) << " "
-	  << bottom[1]->data_at(i, 3, 0, 0) << " "
-	  << bottom[1]->data_at(i, 4, 0, 0) << endl;
-	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
+    gt_boxes.push_back(Point4f<Dtype>(
+        bottom[1]->data_at(i,0,0,0),
+        bottom[1]->data_at(i,1,0,0),
+        bottom[1]->data_at(i,2,0,0),
+        bottom[1]->data_at(i,3,0,0)));
+    gt_labels.push_back(bottom[1]->data_at(i,4,0,0));
+    CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
   }
-  */
-  cout << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
-	  << bottom[1]->width() << endl;
-  const Dtype* gt_data = bottom[1]->cpu_data();
-  for (int i = 0; i < bottom[1]->height(); i++) {
-	  int start_idx = i * 8;
-	  int item_id = gt_data[start_idx]; // batch size index
-	  if (item_id == -1) {
-		  break;
-	  }
-	  gt_boxes.push_back(Point4f<Dtype>(
-		  gt_data[start_idx + 3] * 384,
-		  gt_data[start_idx + 4] * 256,
-		  gt_data[start_idx + 5] * 384,
-		  gt_data[start_idx + 6] * 256));
-	  gt_labels.push_back(gt_data[start_idx + 1]);
 
-	  /*cout << gt_data[start_idx + 3] * 384 << " "
-		  << gt_data[start_idx + 4] * 256 << " "
-		  << gt_data[start_idx + 5] * 384 << " "
-		  << gt_data[start_idx + 6] * 256 << " "
-		  << gt_data[start_idx + 1] << endl;*/
-
-	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
-  }
-  //////////////////////////////////////////////////////
   all_rois.insert(all_rois.end(), gt_boxes.begin(), gt_boxes.end());
 
   DLOG(ERROR) << "gt boxes size: " << gt_boxes.size();

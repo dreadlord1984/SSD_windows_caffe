@@ -23,7 +23,7 @@ namespace caffe {
 		multibox_loss_param_ = this->layer_param_.multibox_loss_param();
 
 		num_ = bottom[0]->num();	//这个是batchsize
-		num_priors_ = bottom[2]->height() / 4; //这个是先验的个数，每个先验包含左上角和右下角的点坐标。
+		num_priors_ = bottom[2]->height() / 4; //这个是先验的default boxes个数，每个先验包含左上角和右下角的点坐标。
 		// Get other parameters.
 		CHECK(multibox_loss_param.has_num_classes()) << "Must provide num_classes."; //类别个数一定要提供
 		num_classes_ = multibox_loss_param.num_classes();	//类别个数
@@ -170,7 +170,7 @@ namespace caffe {
 	void MultiBoxLossLayer<Dtype>::Reshape(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
 		LossLayer<Dtype>::Reshape(bottom, top);
-		num_ = bottom[0]->num();
+		num_ = bottom[0]->num(); // batch size
 		num_priors_ = bottom[2]->height() / 4;
 		num_gt_ = bottom[3]->height();
 		CHECK_EQ(bottom[0]->num(), bottom[1]->num());

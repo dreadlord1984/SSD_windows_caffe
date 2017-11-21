@@ -199,4 +199,74 @@ void FrcnnParam::print_param(){
   LOG(INFO) << "iter_test            : " << FrcnnParam::iter_test;
 }
 
+void FrcnnParam::load_SSD_param(const std::string default_config_path) {
+	std::vector<float> v_tmp;
+
+	str_map default_map = parse_json_config(default_config_path);
+
+	FrcnnParam::scales = extract_vector("scales", default_map);
+	FrcnnParam::max_size = extract_float("max_size", default_map);
+	FrcnnParam::batch_size = extract_float("batch_size", default_map);
+
+	FrcnnParam::fg_fraction = extract_float("fg_fraction", default_map);
+	FrcnnParam::fg_thresh = extract_float("fg_thresh", default_map);
+	FrcnnParam::bg_thresh_hi = extract_float("bg_thresh_hi", default_map);
+	FrcnnParam::bg_thresh_lo = extract_float("bg_thresh_lo", default_map);
+	FrcnnParam::use_flipped =
+		static_cast<bool>(extract_int("use_flipped", default_map));
+
+	FrcnnParam::bbox_reg =
+		static_cast<bool>(extract_int("bbox_reg", default_map));
+	FrcnnParam::bbox_thresh = extract_float("bbox_thresh", default_map);
+	FrcnnParam::snapshot_infix = extract_string("snapshot_infix", default_map);
+	FrcnnParam::bbox_normalize_targets =
+		static_cast<bool>(extract_int("bbox_normalize_targets", default_map));
+	v_tmp = extract_vector("bbox_inside_weights", default_map);
+	std::copy(v_tmp.begin(), v_tmp.end(), FrcnnParam::bbox_inside_weights);
+	v_tmp = extract_vector("bbox_normalize_means", default_map);
+	std::copy(v_tmp.begin(), v_tmp.end(), FrcnnParam::bbox_normalize_means);
+	v_tmp = extract_vector("bbox_normalize_stds", default_map);
+	std::copy(v_tmp.begin(), v_tmp.end(), FrcnnParam::bbox_normalize_stds);
+
+	FrcnnParam::rpn_positive_overlap = extract_float("rpn_positive_overlap", default_map);
+	FrcnnParam::rpn_negative_overlap = extract_float("rpn_negative_overlap", default_map);
+	FrcnnParam::rpn_clobber_positives =
+		static_cast<bool>(extract_int("rpn_clobber_positives", default_map));
+	FrcnnParam::rpn_fg_fraction = extract_float("rpn_fg_fraction", default_map);
+	FrcnnParam::rpn_batchsize = extract_int("rpn_batchsize", default_map);
+	FrcnnParam::rpn_nms_thresh = extract_float("rpn_nms_thresh", default_map);
+	FrcnnParam::rpn_pre_nms_top_n = extract_int("rpn_pre_nms_top_n", default_map);
+	FrcnnParam::rpn_post_nms_top_n = extract_int("rpn_post_nms_top_n", default_map);
+	FrcnnParam::rpn_min_size = extract_float("rpn_min_size", default_map);
+	v_tmp = extract_vector("rpn_bbox_inside_weights", default_map);
+	std::copy(v_tmp.begin(), v_tmp.end(), FrcnnParam::rpn_bbox_inside_weights);
+	FrcnnParam::rpn_positive_weight = extract_float("rpn_positive_weight", default_map);
+	FrcnnParam::rpn_allowed_border = extract_float("rpn_allowed_border", default_map);
+
+	// ======================================== Test
+	FrcnnParam::test_scales = extract_vector("test_scales", default_map);
+	FrcnnParam::test_max_size = extract_float("test_max_size", default_map);
+	FrcnnParam::test_nms = extract_float("test_nms", default_map);
+
+	FrcnnParam::test_bbox_reg = static_cast<bool>(extract_float("test_bbox_reg", default_map));
+	FrcnnParam::test_rpn_nms_thresh = extract_float("test_rpn_nms_thresh", default_map);
+	FrcnnParam::test_rpn_pre_nms_top_n = extract_int("test_rpn_pre_nms_top_n", default_map);
+	FrcnnParam::test_rpn_post_nms_top_n = extract_int("test_rpn_post_nms_top_n", default_map);
+	FrcnnParam::test_rpn_min_size = extract_float("test_rpn_min_size", default_map);
+
+	// ========================================
+	v_tmp = extract_vector("pixel_means", default_map);
+	std::copy(v_tmp.begin(), v_tmp.end(), FrcnnParam::pixel_means);
+	FrcnnParam::rng_seed = extract_int("rng_seed", default_map);
+	FrcnnParam::eps = extract_float("eps", default_map);
+	FrcnnParam::inf = extract_float("inf", default_map);
+
+	// ========================================
+	FrcnnParam::feat_stride = extract_int("feat_stride", default_map);
+	FrcnnParam::anchors = extract_vector("anchors", default_map);
+	FrcnnParam::test_score_thresh = extract_float("test_score_thresh", default_map);
+	FrcnnParam::n_classes = extract_int("n_classes", default_map);
+	FrcnnParam::iter_test = extract_int("iter_test", default_map);
+}
+
 } // namespace detection
