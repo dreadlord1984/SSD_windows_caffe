@@ -65,9 +65,9 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
   CHECK(channes % 4 == 0) << "rpn bbox pred channels should be divided by 4";
 
   //////////////////////////////////////////////////////
-  const float im_height = 256;// bottom_im_info[0] -> 256
-  const float im_width = 384;// bottom_im_info[1] -> 384
-  const float zoom_scale = 1.0;// bottom_im_info[2] - > 1
+	const float im_height = bottom_im_info[0];// bottom_im_info[0] -> 256
+	const float im_width = bottom_im_info[1];// bottom_im_info[1] -> 384
+	const float zoom_scale = bottom_im_info[2];// bottom_im_info[2] - > 1.0
   //////////////////////////////////////////////////////
   int rpn_pre_nms_top_n;
   int rpn_post_nms_top_n;

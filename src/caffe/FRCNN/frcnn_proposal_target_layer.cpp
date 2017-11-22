@@ -58,8 +58,8 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
   vector<Point4f<Dtype> > gt_boxes;
   vector<int> gt_labels;
 
-  //////////////////////////////////////////////////////
-  /*
+	/*-------------------------改写-------------------------*/
+  
   cout << bottom[1]->num() << endl; // gt box数量
   for (int i = 0; i < bottom[1]->num(); i++) {
 	  gt_boxes.push_back(Point4f<Dtype>(
@@ -76,10 +76,10 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 	  << bottom[1]->data_at(i, 4, 0, 0) << endl;
 	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
   }
-  */
+  
   cout << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
 	  << bottom[1]->width() << endl;
-  const Dtype* gt_data = bottom[1]->cpu_data();
+  /*const Dtype* gt_data = bottom[1]->cpu_data();
   for (int i = 0; i < bottom[1]->height(); i++) {
 	  int start_idx = i * 8;
 	  int item_id = gt_data[start_idx]; // batch size index
@@ -93,21 +93,21 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 		  gt_data[start_idx + 6] * 256));
 	  gt_labels.push_back(gt_data[start_idx + 1]);
 
-	  /*cout << gt_data[start_idx + 3] * 384 << " "
+	  cout << gt_data[start_idx + 3] * 384 << " "
 		  << gt_data[start_idx + 4] * 256 << " "
 		  << gt_data[start_idx + 5] * 384 << " "
 		  << gt_data[start_idx + 6] * 256 << " "
-		  << gt_data[start_idx + 1] << endl;*/
+		  << gt_data[start_idx + 1] << endl;
 
 	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
-  }
-  //////////////////////////////////////////////////////
+  }*/
+  /*-------------------------改写-------------------------*/
   all_rois.insert(all_rois.end(), gt_boxes.begin(), gt_boxes.end());
 
   DLOG(ERROR) << "gt boxes size: " << gt_boxes.size();
   const int num_images = 1;
-  const int rois_per_image = FrcnnParam::batch_size / num_images;
-  const int fg_rois_per_image = rois_per_image * FrcnnParam::fg_fraction;
+  const int rois_per_image = FrcnnParam::batch_size / num_images; // 每个图片选择的一次进入训练的rois框数目
+  const int fg_rois_per_image = rois_per_image * FrcnnParam::fg_fraction; // 这些rois框中正样本占比
 
   //Sample rois with classification labels and bounding box regression
   //targets
@@ -158,6 +158,7 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
       }
     }
   }
+	/*-------------------------改写-------------------------*/
   DLOG(INFO) << "FrcnnProposalTargetLayer::Forward_cpu End";
 }
 
@@ -179,7 +180,7 @@ void FrcnnProposalTargetLayer<Dtype>::_sample_rois(const vector<Point4f<Dtype> >
 // Generate a random sample of RoIs comprising foreground and background examples.
 
   CHECK_EQ(gt_label.size(), gt_boxes.size());
-  // overlaps: (rois x gt_boxes)
+  // overlaps: (rois x gt_boxes):相同overlap时（例如都是0）将最大匹配给最后一个gt_box
   std::vector<std::vector<Dtype> > overlaps = get_ious(all_rois, gt_boxes); 
   std::vector<Dtype> max_overlaps(all_rois.size(), 0);
   std::vector<int> gt_assignment(all_rois.size(), -1);
@@ -271,6 +272,10 @@ void FrcnnProposalTargetLayer<Dtype>::_sample_rois(const vector<Point4f<Dtype> >
 #endif
 
   //def _compute_targets(ex_rois, gt_rois, labels):
+	//targets_dx = (gt_ctr_x - ex_ctr_x) / ex_width;
+	//targets_dy = (gt_ctr_y - ex_ctr_y) / ex_height;
+	//targets_dw = log(gt_widths / ex_width);
+	//targets_dh = log(gt_heights / ex_height);
   CHECK_EQ(rois.size(), _gt_boxes.size());
   CHECK_EQ(rois.size(), labels.size());
   std::vector<Point4f<Dtype> > bbox_targets_data = bbox_transform(rois, _gt_boxes);
