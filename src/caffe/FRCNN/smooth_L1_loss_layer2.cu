@@ -28,6 +28,14 @@ __global__ void SmoothL1Forward(const int n, const Dtype* in, Dtype* out,
 template <typename Dtype>
 void SmoothL1LossDLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
+	/*std::cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
+	<< bottom[0]->width() << std::endl;
+	std::cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
+	<< bottom[1]->width() << std::endl;
+	std::cout << "bottom[2]: " << bottom[2]->num() << " " << bottom[2]->channels() << " " << bottom[2]->height() << " "
+	<< bottom[2]->width() << std::endl;
+	std::cout << "bottom[3]: " << bottom[3]->num() << " " << bottom[3]->channels() << " " << bottom[3]->height() << " "
+	<< bottom[3]->width() << std::endl;*/
   int count = bottom[0]->count();
   caffe_gpu_sub(
       count,

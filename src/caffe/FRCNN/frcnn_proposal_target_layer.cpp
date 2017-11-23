@@ -41,123 +41,176 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 
 	/*
 	bottom[0]: "rpn_rois" 维度：(box_final.size(), 5, 1, 1);
-	bottom[1]: "gt_boxes" 维度：(1, 1, gt_box.size(),8);
+	bottom[1]: "gt_boxes" 维度：SSD(1, 1, gt_box.size(),8), faster(gt_box.size(), 5, 1,1);
 	*/
-	cout << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
-		<< bottom[0]->width() << endl; 
-  vector<Point4f<Dtype> > all_rois;
-  for (int i = 0; i < bottom[0]->num(); i++) {//对于每个anchor
-    all_rois.push_back(Point4f<Dtype>(
-        bottom[0]->data_at(i,1,0,0),
-        bottom[0]->data_at(i,2,0,0),
-        bottom[0]->data_at(i,3,0,0),
-        bottom[0]->data_at(i,4,0,0)));
-    CHECK_EQ(bottom[0]->data_at(i,0,0,0), 0) << "Only single item batches are supported";
-  }
-
-  vector<Point4f<Dtype> > gt_boxes;
-  vector<int> gt_labels;
+	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
+		<< bottom[0]->width() << endl;
+	cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
+		<< bottom[1]->width() << endl;*/
 
 	/*-------------------------改写-------------------------*/
-  
-  cout << bottom[1]->num() << endl; // gt box数量
-  for (int i = 0; i < bottom[1]->num(); i++) {
-	  gt_boxes.push_back(Point4f<Dtype>(
-	  bottom[1]->data_at(i, 0, 0, 0),
-	  bottom[1]->data_at(i, 1, 0, 0),
-	  bottom[1]->data_at(i, 2, 0, 0),
-	  bottom[1]->data_at(i, 3, 0, 0)));
-	  gt_labels.push_back(bottom[1]->data_at(i, 4, 0, 0));
+	map<int, vector<Point4f<Dtype> >> batch_all_rois;
+	map<int, vector<Point4f<Dtype> >> batch_gt_boxes;
+	map<int, vector<int>> batch_gt_labels;
 
-	  cout << bottom[1]->data_at(i, 0, 0, 0) << " "
-	  << bottom[1]->data_at(i, 1, 0, 0) << " "
-	  << bottom[1]->data_at(i, 2, 0, 0) << " "
-	  << bottom[1]->data_at(i, 3, 0, 0) << " "
-	  << bottom[1]->data_at(i, 4, 0, 0) << endl;
-	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
-  }
-  
-  cout << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
-	  << bottom[1]->width() << endl;
-  /*const Dtype* gt_data = bottom[1]->cpu_data();
-  for (int i = 0; i < bottom[1]->height(); i++) {
-	  int start_idx = i * 8;
-	  int item_id = gt_data[start_idx]; // batch size index
-	  if (item_id == -1) {
-		  break;
-	  }
-	  gt_boxes.push_back(Point4f<Dtype>(
-		  gt_data[start_idx + 3] * 384,
-		  gt_data[start_idx + 4] * 256,
-		  gt_data[start_idx + 5] * 384,
-		  gt_data[start_idx + 6] * 256));
-	  gt_labels.push_back(gt_data[start_idx + 1]);
 
-	  cout << gt_data[start_idx + 3] * 384 << " "
-		  << gt_data[start_idx + 4] * 256 << " "
-		  << gt_data[start_idx + 5] * 384 << " "
-		  << gt_data[start_idx + 6] * 256 << " "
-		  << gt_data[start_idx + 1] << endl;
+	if (bottom[1]->channels() == 5) // faster数据类型, batch_size = 1
+	{
+		for (int i = 0; i < bottom[0]->num(); i++) {
+			CHECK_EQ(bottom[0]->data_at(i, 0, 0, 0), 0) << "Only single item batches are supported";
+			batch_all_rois[0].push_back(Point4f<Dtype>(
+				bottom[0]->data_at(i, 1, 0, 0),
+				bottom[0]->data_at(i, 2, 0, 0),
+				bottom[0]->data_at(i, 3, 0, 0),
+				bottom[0]->data_at(i, 4, 0, 0)));
+		}
 
-	  CHECK_GT(gt_labels[i], 0) << "Ground Truth Should Be Greater Than 0";
-  }*/
+		for (int i = 0; i < bottom[1]->num(); i++) {
+			batch_gt_boxes[0].push_back(Point4f<Dtype>(
+				bottom[1]->data_at(i, 0, 0, 0),
+				bottom[1]->data_at(i, 1, 0, 0),
+				bottom[1]->data_at(i, 2, 0, 0),
+				bottom[1]->data_at(i, 3, 0, 0)));
+			batch_gt_labels[0].push_back(bottom[1]->data_at(i, 4, 0, 0));
+			CHECK_GT(batch_gt_labels[0][i], 0) << "Ground Truth Should Be Greater Than 0";
+		}
+	}
+	else if (bottom[1]->channels() == 1)// SSD数据类型，batch_size >= 1
+	{
+		 for (int i = 0; i < bottom[0]->num(); i++) {//对于每个anchor
+			int batch_index = bottom[0]->data_at(i, 0, 0, 0);
+			batch_all_rois[batch_index].push_back(Point4f<Dtype>(
+		       bottom[0]->data_at(i,1,0,0),
+		       bottom[0]->data_at(i,2,0,0),
+		       bottom[0]->data_at(i,3,0,0),
+		       bottom[0]->data_at(i,4,0,0)));
+		 }
+		 
+		 const Dtype* gt_data = bottom[1]->cpu_data();
+		 for (int i = 0; i < bottom[1]->height(); i++) {
+		  int start_idx = i * 8;
+			int batch_index = gt_data[start_idx]; // batch size index
+			if (batch_index == -1) {
+				cerr << "batch index is " << batch_index << endl;
+		  }
+			batch_gt_boxes[batch_index].push_back(Point4f<Dtype>(
+			  gt_data[start_idx + 3] * 384,
+			  gt_data[start_idx + 4] * 256,
+			  gt_data[start_idx + 5] * 384,
+			  gt_data[start_idx + 6] * 256));
+			batch_gt_labels[batch_index].push_back(gt_data[start_idx + 1]);
+
+			/* cout << gt_data[start_idx + 3] * 384 << " "
+				 << gt_data[start_idx + 4] * 256 << " "
+				 << gt_data[start_idx + 5] * 384 << " "
+				 << gt_data[start_idx + 6] * 256 << " "
+				 << gt_data[start_idx + 1] << endl;*/
+
+			CHECK_GT(batch_gt_labels[batch_index].size(), 0) << "Ground Truth Should Be Greater Than 0";
+		 }
+	}
+	const int image_batch_size = batch_all_rois.size();// batch size
+
+	vector<vector<int >> batch_labels;
+	vector<vector<Point4f<Dtype> > > batch_rois;
+	vector<vector<vector<Point4f<Dtype> > > > batch_bbox_targets, batch_bbox_inside_weights;
+
+	int batch_batch_size = 0;
+
+	for (int batch_index = 0; batch_index < image_batch_size; batch_index++)
+	{
+		vector<Point4f<Dtype> > all_rois = batch_all_rois[batch_index];
+		vector<Point4f<Dtype> > gt_boxes = batch_gt_boxes[batch_index];
+		vector<int> gt_labels = batch_gt_labels[batch_index];
+		all_rois.insert(all_rois.end(), gt_boxes.begin(), gt_boxes.end());
+		DLOG(ERROR) << "gt boxes size: " << gt_boxes.size();
+		const int num_images = 1;
+		const int rois_per_image = FrcnnParam::batch_size / num_images; // 每个图片选择的一次进入训练的rois框数目
+		const int fg_rois_per_image = rois_per_image * FrcnnParam::fg_fraction; // 这些rois框中正样本占比
+
+		//Sample rois with classification labels and bounding box regression
+		//targets
+		vector<int> labels;
+		vector<Point4f<Dtype> > rois;
+		vector<vector<Point4f<Dtype> > > bbox_targets, bbox_inside_weights;
+
+		_sample_rois(all_rois, gt_boxes, gt_labels, fg_rois_per_image, rois_per_image, labels, rois, bbox_targets, bbox_inside_weights);
+
+		CHECK_EQ(labels.size(), rois.size());
+		CHECK_EQ(labels.size(), bbox_targets.size());
+		CHECK_EQ(labels.size(), bbox_inside_weights.size());
+		batch_batch_size += rois.size();
+
+		batch_labels.push_back(labels);
+		batch_rois.push_back(rois);
+		batch_bbox_targets.push_back(bbox_targets);
+		batch_bbox_inside_weights.push_back(bbox_inside_weights);
+	}
+
+
   /*-------------------------改写-------------------------*/
-  all_rois.insert(all_rois.end(), gt_boxes.begin(), gt_boxes.end());
 
-  DLOG(ERROR) << "gt boxes size: " << gt_boxes.size();
-  const int num_images = 1;
-  const int rois_per_image = FrcnnParam::batch_size / num_images; // 每个图片选择的一次进入训练的rois框数目
-  const int fg_rois_per_image = rois_per_image * FrcnnParam::fg_fraction; // 这些rois框中正样本占比
 
-  //Sample rois with classification labels and bounding box regression
-  //targets
-  vector<int> labels;
-  vector<Point4f<Dtype> > rois;
-  vector<vector<Point4f<Dtype> > > bbox_targets, bbox_inside_weights;
-
-  _sample_rois(all_rois, gt_boxes, gt_labels, fg_rois_per_image, rois_per_image, labels, rois, bbox_targets, bbox_inside_weights);
-
-  CHECK_EQ(labels.size(), rois.size());
-  CHECK_EQ(labels.size(), bbox_targets.size());
-  CHECK_EQ(labels.size(), bbox_inside_weights.size());
-  const int batch_size = rois.size();
-  DLOG(ERROR) << "top[0]-> " << batch_size << " , 5, 1, 1";
-  // sampled rois
-  top[0]->Reshape(batch_size, 5, 1, 1); // rois
+	DLOG(ERROR) << "top[0]-> " << batch_batch_size << " , 5, 1, 1";
+  // 1. top[0]:sampled rois
+	top[0]->Reshape(batch_batch_size, 5, 1, 1); // rois
   caffe_set(top[0]->count(), Dtype(0), top[0]->mutable_cpu_data());
   Dtype *rois_data = top[0]->mutable_cpu_data();
-  for (int i = 0; i < batch_size; i++) {
-    rois_data[ top[0]->offset(i,1,0,0) ] = rois[i][0];
-    rois_data[ top[0]->offset(i,2,0,0) ] = rois[i][1];
-    rois_data[ top[0]->offset(i,3,0,0) ] = rois[i][2];
-    rois_data[ top[0]->offset(i,4,0,0) ] = rois[i][3];
-  }
-  // classification labels
-  top[1]->Reshape(batch_size, 1, 1, 1);
-  Dtype *label_data = top[1]->mutable_cpu_data();
-  for (int i = 0; i < batch_size; i++) {
-    label_data[ top[1]->offset(i,0,0,0) ] = labels[i];
-  }
-  // bbox_targets
-  top[2]->Reshape(batch_size, this->config_n_classes_*4, 1, 1);
-  caffe_set(top[2]->count(), Dtype(0), top[2]->mutable_cpu_data());
-  Dtype *target_data = top[2]->mutable_cpu_data();
-  // bbox_inside_weights and bbox_outside_weights
-  top[3]->Reshape(batch_size, this->config_n_classes_*4, 1, 1); //bbox_inside_weights
-  caffe_set(top[3]->count(), Dtype(0), top[3]->mutable_cpu_data());
-  Dtype *bbox_inside_data = top[3]->mutable_cpu_data();
-  top[4]->Reshape(batch_size, this->config_n_classes_*4, 1, 1); //bbox_outside_weights
-  caffe_set(top[4]->count(), Dtype(0), top[4]->mutable_cpu_data());
-  Dtype *bbox_outside_data = top[4]->mutable_cpu_data();
-  for (int i = 0; i < batch_size; i++) {
-    for (int j = 0; j < this->config_n_classes_; j++) {
-      for (int cor = 0; cor < 4; cor++ ) {
-        target_data[ top[2]->offset(i, j*4+cor, 0, 0) ] = bbox_targets[i][j][cor];
-        bbox_inside_data[ top[2]->offset(i, j*4+cor, 0, 0) ] = bbox_inside_weights[i][j][cor];
-        bbox_outside_data[ top[2]->offset(i, j*4+cor, 0, 0) ] = bbox_inside_weights[i][j][cor] > 0;
-      }
-    }
-  }
+	// 2. top[1]:classification labels
+	top[1]->Reshape(batch_batch_size, 1, 1, 1);
+	Dtype *label_data = top[1]->mutable_cpu_data();
+	// 3. top[2]:bbox_targets
+	top[2]->Reshape(batch_batch_size, this->config_n_classes_ * 4, 1, 1);
+	caffe_set(top[2]->count(), Dtype(0), top[2]->mutable_cpu_data());
+	Dtype *target_data = top[2]->mutable_cpu_data();
+	// 4. top[3],top[4]:bbox_inside_weights and bbox_outside_weights
+	top[3]->Reshape(batch_batch_size, this->config_n_classes_ * 4, 1, 1); //bbox_inside_weights
+	caffe_set(top[3]->count(), Dtype(0), top[3]->mutable_cpu_data());
+	Dtype *bbox_inside_data = top[3]->mutable_cpu_data();
+	top[4]->Reshape(batch_batch_size, this->config_n_classes_ * 4, 1, 1); //bbox_outside_weights
+	caffe_set(top[4]->count(), Dtype(0), top[4]->mutable_cpu_data());
+	Dtype *bbox_outside_data = top[4]->mutable_cpu_data();
+
+	int rois_begin = 0;
+	for (int batch_index = 0; batch_index < image_batch_size; batch_index++)
+	{
+		/*labels = batch_labels[batch_index];
+		rois = batch_rois[batch_index];
+		bbox_targets = batch_bbox_targets[batch_index];
+		bbox_inside_weights = batch_bbox_inside_weights[batch_index];*/
+
+		const int batch_size = batch_rois[batch_index].size();
+		// sampled rois
+		for (int i = 0; i < batch_size; i++) {
+			rois_data[top[0]->offset(rois_begin + i, 1, 0, 0)] = batch_rois[batch_index][i][0];
+			rois_data[top[0]->offset(rois_begin + i, 2, 0, 0)] = batch_rois[batch_index][i][1];
+			rois_data[top[0]->offset(rois_begin + i, 3, 0, 0)] = batch_rois[batch_index][i][2];
+			rois_data[top[0]->offset(rois_begin + i, 4, 0, 0)] = batch_rois[batch_index][i][3];
+
+			label_data[top[1]->offset(rois_begin + i, 0, 0, 0)] = batch_labels[batch_index][i];
+
+			for (int j = 0; j < this->config_n_classes_; j++) {
+				for (int cor = 0; cor < 4; cor++) {
+					target_data[top[2]->offset(rois_begin + i, j * 4 + cor, 0, 0)] = batch_bbox_targets[batch_index][i][j][cor];
+					bbox_inside_data[top[2]->offset(rois_begin + i, j * 4 + cor, 0, 0)] = batch_bbox_inside_weights[batch_index][i][j][cor];
+					bbox_outside_data[top[2]->offset(rois_begin + i, j * 4 + cor, 0, 0)] = batch_bbox_inside_weights[batch_index][i][j][cor] > 0;
+				}
+			}
+		}
+
+		rois_begin += batch_size;
+	}
+	/*cout << "top[0]: " << top[0]->num() << " " << top[0]->channels() << " " << top[0]->height() << " "
+		<< top[0]->width() << endl;
+	cout << "top[1]: " << top[1]->num() << " " << top[1]->channels() << " " << top[1]->height() << " "
+		<< top[1]->width() << endl;
+	cout << "top[2]: " << top[2]->num() << " " << top[2]->channels() << " " << top[2]->height() << " "
+		<< top[2]->width() << endl;
+	cout << "top[3]: " << top[3]->num() << " " << top[3]->channels() << " " << top[3]->height() << " "
+		<< top[3]->width() << endl;
+	cout << "top[4]: " << top[4]->num() << " " << top[4]->channels() << " " << top[4]->height() << " "
+		<< top[4]->width() << endl;*/
+  
 	/*-------------------------改写-------------------------*/
   DLOG(INFO) << "FrcnnProposalTargetLayer::Forward_cpu End";
 }

@@ -58,6 +58,10 @@ void SoftmaxWithLossLayer<Dtype>::Reshape(
 template <typename Dtype>
 void SoftmaxWithLossLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
+		<< bottom[0]->width() << endl;
+	cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
+		<< bottom[1]->width() << endl;*/
   // The forward pass computes the softmax prob values.
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
   const Dtype* prob_data = prob_.cpu_data();

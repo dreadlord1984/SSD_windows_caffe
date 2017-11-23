@@ -51,13 +51,24 @@ void SmoothL1LossDLayer<Dtype>::Reshape(
 template <typename Dtype>
 void SmoothL1LossDLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
     const vector<Blob<Dtype>*>& top) {
-  NOT_IMPLEMENTED;
+	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
+		<< bottom[0]->width() << endl;
+		cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
+		<< bottom[1]->width() << endl;
+		cout << "bottom[2]: " << bottom[2]->num() << " " << bottom[2]->channels() << " " << bottom[2]->height() << " "
+		<< bottom[2]->width() << endl;
+		cout << "bottom[3]: " << bottom[3]->num() << " " << bottom[3]->channels() << " " << bottom[3]->height() << " "
+		<< bottom[3]->width() << endl;*/
+	Forward_gpu(bottom, top);
+
+  //NOT_IMPLEMENTED;
 }
 
 template <typename Dtype>
 void SmoothL1LossDLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
-  NOT_IMPLEMENTED;
+	Backward_gpu(top, propagate_down, bottom);
+  /*NOT_IMPLEMENTED;*/
 }
 
 #ifdef CPU_ONLY

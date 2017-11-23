@@ -94,16 +94,16 @@ __global__ void SelectBoxByIndices(const int nthreads, const float *in_box, int 
 }
 
 template <typename Dtype>
-__global__ void SelectBoxAftNMS(const int nthreads, const float *in_box, int *keep_indices,
+__global__ void SelectBoxAftNMS(int batch_index, int box_begin, const int nthreads, const float *in_box, int *keep_indices,
                           Dtype *top_data, const Dtype *in_score, Dtype* top_score) {
   CUDA_KERNEL_LOOP(index , nthreads) {
-    top_data[index * 5] = 0;
+		top_data[box_begin * 5 + index * 5] = batch_index;
     int keep_idx = keep_indices[index];
     for (int j = 1; j < 5; ++j) {
-      top_data[index * 5 + j] = in_box[keep_idx * 4 + j - 1];
+			top_data[box_begin * 5 + index * 5 + j] = in_box[keep_idx * 4 + j - 1];
     }
     if (top_score != NULL && in_score != NULL) {
-      top_score[index] = in_score[keep_idx];
+			top_score[box_begin + index] = in_score[keep_idx];
     }
   }
 }
@@ -111,26 +111,27 @@ __global__ void SelectBoxAftNMS(const int nthreads, const float *in_box, int *ke
 template <typename Dtype>
 void FrcnnProposalLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype> *> &bottom,
     const vector<Blob<Dtype> *> &top) {
-  Forward_cpu(bottom, top);
-  return ;
-#if 0
+
   DLOG(ERROR) << "========== enter proposal layer";
   const Dtype *bottom_rpn_score = bottom[0]->gpu_data();
   const Dtype *bottom_rpn_bbox = bottom[1]->gpu_data();
   // bottom data comes from host memory
-  Dtype bottom_im_info[3];
+  /*Dtype bottom_im_info[3];
   CHECK_EQ(bottom[2]->count(), 3);
-  CUDA_CHECK(cudaMemcpy(bottom_im_info, bottom[2]->gpu_data(), sizeof(Dtype) * 3, cudaMemcpyDeviceToHost));
+  CUDA_CHECK(cudaMemcpy(bottom_im_info, bottom[2]->gpu_data(), sizeof(Dtype) * 3, cudaMemcpyDeviceToHost));*/
 
-  const int num = bottom[1]->num();
+  const int num = bottom[1]->num();// batch size
   const int channes = bottom[1]->channels();
   const int height = bottom[1]->height();
   const int width = bottom[1]->width();
-  CHECK(num == 1) << "only single item batches are supported";
+	/*-------------------------¸ÄÐ´-------------------------*/
+  //CHECK(num == 1) << "only single item batches are supported";
   CHECK(channes % 4 == 0) << "rpn bbox pred channels should be divided by 4";
 
-  const float im_height = bottom_im_info[0];
-  const float im_width = bottom_im_info[1];
+	const float im_height = 256;// bottom_im_info[0] -> 256
+	const float im_width = 384;// bottom_im_info[1] -> 384
+	const float zoom_scale = 1.0;// bottom_im_info[2] - > 1.0
+	/*-------------------------¸ÄÐ´-------------------------*/
 
   int rpn_pre_nms_top_n;
   int rpn_post_nms_top_n;
@@ -153,113 +154,140 @@ void FrcnnProposalLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype> *> &bottom,
 
   const int config_n_anchors = FrcnnParam::anchors.size() / 4;
   const int total_anchor_num = config_n_anchors * height * width;
-  
-  //Step 1. -------------------------------Sort the rpn result----------------------
-  // the first half of rpn_score is the bg score
-  // Note that the sorting operator will change the order fg_scores (bottom_rpn_score)
-  Dtype *fg_scores = (Dtype*)(&bottom_rpn_score[total_anchor_num]);
+	/*-------------------------¸ÄÐ´-------------------------*/
+	vector<int> batch_keep_num;
+	vector<float*> batch_transform_bbox_;
+	vector<int *>batch_gpu_keep_indices_;
+	vector<Dtype *>batch_bbox_score_;
 
-  Dtype *sorted_scores = NULL;
-  CUDA_CHECK(cudaMalloc((void**)&sorted_scores, sizeof(Dtype) * total_anchor_num));
-  cub::DoubleBuffer<Dtype> d_keys(fg_scores, sorted_scores);
+	for (int batch_index = 0; batch_index < num; batch_index++) {
+		//Step 1. -------------------------------Sort the rpn result----------------------
+		// the first half of rpn_score is the bg score
+		// Note that the sorting operator will change the order fg_scores (bottom_rpn_score)
+		Dtype *fg_scores = (Dtype*)(&bottom_rpn_score[(2*batch_index + 1)*total_anchor_num]);
 
-  int *indices = NULL;
-  CUDA_CHECK(cudaMalloc((void**)&indices, sizeof(int) * total_anchor_num));
-  GetIndex<<<caffe::CAFFE_GET_BLOCKS(total_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS>>>(
-      total_anchor_num, indices);
-  cudaDeviceSynchronize();
+		Dtype *sorted_scores = NULL;
+		CUDA_CHECK(cudaMalloc((void**)&sorted_scores, sizeof(Dtype) * total_anchor_num));
+		cub::DoubleBuffer<Dtype> d_keys(fg_scores, sorted_scores);
 
-  int *sorted_indices = NULL;
-  CUDA_CHECK(cudaMalloc((void**)&sorted_indices, sizeof(int) * total_anchor_num));
-  cub::DoubleBuffer<int> d_values(indices, sorted_indices);
+		int *indices = NULL;
+		CUDA_CHECK(cudaMalloc((void**)&indices, sizeof(int) * total_anchor_num));
+		GetIndex << <caffe::CAFFE_GET_BLOCKS(total_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
+			total_anchor_num, indices);
+		cudaDeviceSynchronize();
 
-  void *sort_temp_storage_ = NULL;
-  size_t sort_temp_storage_bytes_ = 0;
-  // calculate the temp_storage_bytes
-  cub::DeviceRadixSort::SortPairsDescending(sort_temp_storage_, sort_temp_storage_bytes_,
-                                             d_keys, d_values, total_anchor_num);
-  DLOG(ERROR) << "sort_temp_storage_bytes_ : " << sort_temp_storage_bytes_;
-  CUDA_CHECK(cudaMalloc(&sort_temp_storage_, sort_temp_storage_bytes_));
-  // sorting
-  cub::DeviceRadixSort::SortPairsDescending(sort_temp_storage_, sort_temp_storage_bytes_,
-                                            d_keys, d_values, total_anchor_num);
-  cudaDeviceSynchronize();
-  
-  //Step 2. ---------------------------bbox transform----------------------------
-  const int retained_anchor_num = std::min(total_anchor_num, rpn_pre_nms_top_n);
-  // float *transform_bbox = NULL;
-  // CUDA_CHECK(cudaMalloc(&transform_bbox, sizeof(float) * retained_anchor_num * 4));
-  BBoxTransformInv<Dtype><<<caffe::CAFFE_GET_BLOCKS(retained_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS>>>(
-      retained_anchor_num, bottom_rpn_bbox, height, width, FrcnnParam::feat_stride,
-      im_height, im_width, sorted_indices, anchors_, transform_bbox_);
-  cudaDeviceSynchronize();
-  
-  //Step 3. -------------------------filter out small box-----------------------
+		int *sorted_indices = NULL;
+		CUDA_CHECK(cudaMalloc((void**)&sorted_indices, sizeof(int) * total_anchor_num));
+		cub::DoubleBuffer<int> d_values(indices, sorted_indices);
 
-  // select the box larger than min size
-  // int *selected_flags = NULL;
-  // CUDA_CHECK(cudaMalloc(&selected_flags, sizeof(int) * retained_anchor_num));
-  SelectBox<<<caffe::CAFFE_GET_BLOCKS(retained_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS>>>(
-      retained_anchor_num, transform_bbox_, bottom_im_info[2] * rpn_min_size, selected_flags_);
-  cudaDeviceSynchronize();
+		void *sort_temp_storage_ = NULL;
+		size_t sort_temp_storage_bytes_ = 0;
+		// calculate the temp_storage_bytes
+		cub::DeviceRadixSort::SortPairsDescending(sort_temp_storage_, sort_temp_storage_bytes_,
+			d_keys, d_values, total_anchor_num);
+		DLOG(ERROR) << "sort_temp_storage_bytes_ : " << sort_temp_storage_bytes_;
+		CUDA_CHECK(cudaMalloc(&sort_temp_storage_, sort_temp_storage_bytes_));
+		// sorting
+		cub::DeviceRadixSort::SortPairsDescending(sort_temp_storage_, sort_temp_storage_bytes_,
+			d_keys, d_values, total_anchor_num);
+		cudaDeviceSynchronize();
 
-  // cumulative sum up the flags to get the copy index
-  int *selected_indices_ = NULL;
-  CUDA_CHECK(cudaMalloc((void**)&selected_indices_, sizeof(int) * retained_anchor_num));
-  void *cumsum_temp_storage_ = NULL;
-  size_t cumsum_temp_storage_bytes_ = 0;
-  cub::DeviceScan::InclusiveSum(cumsum_temp_storage_, cumsum_temp_storage_bytes_,
-                                 selected_flags_, selected_indices_, retained_anchor_num);
-  DLOG(ERROR) << "cumsum_temp_storage_bytes : " << cumsum_temp_storage_bytes_;
-  CUDA_CHECK(cudaMalloc(&cumsum_temp_storage_, cumsum_temp_storage_bytes_));
-  cub::DeviceScan::InclusiveSum(sort_temp_storage_, cumsum_temp_storage_bytes_,
-                                selected_flags_, selected_indices_, retained_anchor_num);
+		//Step 2. ---------------------------bbox transform----------------------------
+		const int retained_anchor_num = std::min(total_anchor_num, rpn_pre_nms_top_n);
+		// float *transform_bbox = NULL;
+		// CUDA_CHECK(cudaMalloc(&transform_bbox, sizeof(float) * retained_anchor_num * 4));
+		BBoxTransformInv<Dtype> << <caffe::CAFFE_GET_BLOCKS(retained_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
+			retained_anchor_num, bottom_rpn_bbox, height, width, FrcnnParam::feat_stride,
+			im_height, im_width, sorted_indices, anchors_, transform_bbox_);
+		cudaDeviceSynchronize();
 
-  // CUDA_CHECK(cudaFree(cumsum_temp_storage));
+		//Step 3. -------------------------filter out small box-----------------------
 
-  int selected_num = -1;
-  cudaMemcpy(&selected_num, &selected_indices_[retained_anchor_num - 1], sizeof(int), cudaMemcpyDeviceToHost);
-  CHECK_GT(selected_num, 0);
+		// select the box larger than min size
+		// int *selected_flags = NULL;
+		// CUDA_CHECK(cudaMalloc(&selected_flags, sizeof(int) * retained_anchor_num));
+		SelectBox << <caffe::CAFFE_GET_BLOCKS(retained_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
+			retained_anchor_num, transform_bbox_, zoom_scale * rpn_min_size, selected_flags_);
+		cudaDeviceSynchronize();
 
-  Dtype *bbox_score_ = NULL;
-  if (top.size() == 2) CUDA_CHECK(cudaMalloc(&bbox_score_, sizeof(Dtype) * retained_anchor_num));
-  SelectBoxByIndices<<<caffe::CAFFE_GET_BLOCKS(selected_num), caffe::CAFFE_CUDA_NUM_THREADS>>>(
-      selected_num, transform_bbox_, selected_indices_, transform_bbox_, sorted_scores, bbox_score_);
-  cudaDeviceSynchronize();
-  
-  //Step 4. -----------------------------apply nms-------------------------------
-  DLOG(ERROR) << "========== apply nms with rpn_nms_thresh : " << rpn_nms_thresh;
-  vector<int> keep_indices(selected_num);
-  int keep_num = -1;
-  gpu_nms(&keep_indices[0], &keep_num, transform_bbox_, selected_num, 4, rpn_nms_thresh);
-  DLOG(ERROR) << "rpn num after gpu nms: " << keep_num;
+		// cumulative sum up the flags to get the copy index
+		int *selected_indices_ = NULL;
+		CUDA_CHECK(cudaMalloc((void**)&selected_indices_, sizeof(int) * retained_anchor_num));
+		void *cumsum_temp_storage_ = NULL;
+		size_t cumsum_temp_storage_bytes_ = 0;
+		cub::DeviceScan::InclusiveSum(cumsum_temp_storage_, cumsum_temp_storage_bytes_,
+			selected_flags_, selected_indices_, retained_anchor_num);
+		DLOG(ERROR) << "cumsum_temp_storage_bytes : " << cumsum_temp_storage_bytes_;
+		CUDA_CHECK(cudaMalloc(&cumsum_temp_storage_, cumsum_temp_storage_bytes_));
+		cub::DeviceScan::InclusiveSum(sort_temp_storage_, cumsum_temp_storage_bytes_,
+			selected_flags_, selected_indices_, retained_anchor_num);
 
-  keep_num = std::min(keep_num, rpn_post_nms_top_n);
-  DLOG(ERROR) << "========== copy to top";
-  cudaMemcpy(gpu_keep_indices_, &keep_indices[0], sizeof(int) * keep_num, cudaMemcpyHostToDevice);
+		// CUDA_CHECK(cudaFree(cumsum_temp_storage));
 
-  top[0]->Reshape(keep_num, 5, 1, 1);
+		int selected_num = -1;
+		cudaMemcpy(&selected_num, &selected_indices_[retained_anchor_num - 1], sizeof(int), cudaMemcpyDeviceToHost);
+		CHECK_GT(selected_num, 0);
+
+		Dtype *bbox_score_ = NULL;
+		if (top.size() == 2) CUDA_CHECK(cudaMalloc(&bbox_score_, sizeof(Dtype) * retained_anchor_num));
+		SelectBoxByIndices << <caffe::CAFFE_GET_BLOCKS(selected_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
+			selected_num, transform_bbox_, selected_indices_, transform_bbox_, sorted_scores, bbox_score_);
+		cudaDeviceSynchronize();
+
+		//Step 4. -----------------------------apply nms-------------------------------
+		DLOG(ERROR) << "========== apply nms with rpn_nms_thresh : " << rpn_nms_thresh;
+		vector<int> keep_indices(selected_num);
+		int keep_num = -1;
+		gpu_nms(&keep_indices[0], &keep_num, transform_bbox_, selected_num, 4, rpn_nms_thresh);
+		DLOG(ERROR) << "rpn num after gpu nms: " << keep_num;
+
+		keep_num = std::min(keep_num, rpn_post_nms_top_n);
+		DLOG(ERROR) << "========== copy to top";
+		cudaMemcpy(gpu_keep_indices_, &keep_indices[0], sizeof(int) * keep_num, cudaMemcpyHostToDevice);
+
+		////////////////////////////////////
+		// do not forget to free the malloc memory
+		CUDA_CHECK(cudaFree(sorted_scores));
+		CUDA_CHECK(cudaFree(indices));
+		CUDA_CHECK(cudaFree(sorted_indices));
+		CUDA_CHECK(cudaFree(sort_temp_storage_));
+		CUDA_CHECK(cudaFree(cumsum_temp_storage_));
+		CUDA_CHECK(cudaFree(selected_indices_));
+
+		batch_keep_num.push_back(keep_num);
+		batch_transform_bbox_.push_back(transform_bbox_);
+		batch_bbox_score_.push_back(bbox_score_);
+		batch_gpu_keep_indices_.push_back(gpu_keep_indices_);
+	}
+
+	int total_boxes = 0;
+	for (size_t batch_index = 0; batch_index < batch_keep_num.size(); batch_index++) {
+		total_boxes += batch_keep_num[batch_index];
+	}
+
+	top[0]->Reshape(total_boxes, 5, 1, 1);
   Dtype *top_data = top[0]->mutable_gpu_data();
   Dtype *top_score = NULL;
   if (top.size() == 2) {
-    top[1]->Reshape(keep_num, 1, 1, 1);
+		top[1]->Reshape(total_boxes, 1, 1, 1);
     top_score = top[1]->mutable_gpu_data();
   }
-  SelectBoxAftNMS<<<caffe::CAFFE_GET_BLOCKS(keep_num), caffe::CAFFE_CUDA_NUM_THREADS>>>(
-      keep_num, transform_bbox_, gpu_keep_indices_, top_data, bbox_score_, top_score);
+	int box_begin = 0;
+	for (size_t batch_index = 0; batch_index < batch_keep_num.size(); batch_index++) {
+		const int keep_num = batch_keep_num[batch_index];
+		SelectBoxAftNMS << <caffe::CAFFE_GET_BLOCKS(keep_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
+			batch_index, box_begin, keep_num, batch_transform_bbox_[batch_index], batch_gpu_keep_indices_[batch_index],
+			top_data, batch_bbox_score_[batch_index], top_score);
+		box_begin += keep_num;
+	}
   
   DLOG(ERROR) << "========== exit proposal layer";
   ////////////////////////////////////
   // do not forget to free the malloc memory
-  CUDA_CHECK(cudaFree(sorted_scores));
-  CUDA_CHECK(cudaFree(indices));
-  CUDA_CHECK(cudaFree(sorted_indices));
-  CUDA_CHECK(cudaFree(sort_temp_storage_));
-  CUDA_CHECK(cudaFree(cumsum_temp_storage_));
-  CUDA_CHECK(cudaFree(selected_indices_));
-  if (bbox_score_!=NULL)  CUDA_CHECK(cudaFree(bbox_score_));
- 
-#endif
+	for (size_t batch_index = 0; batch_index < batch_keep_num.size(); batch_index++) {
+		if (batch_bbox_score_[batch_index] != NULL)  
+			CUDA_CHECK(cudaFree(batch_bbox_score_[batch_index]));
+	}
 
 }
 
