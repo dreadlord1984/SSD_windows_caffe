@@ -76,8 +76,8 @@ class FrcnnProposalLayer : public Layer<Dtype> {
 #ifndef CPU_ONLY
   // CUDA CU 
   float* anchors_;
+	unsigned long long *mask_;
   float* transform_bbox_;
-  unsigned long long *mask_;
   int *selected_flags_;
   int *gpu_keep_indices_;
 #endif

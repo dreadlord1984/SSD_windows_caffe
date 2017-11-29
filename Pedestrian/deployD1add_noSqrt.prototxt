@@ -1338,7 +1338,7 @@ layer {
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
-  	  min_size: 15.0
+    min_size: 15.0
     max_size: 25.0
     min_size: 25.0
 	  max_size: 51.0

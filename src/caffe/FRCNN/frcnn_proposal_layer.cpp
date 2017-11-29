@@ -22,19 +22,19 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
   const vector<Blob<Dtype> *> &top) {
 
 #ifndef CPU_ONLY
-
+	
   CUDA_CHECK(cudaMalloc(&anchors_, sizeof(float) * FrcnnParam::anchors.size()));
   CUDA_CHECK(cudaMemcpy(anchors_, &(FrcnnParam::anchors[0]),
                         sizeof(float) * FrcnnParam::anchors.size(), cudaMemcpyHostToDevice));
 
   const int rpn_pre_nms_top_n = 
     this->phase_ == TRAIN ? FrcnnParam::rpn_pre_nms_top_n : FrcnnParam::test_rpn_pre_nms_top_n;
-  CUDA_CHECK(cudaMalloc(&transform_bbox_, sizeof(float) * rpn_pre_nms_top_n * 4));
-  CUDA_CHECK(cudaMalloc(&selected_flags_, sizeof(int) * rpn_pre_nms_top_n));
+	CUDA_CHECK(cudaMalloc(&transform_bbox_, bottom[0]->num()* sizeof(float) * rpn_pre_nms_top_n * 4)); // *batch_size
+	CUDA_CHECK(cudaMalloc(&selected_flags_, bottom[0]->num() * sizeof(int) * rpn_pre_nms_top_n)); // *batch_size
 
   const int rpn_post_nms_top_n = 
     this->phase_ == TRAIN ? FrcnnParam::rpn_post_nms_top_n : FrcnnParam::test_rpn_post_nms_top_n;
-  CUDA_CHECK(cudaMalloc(&gpu_keep_indices_, sizeof(int) * rpn_post_nms_top_n));
+	CUDA_CHECK(cudaMalloc(&gpu_keep_indices_, bottom[0]->num() * sizeof(int) * rpn_post_nms_top_n)); // *batch_size
 
 #endif
   top[0]->Reshape(1, 5, 1, 1); // rpn_rois
@@ -46,7 +46,7 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
 template <typename Dtype>
 void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
                                             const vector<Blob<Dtype> *> &top) {
-	Forward_gpu(bottom, top);
+//Forward_gpu(bottom, top);
 //#if 0
   DLOG(ERROR) << "========== enter proposal layer";
   const Dtype *bottom_rpn_score = bottom[0]->cpu_data();  // rpn_cls_prob_reshape
@@ -145,11 +145,9 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		std::sort(sort_vector.begin(), sort_vector.end(), std::greater<sort_pair>());
 		const int n_anchors = std::min((int)sort_vector.size(), rpn_pre_nms_top_n);
 		sort_vector.erase(sort_vector.begin() + n_anchors, sort_vector.end());
-		//anchors.erase(anchors.begin() + n_anchors, anchors.end());
+
 		std::vector<bool> select(n_anchors, true);
-		//std::cout << "n="<<n_anchors;
-		//std::cout << "w="<<width;
-		//std::cout << "h="<<height;
+
 
 		// apply nms 数量限制FrcnnParam::rpn_post_nms_top_n和阈值限制FrcnnParam::rpn_nms_thresh
 		DLOG(ERROR) << "========== apply nms, pre nms number is : " << n_anchors;
@@ -175,22 +173,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 
 	}
 
-
-  /*
-  const int n_anchors =(int)sort_vector.size();
-  //std::cout << "n="<<n_anchors;
-  std::vector<Point4f<Dtype> > box_final;
-  std::vector<Dtype> scores_;
-  for (int i = 0; i < n_anchors; i++) {
-      if(sort_vector[i].first>0.5)
-      {
-      int cur_j = sort_vector[i].second;
-      box_final.push_back(anchors[cur_j]);
-      scores_.push_back(sort_vector[i].first);
-      }
-  }
-  */
-
 	int total_boxes = 0;
 	for (std::vector<std::vector<Point4f<Dtype> >>::iterator it =
 		batch_box_final.begin(); it != batch_box_final.end(); ++it) {
@@ -198,25 +180,11 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	}
 
   DLOG(ERROR) << "========== copy to top";
-	/*top[0]->Reshape(box_final.size(), 5, 1, 1);
-	Dtype *top_data = top[0]->mutable_cpu_data();
-	CHECK_EQ(box_final.size(), scores_.size());
-	for (size_t i = 0; i < box_final.size(); i++) {
-	Point4f<Dtype> &box = box_final[i];
-	top_data[i * 5] = 0;
-	for (int j = 1; j < 5; j++) {
-	top_data[i * 5 + j] = box[j - 1];
-	}
-	}
-
-	if (top.size() > 1) {
-	top[1]->Reshape(box_final.size(), 1, 1, 1);
-	for (size_t i = 0; i < box_final.size(); i++) {
-	top[1]->mutable_cpu_data()[i] = scores_[i];
-	}
-	}*/
 
 	top[0]->Reshape(total_boxes, 5, 1, 1);
+	if (top.size() > 1) {
+		top[1]->Reshape(total_boxes, 1, 1, 1);
+	}
 	Dtype *top_data = top[0]->mutable_cpu_data();
 	std::vector<Point4f<Dtype> > box_final;
 	std::vector<Dtype> scores_;
@@ -234,7 +202,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		}
 
 		if (top.size() > 1) {
-			top[1]->Reshape(box_final.size(), 1, 1, 1);
 			for (size_t i = 0; i < box_final.size(); i++) {
 				top[1]->mutable_cpu_data()[box_begin + i] = scores_[i];
 			}

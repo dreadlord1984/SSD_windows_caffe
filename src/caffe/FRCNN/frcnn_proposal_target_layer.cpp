@@ -6,6 +6,7 @@
 // ------------------------------------------------------------------
 
 #include "caffe/FRCNN/frcnn_proposal_target_layer.hpp"
+#include <io.h>
 
 namespace caffe {
 
@@ -38,11 +39,9 @@ void FrcnnProposalTargetLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bo
 template <typename Dtype>
 void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype> *> &bottom, const vector<Blob<Dtype> *> &top) {
+	//bottom[0]: "rpn_rois" 维度：(box_final.size(), 5, 1, 1);
+	//bottom[1]: "gt_boxes" 维度：SSD(1, 1, gt_box.size(),8), faster(gt_box.size(), 5, 1,1);
 
-	/*
-	bottom[0]: "rpn_rois" 维度：(box_final.size(), 5, 1, 1);
-	bottom[1]: "gt_boxes" 维度：SSD(1, 1, gt_box.size(),8), faster(gt_box.size(), 5, 1,1);
-	*/
 	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
 		<< bottom[0]->width() << endl;
 	cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
@@ -64,7 +63,6 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 				bottom[0]->data_at(i, 3, 0, 0),
 				bottom[0]->data_at(i, 4, 0, 0)));
 		}
-
 		for (int i = 0; i < bottom[1]->num(); i++) {
 			batch_gt_boxes[0].push_back(Point4f<Dtype>(
 				bottom[1]->data_at(i, 0, 0, 0),
@@ -85,7 +83,21 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 		       bottom[0]->data_at(i,3,0,0),
 		       bottom[0]->data_at(i,4,0,0)));
 		 }
-		 
+		 /*-------------------------验证代码-------------------------*/
+		 //ofstream  outfile;
+		 //if (_access("frcnn_top.txt", 0) != -1) // 如果临时文件存在，删除！
+			// remove("frcnn_top.txt");
+		 //outfile.open("frcnn_top.txt", ios::out | ios::app);
+		 //outfile << bottom[0]->num() << endl;
+		 //for (int i = 0; i < bottom[0]->num(); i++) {
+			// outfile << bottom[0]->data_at(i, 0, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 1, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 2, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 3, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 4, 0, 0) << endl;
+		 //}
+		 //outfile.close();
+		 /*-------------------------验证代码-------------------------*/
 		 const Dtype* gt_data = bottom[1]->cpu_data();
 		 for (int i = 0; i < bottom[1]->height(); i++) {
 		  int start_idx = i * 8;
@@ -99,12 +111,6 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 			  gt_data[start_idx + 5] * 384,
 			  gt_data[start_idx + 6] * 256));
 			batch_gt_labels[batch_index].push_back(gt_data[start_idx + 1]);
-
-			/* cout << gt_data[start_idx + 3] * 384 << " "
-				 << gt_data[start_idx + 4] * 256 << " "
-				 << gt_data[start_idx + 5] * 384 << " "
-				 << gt_data[start_idx + 6] * 256 << " "
-				 << gt_data[start_idx + 1] << endl;*/
 
 			CHECK_GT(batch_gt_labels[batch_index].size(), 0) << "Ground Truth Should Be Greater Than 0";
 		 }
@@ -147,10 +153,6 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 		batch_bbox_inside_weights.push_back(bbox_inside_weights);
 	}
 
-
-  /*-------------------------改写-------------------------*/
-
-
 	DLOG(ERROR) << "top[0]-> " << batch_batch_size << " , 5, 1, 1";
   // 1. top[0]:sampled rois
 	top[0]->Reshape(batch_batch_size, 5, 1, 1); // rois
@@ -174,11 +176,6 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 	int rois_begin = 0;
 	for (int batch_index = 0; batch_index < image_batch_size; batch_index++)
 	{
-		/*labels = batch_labels[batch_index];
-		rois = batch_rois[batch_index];
-		bbox_targets = batch_bbox_targets[batch_index];
-		bbox_inside_weights = batch_bbox_inside_weights[batch_index];*/
-
 		const int batch_size = batch_rois[batch_index].size();
 		// sampled rois
 		for (int i = 0; i < batch_size; i++) {

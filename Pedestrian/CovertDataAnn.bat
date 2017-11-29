@@ -14,7 +14,7 @@ REM the directory which includes the convert_annoset.exe
 set BINDIR=E:\caffe-master_\Build\x64\Release
 
 REM The directory to store the link of the database files
-set OUTDIR=E:/caffe-master_/Pedestrian/testFL
+set OUTDIR=E:/caffe-master_/Pedestrian/Data_0731
 
 REM resize the image to specified dimension. 
 set RESIZE_HEIGHT=256		REM 0 - keep unchanged
@@ -33,7 +33,7 @@ set ANNOTYPE="detection"
 
 set	TRAINVAL="train"
 set VAL="val"
-set SHUFFLE=false
+set SHUFFLE=true
 set GRAY=false
 set CHECK_SIZE=false
 set CHECK_LABEL=true
@@ -54,11 +54,10 @@ if not exist %VAL_DATA_LIST% (
 )
 echo "create val leveldb(lmdb)..."
 SET GLOG_logtostderr = 1
-echo "create train leveldb(lmdb)..."
-SET GLOG_logtostderr = 1
 %BINDIR%\convert_annoset.exe %ROOTDIR% %VAL_DATA_LIST% %OUTDIR%/%VAL%_%DBTYPE% --encoded=%encoded% --encode_type=%encode_type% --anno_type=%ANNOTYPE% --label_map_file=%MAPFILE% --min_dim=%MIN_DIM% --max_dim=%MAX_DIM% --resize_width=%RESIZE_WIDTH% --resize_height=%RESIZE_HEIGHT% --check_label=%CHECK_LABEL% --shuffle=false --gray=%GRAY% --backend=%DBTYPE%
 
 SET GLOG_logtostderr = 1
+echo "create train leveldb(lmdb)..."
 %BINDIR%\convert_annoset.exe %ROOTDIR% %TRAIN_DATA_LIST% %OUTDIR%/%TRAINVAL%_%DBTYPE% --encoded=%encoded% --encode_type=%encode_type% --anno_type=%ANNOTYPE% --label_map_file=%MAPFILE% --min_dim=%MIN_DIM% --max_dim=%MAX_DIM% --resize_width=%RESIZE_WIDTH% --resize_height=%RESIZE_HEIGHT% --check_label=%CHECK_LABEL% --shuffle=%SHUFFLE% --gray=%GRAY% --backend=%DBTYPE% 
-echo "create val leveldb(lmdb)..."
+
 pause

@@ -67,11 +67,14 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deployD1_noSqrt.prototxt'
-model_weights = \
-    'View\\COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\' \
-    'add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000.caffemodel'
-ROOTDIR = "D:\Other_Dataets\Background" #服务器路径
+model_def = 'deployD1add_noSqrt.prototxt'
+model_weights = 'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_290000.caffemodel'
+ROOTDIR = u"\\\\192.168.1.186\\视频结构化数据\\ImageNet\\".encode('gbk') #服务器路径
+imgList = "E:\\tyang\\Result\\Sence_defghij.txt"
+out_List = 'E:\\tyang\\Result\\Result_Sence_defghij_0.txt'
+part_num = 100000
+conf_threshold = 0.2
+
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights4
@@ -86,10 +89,17 @@ resize_height = 256
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 
-for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
-    for filename in filenames:
-        img_name = os.path.join(parent,filename)
-        print img_name.decode("gbk")
+# for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返回1.父目录 2.所有文件夹名字（不含路径） 3.所有文件名字
+#     for filename in filenames:
+#         img_name = os.path.join(parent,filename)
+if os.path.exists(out_List):
+    os.remove(out_List)
+
+num = 0
+with open(imgList) as fp:
+    for line in fp:  # 每一行匹配数据 resultFile
+        img_name = os.path.join(ROOTDIR, line.strip())
+        # print img_name.decode("gbk")
 
         #### load input and configure preprocessing type 2 ####
         # image = cv2.imread(img_name)
@@ -97,7 +107,11 @@ for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返
         # transformer.set_mean('data', np.array([104, 117, 123]))  # mean pixel
 
         #### load input and configure preprocessing type 1 ####
-        image = caffe.io.load_image(img_name)
+        try:
+            image = caffe.io.load_image(img_name)
+        except:
+            print img_name.decode("gbk")
+            continue
         transformer.set_channel_swap('data', (2, 1, 0))  # the reference model has channels in BGR order instead of RGB
         transformer.set_raw_scale('data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
         transformer.set_transpose('data', (2, 0, 1))
@@ -118,7 +132,7 @@ for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返
         det_ymax = detections[0,0,:,6]
 
         # Get detections with confidence higher than 0.6.
-        top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.1]
+        top_indices = [i for i, conf in enumerate(det_conf) if conf >= conf_threshold]
 
         top_conf = det_conf[top_indices]
         top_label_indices = det_label[top_indices].tolist()
@@ -130,9 +144,15 @@ for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返
 
         colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist()
 
-        plt.imshow(image)
-        currentAxis = plt.gca()
+        # plt.imshow(image)
+        # currentAxis = plt.gca()
 
+        if top_conf.shape[0] > 0:
+            num += 1
+            output = open(out_List, 'a')
+            output.write(line.strip())
+        else:
+            continue
         detectBoxes = []
         for i in xrange(top_conf.shape[0]): # 对每个检测到的目标
             not_match = 0
@@ -141,28 +161,25 @@ for parent, dirnames, filenames in os.walk(ROOTDIR):  # 三个参数：分别返
             xmax = int(round(top_xmax[i] * image.shape[1]))
             ymax = int(round(top_ymax[i] * image.shape[0]))
             score = top_conf[i]
-            label = int(top_label_indices[i])
-            label_name = top_labels[i]
-            display_txt = '%s: %.2f'%(label_name, score)
-            coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
-            color = colors[label]
-            detectBoxes.append([xmin, ymin, xmax, ymax])
-            currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
-            currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
-
-        plt.show()
-
+            output.write('\t')
+            output.write(str(score) + ' ')
+            output.write(str(xmin) + ' ' + str(ymin) + ' ' + str(xmax)+ ' ' + str(ymax))
+            # label = int(top_label_indices[i])
+            # label_name = top_labels[i]
+            # display_txt = '%s: %.2f'%(label_name, score)
+            # coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
+            # color = colors[label]
+            # detectBoxes.append([xmin, ymin, xmax, ymax])
+            # currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
+            # currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
+        # plt.show()
+        if top_conf.shape[0] > 0:
+            output.write('\n')
+            output.close()
+            if num % part_num == 0:
+                print ('process {} images'.format(num))
+                out_List = out_List[:-5]+'{}.txt'.format(num // part_num)
+                if os.path.exists(out_List):
+                    os.remove(out_List)
 # print 'TPs: %i FPs: %i FNs: %i'%(TPs, FPs, FNs)
 
-
-# layer {
-#   name: "rpn_loss_bbox"
-#   type: "SmoothL1LossD"
-#   bottom: "rpn_bbox_pred"
-#   bottom: "rpn_bbox_targets"
-#   bottom: "rpn_bbox_inside_weights"
-#   bottom: "rpn_bbox_outside_weights"
-#   top: "rpn_loss_bbox"
-#   loss_weight: 1
-#   smooth_l1_loss_param { sigma: 3.0 }
-# }
