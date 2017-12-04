@@ -334,6 +334,7 @@ float extract_float(string target_key,  str_map& default_map);
 int extract_int(string target_key, str_map& default_map);
 
 vector<float> extract_vector(string target_key, str_map& default_map);
+vector<int> extract_vector_int(string target_key, str_map& default_map);
 
 // file 
 vector<string> get_file_list (const string& path, const string& ext);
@@ -346,6 +347,16 @@ string anchor_to_string(vector<float> data);
 string float_to_string(const vector<float> data);
 
 string float_to_string(const float *data);
+
+/***********************************************************************
+* function: ªÒ»° anchors
+***********************************************************************/
+template <typename Dtype>
+void GetAnchors(const Dtype* prior_data, const int num_priors,
+	vector<Point4f<Dtype>>* prior_bboxes,
+	vector<vector<float> >* prior_variances,
+	const float& im_height,
+	const float& im_width);
 
 } // namespace Frcnn
 

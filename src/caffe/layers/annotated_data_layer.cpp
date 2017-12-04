@@ -44,7 +44,7 @@ void AnnotatedDataLayer<Dtype>::DataLayerSetUp(
   if (config_ != "")
   {
 	  Frcnn::FrcnnParam::load_SSD_param(config_);
-	  Frcnn::FrcnnParam::print_param();
+	  Frcnn::FrcnnParam::print_SSD_param();
   }
 
   // Make sure dimension is consistent within batch.

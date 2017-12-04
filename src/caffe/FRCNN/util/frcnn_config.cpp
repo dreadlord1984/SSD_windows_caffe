@@ -79,6 +79,19 @@ std::vector<float> extract_vector(std::string target_key,
   return results;
 }
 
+std::vector<int> extract_vector_int(std::string target_key,
+	str_map& default_map) {
+	std::string target_str = extract_string(target_key, default_map);
+	std::vector<int> results;
+	std::vector<std::string> elems = split(target_str, ',');
+
+	for (std::vector<std::string>::const_iterator it = elems.begin();
+		it != elems.end(); ++it) {
+		results.push_back(atof((*it).c_str()));
+	}
+	return results;
+}
+
 } // namespace frcnn
 
 } // namespace caffe

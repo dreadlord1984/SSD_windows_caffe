@@ -239,8 +239,8 @@ s_ids = np.arange(prior_nums.size)
 s_ids2 = np.arange(area_thresholds.size)
 
 if __name__ == "__main__":
-    # copyList("../View/COMPARE2/add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt/IOU_ALL.txt",
-    # "../Data_0922/train_lmdb_list.txt",
-    # "../View/COMPARE2/add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt/IOU_ALL_image_List.txt")
-    # showList("../Data_0922/IOU_ALL_image_List.txt")
-    statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt")
+    # copyList("..\\Data_480_320\\a\\IOU_ALL.txt",
+    # "..\\Data_480_320\\train_lmdb_list.txt",
+    # "..\\Data_480_320\\a\\IOU_ALL_image_List.txt")
+    # showList("..\\Data_480_320\\a\\IOU_ALL_image_List.txt")
+    statistic("..\\Data_480_320\\a\\IOU_ALL_image_List.txt")

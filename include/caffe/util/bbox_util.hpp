@@ -521,6 +521,17 @@ void VisualizeBBox(const vector<cv::Mat>& images, const Blob<Dtype>* detections,
                    const string& save_file);
 #endif  // USE_OPENCV
 
+/***********************************************************************
+* function: ªÒ»° confrence
+***********************************************************************/
+template <typename Dtype>
+void GetConfPredictions(const Dtype* conf_data, const int num,
+	const int num_preds_per_class, const int num_classes,
+	const int background_label_id, const int loss_type,
+	const vector<map<int, vector<int> > >& all_match_indices,
+	const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+	vector<vector<Dtype> >* all_conf_preds);
+
 }  // namespace caffe
 
 #endif  // CAFFE_UTIL_BBOX_UTIL_H_

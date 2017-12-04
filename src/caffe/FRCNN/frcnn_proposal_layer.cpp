@@ -1,9 +1,16 @@
-// ------------------------------------------------------------------
-// Fast R-CNN
-// Copyright (c) 2015 Microsoft
-// Licensed under The MIT License [see fast-rcnn/LICENSE for details]
-// Written by Ross Girshick
-// ------------------------------------------------------------------
+/**********************************************************************************************
+
+  * @file   frcnn_proposal_layer.cpp
+
+  * @brief This is a brief description.
+
+  * @date   2017:11:30 
+
+  * @written by xuanyuyt
+
+  * @version <version  1>
+
+ *********************************************************************************************/ 
 
 #include "caffe/FRCNN/frcnn_proposal_layer.hpp"
 #include "caffe/FRCNN/util/frcnn_utils.hpp"
@@ -11,6 +18,7 @@
 #include "caffe/FRCNN/util/frcnn_param.hpp"  
 #include <time.h>
 #include <iostream>
+#include <io.h>
 namespace caffe {
 
 namespace Frcnn {
@@ -45,62 +53,176 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
 
 template <typename Dtype>
 void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
-                                            const vector<Blob<Dtype> *> &top) {
-//Forward_gpu(bottom, top);
-//#if 0
-  DLOG(ERROR) << "========== enter proposal layer";
-  const Dtype *bottom_rpn_score = bottom[0]->cpu_data();  // rpn_cls_prob_reshape
-  const Dtype *bottom_rpn_bbox = bottom[1]->cpu_data();   // rpn_bbox_pred
-  const Dtype *bottom_im_info = bottom[2]->cpu_data();    // im_info
-  const int num = bottom[1]->num();// batch size
-  const int channes = bottom[1]->channels();
-  const int height = bottom[1]->height();
-  const int width = bottom[1]->width();
-	/*cout << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
-		<< bottom[0]->width() << endl;
-	cout << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
-		<< bottom[1]->width() << endl;
-	cout << bottom[2]->num() << " " << bottom[2]->channels() << " " << bottom[2]->height() << " "
-		<< bottom[2]->width() << endl;*/
-	/*-------------------------改写-------------------------*/
-  //CHECK(num == 1) << "only single item batches are supported";
-  CHECK(channes % 4 == 0) << "rpn bbox pred channels should be divided by 4";
+	const vector<Blob<Dtype> *> &top) {
+	//Forward_gpu(bottom, top);
+	//#if 0
+	DLOG(ERROR) << "========== enter proposal layer";
+	const int scale_layer_num = FrcnnParam::scale_layer_num;
+	const Dtype *conf_data = bottom[0]->cpu_data();  // rpn_cls_prob_reshape
+	const Dtype *loc_data = bottom[1]->cpu_data();   // rpn_bbox_pred
+	const Dtype *prior_data = bottom[2]->cpu_data();    // pripr box
+	const Dtype* match_imfo = bottom[3]->cpu_data(); // match_imfo
+	const Dtype* gt_data = bottom[4]->cpu_data(); // gt_data
+	/*-------------------------验证代码-------------------------*/
+	for (vector<Blob<Dtype> *>::const_iterator iter = bottom.cbegin(); iter != bottom.cend(); iter++)
+	{
+		cout << (*iter)->num() << " " << (*iter)->channels() << " " << (*iter)->height() << " " << (*iter)->width() << endl;
+	}
+	/*-------------------------验证代码-------------------------*/
+	/***********************************************************************
+	* 注意: prototxt中如果多个尺度bottom需要按照confs、locs、boxes的顺序
+	***********************************************************************/
+	const int batch_size = bottom[0]->num();// batch size
+	const int num_priors = bottom[2]->height() / 4;
+	bool share_location = FrcnnParam::share_location;
+	int loc_classes = FrcnnParam::share_location ? 1 : FrcnnParam::n_classes;
+	CHECK_EQ(bottom[0]->num(), bottom[1]->num());
+	CHECK_EQ(num_priors * FrcnnParam::n_classes, bottom[0]->channels())
+		<< "Number of priors must match number of confidence predictions.";
+	CHECK_EQ(num_priors * loc_classes * 4, bottom[1]->channels()) // 如果shared表示所有的类别同用一个location prediction，否则每一类各自预测。
+		<< "Number of priors must match number of location predictions.";
+	
+	const float im_height = FrcnnParam::im_height;
+	const float im_width = FrcnnParam::im_width;
 
-	const float im_height = 256;// bottom_im_info[0] -> 256
-	const float im_width = 384;// bottom_im_info[1] -> 384
-	const float zoom_scale = 1.0;// bottom_im_info[2] - > 1.0
-	/*-------------------------改写-------------------------*/
-  int rpn_pre_nms_top_n;
-  int rpn_post_nms_top_n;
-  float rpn_nms_thresh;
-  int rpn_min_size;
-  if (this->phase_ == TRAIN) {
-    rpn_pre_nms_top_n = FrcnnParam::rpn_pre_nms_top_n;
-    rpn_post_nms_top_n = FrcnnParam::rpn_post_nms_top_n;
-    rpn_nms_thresh = FrcnnParam::rpn_nms_thresh;
-    rpn_min_size = FrcnnParam::rpn_min_size;
-  } else {
-    rpn_pre_nms_top_n = FrcnnParam::test_rpn_pre_nms_top_n;
-    rpn_post_nms_top_n = FrcnnParam::test_rpn_post_nms_top_n;
-    rpn_nms_thresh = FrcnnParam::test_rpn_nms_thresh;
-    rpn_min_size = FrcnnParam::test_rpn_min_size; // 从输入图像到特征层的操作步长
-  }
-  const int config_n_anchors = FrcnnParam::anchors.size() / 4;
-  LOG_IF(ERROR, rpn_pre_nms_top_n <= 0 ) << "rpn_pre_nms_top_n : " << rpn_pre_nms_top_n;
-  LOG_IF(ERROR, rpn_post_nms_top_n <= 0 ) << "rpn_post_nms_top_n : " << rpn_post_nms_top_n;
-  if (rpn_pre_nms_top_n <= 0 || rpn_post_nms_top_n <= 0 ) return;
+	int rpn_pre_nms_top_n;
+	int rpn_post_nms_top_n;
+	float rpn_nms_thresh;
+	int rpn_min_size;
+	if (this->phase_ == TRAIN) {
+		rpn_pre_nms_top_n = FrcnnParam::rpn_pre_nms_top_n;
+		rpn_post_nms_top_n = FrcnnParam::rpn_post_nms_top_n;
+		rpn_nms_thresh = FrcnnParam::rpn_nms_thresh;
+		rpn_min_size = FrcnnParam::rpn_min_size;
+	}
+	else {
+		rpn_pre_nms_top_n = FrcnnParam::test_rpn_pre_nms_top_n;
+		rpn_post_nms_top_n = FrcnnParam::test_rpn_post_nms_top_n;
+		rpn_nms_thresh = FrcnnParam::test_rpn_nms_thresh;
+		rpn_min_size = FrcnnParam::test_rpn_min_size; // 从输入图像到特征层的操作步长
+	}
+	LOG_IF(ERROR, rpn_pre_nms_top_n <= 0) << "rpn_pre_nms_top_n : " << rpn_pre_nms_top_n;
+	LOG_IF(ERROR, rpn_post_nms_top_n <= 0) << "rpn_post_nms_top_n : " << rpn_post_nms_top_n;
+	if (rpn_pre_nms_top_n <= 0 || rpn_post_nms_top_n <= 0) return;
 
-	/*-------------------------改写-------------------------*/
 	std::vector<std::vector<Point4f<Dtype> >> batch_box_final;
 	std::vector<std::vector<Dtype>> batch_scores_;
+	const int background_label_id = 0;
+	bool use_difficult_gt = true;
+	// 1.Retrieve all ground truth.
+	/*const int num_gt = bottom[4]->height();
+	map<int, vector<NormalizedBBox> > all_gt_bboxes;
+	GetGroundTruth(gt_data, num_gt, background_label_id, use_difficult_gt,
+		&all_gt_bboxes);
+*/
+	// 2. Retrieve all loc predictions.
+	vector<LabelBBox> all_loc_preds;
+	GetLocPredictions(loc_data, batch_size, num_priors, loc_classes, share_location,
+		&all_loc_preds);
+	// 3. Retrieve all matching.
+	vector<vector<int> > all_match_indices;
+	vector<vector<Dtype> > all_match_overlaps;
+	vector<vector<Dtype>> all_match_confs;
+	for (int batch_index = 0; batch_index < batch_size; batch_index++) {
+		int match_begin = batch_index * num_priors;
+		vector<int> match_indices;
+		vector<Dtype> match_overlaps;
+		vector<Dtype> match_confs;
+		for (int priors_index = 0; priors_index < num_priors; priors_index++) {
+			match_indices.push_back(match_imfo[match_begin * 3 + priors_index * 3]);
+			match_overlaps.push_back(match_imfo[match_begin * 3 + priors_index * 3 + 1]);
+			match_confs.push_back(match_imfo[match_begin * 3 + priors_index * 3 + 2]);
+		}
+		all_match_indices.push_back(match_indices);
+		all_match_overlaps.push_back(match_overlaps);
+		all_match_confs.push_back(match_confs);
+	}
 
-	for (int batch_index = 0; batch_index < num; batch_index++) {
+	//ofstream  outfile1;
+	//if (_access("SSDconf_pred.txt", 0) != -1) // 如果临时文件存在，删除！
+	//	remove("SSDconf_pred.txt");
+	//outfile1.open("SSDconf_pred.txt", ios::out | ios::app);
+	//for (int batch_index = 0; batch_index < batch_size; ++batch_index) {
+	//	outfile1 << "batch " << batch_index << endl;
+	//	for (int p = 0; p < num_priors; ++p) {
+	//		outfile1 << all_conf_preds[batch_index][p] << endl;
+	//	}
+	//}
+	//outfile1.close();
+
+	/*-------------------------验证代码-------------------------*/
+	//ofstream  outfile;
+	//if (_access("conf_pred.txt", 0) != -1) // 如果临时文件存在，删除！
+	// remove("conf_pred.txt");
+	//outfile.open("conf_pred.txt", ios::out | ios::app);
+	//for (int bottom_index = 5; bottom_index < bottom.size(); bottom_index++)
+	//{
+	//	outfile << "layer  " << bottom_index-2 << endl;
+	//	const int config_n_anchors = bottom[bottom_index]->channels() / 2;
+	//	const int height = bottom[bottom_index]->height();
+	//	const int width = bottom[bottom_index]->width();
+	//	const int num_total = config_n_anchors*height*width;
+	//	const Dtype *part_conf_data = bottom[bottom_index]->cpu_data();
+	//	for (int batch_index = 0; batch_index < bottom[bottom_index]->num(); batch_index++) {
+	//		outfile << "batch " << batch_index << endl;
+	//		for (int j = 0; j < height; j++) {
+	//			for (int i = 0; i < width; i++) {
+	//				for (int k = 0; k < config_n_anchors; k++) {
+	//					outfile << part_conf_data[(2 * k) * (height*width) + j*width + i] << " "
+	//						<< part_conf_data[(2 * k + 1) * (height*width) + j*width + i] << endl;
+	//				}
+	//			}
+	//		}
+	//	}
+	//}
+	//outfile.close();
+	/*-------------------------验证代码-------------------------*/
+	DLOG(ERROR) << "========== generate anchors";
+	std::vector<Point4f<Dtype> > anchors;
+	std::vector<vector<float> > prior_variances;
+	GetAnchors(prior_data, num_priors, &anchors, &prior_variances, im_height, im_width);
+
+	for (int batch_index = 0; batch_index < batch_size; batch_index++) {
+		typedef pair<Dtype, int> sort_pair;
+		std::vector<sort_pair> sort_vector;
+		const Dtype bounds[4] = { im_width - 1, im_height - 1, im_width - 1, im_height - 1 };
+		const Dtype min_size = rpn_min_size;
+		int match_begin = batch_index * num_priors;
+		for (int priors_index = 0; priors_index < num_priors; priors_index++) {
+			Dtype score = match_imfo[match_begin * 3 + priors_index * 3 + 2];
+			int match_gt_index = match_imfo[match_begin * 3 + priors_index * 3];
+			Point4f<Dtype> box_delta;
+			if (match_gt_index > -1)
+			{
+				box_delta[0] = loc_data[match_begin * 4] * im_width;
+				box_delta[1] = loc_data[match_begin * 4 + 1] * im_height;
+				box_delta[2] = loc_data[match_begin * 4 + 2] * im_width;
+				box_delta[3] = loc_data[match_begin * 4 + 3] * im_height;
+			}
+			else if (match_gt_index < -1)
+			{
+				continue;
+			}
+			cout << endl;
+		}
+
+	}
+
+	for (int batch_index = 0; batch_index < batch_size; batch_index++) {
 		std::vector<Point4f<Dtype> > anchors;
 		typedef pair<Dtype, int> sort_pair;
 		std::vector<sort_pair> sort_vector;
 		const Dtype bounds[4] = { im_width - 1, im_height - 1, im_width - 1, im_height - 1 };
-		const Dtype min_size = zoom_scale * rpn_min_size;
+		const Dtype min_size = rpn_min_size;
 
+		DLOG(ERROR) << "========== generate anchors";
+		// min_size = FrcnnParam::rpn_min_size限制
+		int prior_data_begin = 0;
+		
+		const int channes = bottom[1]->channels();
+		const int height = bottom[1]->height();
+		const int width = bottom[1]->width();
+		const int config_n_anchors = FrcnnParam::anchors.size() / 4;
 		DLOG(ERROR) << "========== generate anchors";
 		// min_size = FrcnnParam::rpn_min_size限制
 		int rpn_score_begin = batch_index * 2 * config_n_anchors * height * width;
@@ -108,7 +230,7 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		for (int j = 0; j < height; j++) {
 			for (int i = 0; i < width; i++) {
 				for (int k = 0; k < config_n_anchors; k++) {
-					Dtype score = bottom_rpn_score[rpn_score_begin + config_n_anchors * height * width +
+					Dtype score = conf_data[rpn_score_begin + config_n_anchors * height * width +
 						k * height * width + j * width + i];
 
 					Point4f<Dtype> anchor(
@@ -118,10 +240,10 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 						FrcnnParam::anchors[k * 4 + 3] + j * FrcnnParam::feat_stride); // shift_y[i][j];
 
 					Point4f<Dtype> box_delta(
-						bottom_rpn_bbox[rpn_bbox_begin + (k * 4 + 0) * height * width + j * width + i],
-						bottom_rpn_bbox[rpn_bbox_begin + (k * 4 + 1) * height * width + j * width + i],
-						bottom_rpn_bbox[rpn_bbox_begin + (k * 4 + 2) * height * width + j * width + i],
-						bottom_rpn_bbox[rpn_bbox_begin + (k * 4 + 3) * height * width + j * width + i]);
+						loc_data[rpn_bbox_begin + (k * 4 + 0) * height * width + j * width + i],
+						loc_data[rpn_bbox_begin + (k * 4 + 1) * height * width + j * width + i],
+						loc_data[rpn_bbox_begin + (k * 4 + 2) * height * width + j * width + i],
+						loc_data[rpn_bbox_begin + (k * 4 + 3) * height * width + j * width + i]);
 
 					// FrcnnParam::anchors加上box_delta后的框位置
 					Point4f<Dtype> cbox = bbox_transform_inv(anchor, box_delta);
@@ -209,7 +331,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		box_begin += box_final.size();
 
 	}
-	/*-------------------------改写-------------------------*/
   DLOG(ERROR) << "========== exit proposal layer";
 //#endif
 }

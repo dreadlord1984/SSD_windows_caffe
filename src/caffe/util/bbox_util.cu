@@ -603,7 +603,7 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
       vector<vector<float> >* all_conf_loss,
 	  const float fl_alpha, const float fl_gamma, const float fl_weight) {
   CHECK_LT(background_label_id, num_classes);
-  Blob<Dtype> match_blob(num, num_preds_per_class, 1, 1);
+  Blob<Dtype> match_blob(num, num_preds_per_class, 1, 1);//匹配结果，label=0是背景，label=1,2...是目标标签
   Dtype* match_data = match_blob.mutable_cpu_data();
   for (int i = 0; i < num; ++i) {
     const map<int, vector<int> >& match_indices = all_match_indices[i];
@@ -629,17 +629,26 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
       }
       match_data[i * num_preds_per_class + p] = label;
     }
-  }
+	}
   // Get probability data.
   const Dtype* conf_gpu_data = conf_blob.gpu_data();
   Blob<Dtype> prob_blob;
   prob_blob.ReshapeLike(conf_blob);
+	vector<vector<Dtype>> Test_data;
   if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX || loss_type == MultiBoxLossParameter_ConfLossType_FocalLoss){
     Dtype* prob_gpu_data = prob_blob.mutable_gpu_data();
     SoftMaxGPU(conf_blob.gpu_data(), num * num_preds_per_class, num_classes, 1,
         prob_gpu_data);
     conf_gpu_data = prob_blob.gpu_data();
-	/*std::cout << "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH" << std::endl;*/
+		/*-------------------------验证代码-------------------------*/
+		/*const Dtype* test_data = prob_blob.cpu_data();
+		for (int i = 0; i < num*num_preds_per_class; ++i) {
+			vector<Dtype> tmp;
+			tmp.push_back(test_data[2 * i]);
+			tmp.push_back(test_data[2 * i + 1]);
+			Test_data.push_back(tmp);
+		}*/
+		/*-------------------------验证代码-------------------------*/
   }
   // Compute the loss.
   Blob<Dtype> conf_loss_blob(num, num_preds_per_class, 1, 1);
@@ -653,7 +662,6 @@ void ComputeConfLossGPU(const Blob<Dtype>& conf_blob, const int num,
 		fl_alpha, fl_gamma, fl_weight);
   /*****************************************************************************/
   // Save the loss.
-  /*std::cout << "MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM" << std::endl;*/
   all_conf_loss->clear();
   const Dtype* loss_data = conf_loss_blob.cpu_data();
  /* for (int i = 0; i < 10; ++i) {

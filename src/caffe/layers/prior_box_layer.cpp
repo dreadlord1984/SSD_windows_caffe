@@ -2,7 +2,7 @@
 #include <functional>
 #include <utility>
 #include <vector>
-
+#include <io.h>
 #include "caffe/layers/prior_box_layer.hpp"
 
 namespace caffe {
@@ -255,6 +255,7 @@ namespace caffe {
 		*/
 		//////////////////////////////////////////////////////////////////
 
+ 
 		//int default_box_num = 0;
 		int idx = 0;
 		for (int h = 0; h < layer_height; ++h) {
@@ -276,10 +277,6 @@ namespace caffe {
 					top_data[idx++] = (center_x + box_width / 2.) / img_width;
 					// ymax
 					top_data[idx++] = (center_y + box_height / 2.) / img_height;
-					/*cout << (-box_width / 2.) << " "
-						<< (- box_height / 2.) << " "
-						<< (box_width / 2.) << " "
-						<< (box_height / 2.) << endl;*/
 
 					/***********************************************************************
 					* note: 注释掉 aspect_ratio = 1, size = sqrt(min_size * max_size)此情况
@@ -318,21 +315,36 @@ namespace caffe {
 						top_data[idx++] = (center_x + box_width / 2.) / img_width;
 						// ymax
 						top_data[idx++] = (center_y + box_height / 2.) / img_height;
-						/*cout << (-box_width / 2.) << " "
-							<< (-box_height / 2.) << " "
-							<< (box_width / 2.) << " "
-							<< (box_height / 2.) << endl;*/
 					}
 				}
 			}
 		}
-
+		
 		// clip the prior's coordidate such that it is within [0, 1]
 		if (clip_) {
 			for (int d = 0; d < dim; ++d) {
 				top_data[d] = std::min<Dtype>(std::max<Dtype>(top_data[d], 0.), 1.);
 			}
 		}
+		/*-------------------------验证代码-------------------------*/
+		ofstream  outfile;
+		outfile.open("prior_box.txt", ios::out | ios::app);
+		ofstream  outfile2;
+		outfile2.open("prior_box_norm.txt", ios::out | ios::app);
+		for (int d = 0; d < dim/4; ++d) {
+			outfile << top_data[4 * d] * img_width << " "
+				<< top_data[4 * d + 1] * img_height << " "
+				<< top_data[4 * d + 2] * img_width << " "
+				<< top_data[4 * d + 3] * img_height << endl;
+			outfile2 << top_data[4 * d] << " "
+				<< top_data[4 * d + 1] << " "
+				<< top_data[4 * d + 2] << " "
+				<< top_data[4 * d + 3] << endl;
+		}
+		outfile.close();
+		outfile2.close();
+		/*-------------------------验证代码-------------------------*/
+
 		// set the variance.
 		top_data += top[0]->offset(0, 1);
 		if (variance_.size() == 1) {

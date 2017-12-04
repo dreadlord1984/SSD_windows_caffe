@@ -12,6 +12,9 @@ namespace caffe {
 	void MultiBoxLossLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 		const vector<Blob<Dtype>*>& top) {
 		LossLayer<Dtype>::LayerSetUp(bottom, top);
+		/*-------------------------改写-------------------------*/
+		this->layer_param_.add_loss_weight(Dtype(0));
+		/*-------------------------改写-------------------------*/
 		if (this->layer_param_.propagate_down_size() == 0) {
 			this->layer_param_.add_propagate_down(true);
 			this->layer_param_.add_propagate_down(true);
@@ -220,8 +223,6 @@ namespace caffe {
 		FindMatches(all_loc_preds, all_gt_bboxes, prior_bboxes, prior_variances,
 			multibox_loss_param_, &all_match_overlaps, &all_match_indices_);
 
-
-
 #ifdef BOX_LIST
 		/**********************************************************************************************/
 		const char* model = "all"; // 选择只统计IOU<0.5的bbox还是统计全部匹配
@@ -334,6 +335,23 @@ namespace caffe {
 			&num_matches_, &num_negs, &all_match_indices_,
 			&all_neg_indices_);
 
+		if (top.size() > 1) {
+			vector<vector<Dtype>> all_conf_preds;
+			GetConfPredictions(bottom[1]->cpu_data(), num_, num_priors_, multibox_loss_param_.num_classes(),
+				multibox_loss_param_.background_label_id(), multibox_loss_param_.mining_type(),
+				all_match_indices_, all_gt_bboxes, &all_conf_preds);
+
+			top[1]->Reshape(num_*num_priors_, 3, 1, 1);
+			Dtype *top_data = top[1]->mutable_cpu_data();
+			for (int batch_index = 0; batch_index < num_; batch_index++) {
+				int match_begin = batch_index * num_priors_;
+				for (int priors_index = 0; priors_index < num_priors_; priors_index++) {
+					top_data[match_begin * 3 + priors_index * 3] = all_match_indices_[batch_index][-1][priors_index];
+					top_data[match_begin * 3 + priors_index * 3 + 1] = all_match_overlaps[batch_index][-1][priors_index];
+					top_data[match_begin * 3 + priors_index * 3 + 2] = all_conf_preds[batch_index][priors_index];
+				}
+			}
+		}
 		if (num_matches_ >= 1) {
 			// Form data to pass on to loc_loss_layer_.
 			vector<int> loc_shape(2);

@@ -41,7 +41,6 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype> *> &bottom, const vector<Blob<Dtype> *> &top) {
 	//bottom[0]: "rpn_rois" Î¬¶È£º(box_final.size(), 5, 1, 1);
 	//bottom[1]: "gt_boxes" Î¬¶È£ºSSD(1, 1, gt_box.size(),8), faster(gt_box.size(), 5, 1,1);
-
 	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
 		<< bottom[0]->width() << endl;
 	cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "

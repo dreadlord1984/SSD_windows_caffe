@@ -11,7 +11,7 @@
 #include "caffe/common.hpp"
 #include "caffe/layer.hpp"
 #include "caffe/proto/caffe.pb.h"
-
+#include "caffe/util/bbox_util.hpp"
 namespace caffe {
 
 namespace Frcnn {
@@ -40,7 +40,7 @@ class FrcnnProposalLayer : public Layer<Dtype> {
   virtual inline const char* type() const { return "FrcnnProposal"; }
 
   virtual inline int MinBottomBlobs() const { return 3; }
-  virtual inline int MaxBottomBlobs() const { return 3; }
+  virtual inline int MaxBottomBlobs() const { return 11; }
   virtual inline int MinTopBlobs() const { return 1; }
   virtual inline int MaxTopBlobs() const { return 2; }
 

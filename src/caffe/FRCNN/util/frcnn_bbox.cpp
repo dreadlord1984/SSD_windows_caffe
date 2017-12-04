@@ -56,6 +56,45 @@ float get_scale_factor(int width, int height, int short_size, int max_long_size)
   return scale_factor;
 }
 
+/***********************************************************************
+* function: ªÒ»° anchors
+***********************************************************************/
+template <typename Dtype>
+void GetAnchors(const Dtype* prior_data, const int num_priors,
+	vector < Point4f<Dtype> >* anchors,
+	vector<vector<float> >* prior_variances,
+	const float& im_height, const float& im_width) {
+	anchors->clear();
+	prior_variances->clear();
+	for (int i = 0; i < num_priors; ++i) {
+		int start_idx = i * 4;
+		Point4f<Dtype> anchor(prior_data[start_idx] * im_width,
+			prior_data[start_idx + 1] * im_height,
+			prior_data[start_idx + 2] * im_width,
+			prior_data[start_idx + 3] * im_height);
+		anchors->push_back(anchor);
+	}
+
+	for (int i = 0; i < num_priors; ++i) {
+		int start_idx = (num_priors + i) * 4;
+		vector<float> var;
+		for (int j = 0; j < 4; ++j) {
+			var.push_back(prior_data[start_idx + j]);
+		}
+		prior_variances->push_back(var);
+	}
+}
+
+// Explicit initialization.
+template void GetAnchors(const float* prior_data, const int num_priors,
+	vector<Point4f<float>>* anchors,
+	vector<vector<float> >* prior_variances,
+	const float& im_height, const float& im_width);
+template void GetAnchors(const double* prior_data, const int num_priors,
+	vector<Point4f<double>>* anchors,
+	vector<vector<float> >* prior_variances,
+	const float& im_height, const float& im_width);
+
 } // namespace frcnn
 
 } // namespace caffe

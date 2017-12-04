@@ -129,9 +129,8 @@ namespace caffe {
 			//CHECK(num == 1) << "only single item batches are supported";
 			CHECK(channes % 4 == 0) << "rpn bbox pred channels should be divided by 4";
 
-			const float im_height = 256;// bottom_im_info[0] -> 256
-			const float im_width = 384;// bottom_im_info[1] -> 384
-			const float zoom_scale = 1.0;// bottom_im_info[2] - > 1.0
+			const float im_height = FrcnnParam::im_height;
+			const float im_width = FrcnnParam::im_width;
 			/*-------------------------改写-------------------------*/
 
 			int rpn_pre_nms_top_n;
@@ -231,7 +230,7 @@ namespace caffe {
 
 				//Step 3. -------------------------filter out small box-----------------------
 				SelectBox << <caffe::CAFFE_GET_BLOCKS(retained_anchor_num), caffe::CAFFE_CUDA_NUM_THREADS >> >(
-					retained_anchor_num, &transform_bbox_[transform_bbox_begin], zoom_scale * rpn_min_size, &selected_flags_[selected_flags_begin]);
+					retained_anchor_num, &transform_bbox_[transform_bbox_begin], rpn_min_size, &selected_flags_[selected_flags_begin]);
 				cudaDeviceSynchronize();
 				/*-------------------------验证代码-------------------------*/
 				//if (selected_flags_ != NULL)
