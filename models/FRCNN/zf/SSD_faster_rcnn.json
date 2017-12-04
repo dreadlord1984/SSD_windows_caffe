@@ -1,0 +1,40 @@
+{
+ "im_height": "256",
+ "im_width": "384",
+ "scale_layer_num": "6",
+ 
+ "batch_size": "128",
+ "fg_fraction": "0.25",
+ "fg_thresh": "0.5",
+ "bg_thresh_hi": "0.5",
+ "bg_thresh_lo": "0",
+
+ "bbox_normalize_targets": "1",
+ "bbox_inside_weights": "1.0, 1.0, 1.0, 1.0",
+ "bbox_normalize_means": "0.0, 0.0, 0.0, 0.0",
+ "bbox_normalize_stds": "0.1, 0.1, 0.2, 0.2",
+
+ "rpn_nms_thresh": "0.7",
+ "rpn_pre_nms_top_n": "3000",
+ "rpn_post_nms_top_n": "500",
+ "rpn_min_size": "16",
+  
+ "test_rpn_nms_thresh": "0.7",
+ "test_rpn_pre_nms_top_n": "3000",
+ "test_rpn_post_nms_top_n": "300",
+ "test_rpn_min_size": "16",
+  
+ "rpn_bbox_inside_weights": "1.0, 1.0, 1.0, 1.0",
+ "rpn_positive_weight": "-1.0",
+ "rpn_allowed_border": "0",
+ 
+ "rng_seed": "3",
+ "eps": "0.00000000000001",
+ "inf": "100000000",
+ "share_location" : "1",
+
+ "feat_stride": "8",
+ "anchors": "-7.5, -7.5, 7.5, 7.5, -3.75, -15, 3.75, 15, -5.3033, -10.6066, 5.3033, 10.6066, -6.49519, -8.66025, 6.49519, 8.66025, -8.38525, -6.7082, 8.38525, 6.7082, -12.5, -12.5, 12.5, 12.5, -6.25, -25, 6.25, 25, -8.83883, -17.6777, 8.83883, 17.6777, -10.8253, -14.4338, 10.8253, 14.4338, -13.9754, -11.1803, 13.9754, 11.1803",
+ "test_score_thresh": "0.05",
+ "n_classes": "2"
+ }
