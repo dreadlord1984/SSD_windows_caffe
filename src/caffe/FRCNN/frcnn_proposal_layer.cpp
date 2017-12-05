@@ -47,7 +47,7 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
 #endif
   top[0]->Reshape(1, 5, 1, 1); // rpn_rois
   if (top.size() > 1) {
-    top[1]->Reshape(1, 1, 1, 1);
+    top[1]->Reshape(1, 2, 1, 1);
   }
 }
 
@@ -60,9 +60,8 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	const int scale_layer_num = FrcnnParam::scale_layer_num;
 	const Dtype *conf_data = bottom[0]->cpu_data();  // rpn_cls_prob_reshape
 	const Dtype *loc_data = bottom[1]->cpu_data();   // rpn_bbox_pred
-	const Dtype *prior_data = bottom[2]->cpu_data();    // pripr box
+	const Dtype *prior_data = bottom[2]->cpu_data();    // prior box
 	const Dtype* match_imfo = bottom[3]->cpu_data(); // match_imfo
-	const Dtype* gt_data = bottom[4]->cpu_data(); // gt_data
 	/*-------------------------验证代码-------------------------*/
 	for (vector<Blob<Dtype> *>::const_iterator iter = bottom.cbegin(); iter != bottom.cend(); iter++)
 	{
@@ -72,12 +71,11 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	/***********************************************************************
 	* 注意: prototxt中如果多个尺度bottom需要按照confs、locs、boxes的顺序
 	***********************************************************************/
-	const int batch_size = bottom[0]->num();// batch size
+	const int batch_size = bottom[1]->num();// batch size
 	const int num_priors = bottom[2]->height() / 4;
 	bool share_location = FrcnnParam::share_location;
 	int loc_classes = FrcnnParam::share_location ? 1 : FrcnnParam::n_classes;
-	CHECK_EQ(bottom[0]->num(), bottom[1]->num());
-	CHECK_EQ(num_priors * FrcnnParam::n_classes, bottom[0]->channels())
+	CHECK_EQ(num_priors * batch_size, bottom[0]->num())
 		<< "Number of priors must match number of confidence predictions.";
 	CHECK_EQ(num_priors * loc_classes * 4, bottom[1]->channels()) // 如果shared表示所有的类别同用一个location prediction，否则每一类各自预测。
 		<< "Number of priors must match number of location predictions.";
@@ -106,7 +104,8 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	if (rpn_pre_nms_top_n <= 0 || rpn_post_nms_top_n <= 0) return;
 
 	// 1.Retrieve all ground truth.
-	/*const int num_gt = bottom[4]->height();
+	/*const Dtype* gt_data = bottom[4]->cpu_data(); // gt_data
+	const int num_gt = bottom[4]->height();
 	const int background_label_id = 0;
 	bool use_difficult_gt = true;
 	map<int, vector<NormalizedBBox> > all_gt_bboxes;
@@ -135,18 +134,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		all_match_overlaps.push_back(match_overlaps);
 		all_match_confs.push_back(match_confs);
 	}*/
-
-	//ofstream  outfile1;
-	//if (_access("SSDconf_pred.txt", 0) != -1) // 如果临时文件存在，删除！
-	//	remove("SSDconf_pred.txt");
-	//outfile1.open("SSDconf_pred.txt", ios::out | ios::app);
-	//for (int batch_index = 0; batch_index < batch_size; ++batch_index) {
-	//	outfile1 << "batch " << batch_index << endl;
-	//	for (int p = 0; p < num_priors; ++p) {
-	//		outfile1 << all_conf_preds[batch_index][p] << endl;
-	//	}
-	//}
-	//outfile1.close();
 
 	/*-------------------------验证代码-------------------------*/
 	//ofstream  outfile;
@@ -185,15 +172,8 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	std::vector<vector<float> > prior_variances;
 	GetAnchors(prior_data, num_priors, &prior_bboxes, &prior_variances, im_height, im_width);
 
-	/*-------------------------验证代码-------------------------*/
-	//ofstream  outfile;
-	//if (_access("loc_pred.txt", 0) != -1) // 如果临时文件存在，删除！
-	//	remove("loc_pred.txt");
-	//outfile.open("loc_pred.txt", ios::out | ios::app);
-	/*-------------------------验证代码-------------------------*/
 
 	for (int batch_index = 0; batch_index < batch_size; batch_index++) {
-		//outfile << "layer  " << batch_index << endl;
 		std::vector<Point4f<Dtype> > anchors;
 		typedef pair<Dtype, int> sort_pair;
 		std::vector<int> match_indexes;//添加匹配gt索引
@@ -203,16 +183,16 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		const Dtype min_size = rpn_min_size;
 		int match_begin = batch_index * num_priors;
 		for (int priors_index = 0; priors_index < num_priors; priors_index++) {
-			int match_gt_index = match_imfo[match_begin * 3 + priors_index * 3];
-			Dtype overlap = match_imfo[match_begin * 3 + priors_index * 3 + 1];
-			Dtype score = match_imfo[match_begin * 3 + priors_index * 3 + 2];
+			int match_gt_index = match_imfo[match_begin * 2 + priors_index * 2];
+			Dtype overlap = match_imfo[match_begin * 2 + priors_index * 2 + 1];
+			Dtype score = conf_data[match_begin + priors_index ];
 			Point4f<Dtype> box_delta;
 			if (match_gt_index > -1)
 			{
-				box_delta[0] = loc_data[match_begin * 4];// *im_width;
-				box_delta[1] = loc_data[match_begin * 4 + 1];// *im_height;
-				box_delta[2] = loc_data[match_begin * 4 + 2];// *im_width;
-				box_delta[3] = loc_data[match_begin * 4 + 3];// *im_height;
+				box_delta[0] = loc_data[match_begin * 4 + 4 * priors_index];
+				box_delta[1] = loc_data[match_begin * 4 + 4 * priors_index + 1];
+				box_delta[2] = loc_data[match_begin * 4 + 4 * priors_index + 2];
+				box_delta[3] = loc_data[match_begin * 4 + 4 * priors_index + 3];
 			}
 			else if (match_gt_index < -1)
 			{
@@ -232,9 +212,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 			cbox[1] = (decode_bbox_center_y - decode_bbox_height / 2.)*im_height;
 			cbox[2] = (decode_bbox_center_x + decode_bbox_width / 2.)*im_width;
 			cbox[3] = (decode_bbox_center_y + decode_bbox_height / 2.)*im_height;
-			/*-------------------------验证代码-------------------------*/
-			//outfile << cbox[0] << " " << cbox[1] << " " << cbox[2] << " " << cbox[3] << endl;
-			/*-------------------------验证代码-------------------------*/
 			// 2. clip predicted boxes to image
 			for (int q = 0; q < 4; q++) {
 				cbox.Point[q] = std::max(Dtype(0), std::min(cbox[q], bounds[q]));
@@ -286,7 +263,6 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		batch_match_overlaps.push_back(box_final_overlaps);
 		DLOG(ERROR) << "rpn number after nms: " << box_final.size();
 	}
-	//outfile.close();
 	int total_boxes = 0;
 	for (std::vector<std::vector<Point4f<Dtype> >>::iterator it =
 		batch_box_final.begin(); it != batch_box_final.end(); ++it) {
@@ -299,6 +275,13 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	* 输出top[0]: batch_index  xmin  ymin  xmax  ymax 
 	* 输出top[1]: match_gt_index  match_iou
 	***********************************************************************/
+	/*-------------------------验证代码-------------------------*/
+	ofstream  outfile;
+	if (_access("frcnn_proposal_layer_output.txt", 0) != -1) // 如果临时文件存在，删除！
+		remove("frcnn_proposal_layer_output.txt");
+	outfile.open("frcnn_proposal_layer_output.txt", ios::out | ios::app);
+	/*-------------------------验证代码-------------------------*/
+
 	top[0]->Reshape(total_boxes, 5, 1, 1);
 	if (top.size() > 1) {
 		top[1]->Reshape(total_boxes, 2, 1, 1);
@@ -306,28 +289,36 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	Dtype *top_data = top[0]->mutable_cpu_data();
 	int box_begin = 0;
 	for (size_t batch_index = 0; batch_index < batch_box_final.size(); batch_index++) {
+		outfile << "layer  " << batch_index << endl;
 		std::vector<Point4f<Dtype> > box_final = batch_box_final[batch_index];
 		std::vector<Dtype>scores_ = batch_scores_[batch_index];
+		std::vector<int> box_final_match_indexes;
+		std::vector<Dtype> box_final_overlaps;
+		if (top.size() > 1) {
+			box_final_match_indexes = batch_box_match[batch_index];
+			box_final_overlaps = batch_match_overlaps[batch_index];
+		}
 		CHECK_EQ(box_final.size(), scores_.size());
 		for (size_t i = 0; i < box_final.size(); i++) {
 			Point4f<Dtype> &box = box_final[i];
 			top_data[box_begin * 5 + i * 5] = batch_index; // batch index
 			for (int j = 1; j < 5; j++) {
 				top_data[box_begin * 5 + i * 5 + j] = box[j - 1];
+				outfile << box[j - 1] << " ";
 			}
-		}
-
-		if (top.size() > 1) {
-			std::vector<int> box_final_match_indexes = batch_box_match[batch_index];
-			std::vector<Dtype> box_final_overlaps = batch_match_overlaps[batch_index];
-			for (size_t i = 0; i < box_final.size(); i++) {
+			if (top.size() > 1) {
 				top[1]->mutable_cpu_data()[box_begin * 2 + 2 * i] = box_final_match_indexes[i];
 				top[1]->mutable_cpu_data()[box_begin * 2 + 2 * i + 1] = box_final_overlaps[i];
+				outfile << box_final_match_indexes[i] << " " << box_final_overlaps[i] << endl;
+			}
+			else
+			{
+				outfile << endl;
 			}
 		}
 		box_begin += box_final.size();
 	}
-
+	outfile.close();
   DLOG(ERROR) << "========== exit proposal layer";
 //#endif
 }

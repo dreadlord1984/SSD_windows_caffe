@@ -509,6 +509,18 @@ template <typename Dtype>
       vector<vector<float> >* all_conf_loss,
 	  const float fl_alpha, const float fl_gamma, const float fl_beta);
 /*****************************************************************************/
+
+/***********************************************************************
+* function: ªÒ»° confrence
+***********************************************************************/
+template <typename Dtype>
+void GetConfPredictionsGPU(const Blob<Dtype>& conf_blob, const int num,
+	const int num_preds_per_class, const int num_classes,
+	const int background_label_id, const int loss_type,
+	const vector<map<int, vector<int> > >& all_match_indices,
+	const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+	vector<vector<Dtype> >* all_conf_preds);
+
 #endif  // !CPU_ONLY
 
 #ifdef USE_OPENCV

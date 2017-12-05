@@ -116,12 +116,15 @@ namespace caffe {
 			DLOG(ERROR) << "========== enter proposal layer";
 			const Dtype *bottom_rpn_score = bottom[0]->gpu_data();
 			const Dtype *bottom_rpn_bbox = bottom[1]->gpu_data();
+			const Dtype *prior_data = bottom[2]->gpu_data();    // pripr box
+			const Dtype* match_imfo = bottom[3]->gpu_data(); // match_imfo
+
 			// bottom data comes from host memory
 			/*Dtype bottom_im_info[3];
 			CHECK_EQ(bottom[2]->count(), 3);
 			CUDA_CHECK(cudaMemcpy(bottom_im_info, bottom[2]->gpu_data(), sizeof(Dtype) * 3, cudaMemcpyDeviceToHost));*/
 
-			const int num = bottom[1]->num();// batch size
+			const int batch_size = bottom[1]->num();// batch size
 			const int channes = bottom[1]->channels();
 			const int height = bottom[1]->height();
 			const int width = bottom[1]->width();
@@ -161,7 +164,7 @@ namespace caffe {
 			vector<int *>batch_gpu_keep_indices_;
 			vector<Dtype *>batch_bbox_score_;
 
-			for (int batch_index = 0; batch_index < num; batch_index++) {
+			for (int batch_index = 0; batch_index < batch_size; batch_index++) {
 				//Step 1. -------------------------------Sort the rpn result----------------------
 				// the first half of rpn_score is the bg score
 				// Note that the sorting operator will change the order fg_scores (bottom_rpn_score)

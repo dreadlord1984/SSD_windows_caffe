@@ -39,7 +39,7 @@ class MultiBoxLossLayer : public LossLayer<Dtype> {
   // bottom[3] stores the ground truth bounding boxes.
   virtual inline int ExactNumBottomBlobs() const { return 4; }
 	/*-------------------------¸ÄÐ´-------------------------*/
-  virtual inline int ExactNumTopBlobs() const { return 2; }
+  virtual inline int ExactNumTopBlobs() const { return 3; }
 	/*-------------------------¸ÄÐ´-------------------------*/
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
