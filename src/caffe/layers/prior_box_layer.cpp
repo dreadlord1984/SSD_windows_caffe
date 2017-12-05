@@ -327,7 +327,7 @@ namespace caffe {
 			}
 		}
 		/*-------------------------验证代码-------------------------*/
-		ofstream  outfile;
+		/*ofstream  outfile;
 		outfile.open("prior_box.txt", ios::out | ios::app);
 		ofstream  outfile2;
 		outfile2.open("prior_box_norm.txt", ios::out | ios::app);
@@ -342,7 +342,7 @@ namespace caffe {
 				<< top_data[4 * d + 3] << endl;
 		}
 		outfile.close();
-		outfile2.close();
+		outfile2.close();*/
 		/*-------------------------验证代码-------------------------*/
 
 		// set the variance.

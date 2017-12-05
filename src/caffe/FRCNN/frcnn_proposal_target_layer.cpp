@@ -83,19 +83,19 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 		       bottom[0]->data_at(i,4,0,0)));
 		 }
 		 /*-------------------------验证代码-------------------------*/
-		 //ofstream  outfile;
-		 //if (_access("frcnn_top.txt", 0) != -1) // 如果临时文件存在，删除！
-			// remove("frcnn_top.txt");
-		 //outfile.open("frcnn_top.txt", ios::out | ios::app);
-		 //outfile << bottom[0]->num() << endl;
-		 //for (int i = 0; i < bottom[0]->num(); i++) {
-			// outfile << bottom[0]->data_at(i, 0, 0, 0) << " "
-			//	 << bottom[0]->data_at(i, 1, 0, 0) << " "
-			//	 << bottom[0]->data_at(i, 2, 0, 0) << " "
-			//	 << bottom[0]->data_at(i, 3, 0, 0) << " "
-			//	 << bottom[0]->data_at(i, 4, 0, 0) << endl;
-		 //}
-		 //outfile.close();
+		 ofstream  outfile;
+		 if (_access("frcnn_top.txt", 0) != -1) // 如果临时文件存在，删除！
+			 remove("frcnn_top.txt");
+		 outfile.open("frcnn_top.txt", ios::out | ios::app);
+		 outfile << bottom[0]->num() << endl;
+		 for (int i = 0; i < bottom[0]->num(); i++) {
+			 outfile << bottom[0]->data_at(i, 0, 0, 0) << " "
+				 << bottom[0]->data_at(i, 1, 0, 0) << " "
+				 << bottom[0]->data_at(i, 2, 0, 0) << " "
+				 << bottom[0]->data_at(i, 3, 0, 0) << " "
+				 << bottom[0]->data_at(i, 4, 0, 0) << endl;
+		 }
+		 outfile.close();
 		 /*-------------------------验证代码-------------------------*/
 		 const Dtype* gt_data = bottom[1]->cpu_data();
 		 for (int i = 0; i < bottom[1]->height(); i++) {
@@ -264,7 +264,7 @@ void FrcnnProposalTargetLayer<Dtype>::_sample_rois(const vector<Point4f<Dtype> >
   const int fg_rois_per_this_image = std::min(fg_rois_per_image, int(fg_inds.size()));
   DLOG(INFO) << "fg_inds [PRE,AFT] : [" << fg_inds.size() << "," << fg_rois_per_this_image << "] FG_THRESH : " << FrcnnParam::fg_thresh;
   // Sample foreground regions without replacement
-  if (fg_inds.size() > 0) {
+  if (fg_inds.size() > 0) {//打乱截取
     shuffle(fg_inds.begin(), fg_inds.end(), (caffe::rng_t *) this->rng_->generator());
     fg_inds.resize(fg_rois_per_this_image);
   }
@@ -281,7 +281,7 @@ void FrcnnProposalTargetLayer<Dtype>::_sample_rois(const vector<Point4f<Dtype> >
   const int bg_rois_per_this_image = std::min(rois_per_image-fg_rois_per_this_image, int(bg_inds.size()));
   DLOG(INFO) << "bg_inds [PRE,AFT] : [" << bg_inds.size() << "," << bg_rois_per_this_image << "] BG_THRESH : [" << FrcnnParam::bg_thresh_lo << ", " << FrcnnParam::bg_thresh_hi << ")" ;
   // Sample background regions without replacement
-  if (bg_inds.size() > 0) {
+  if (bg_inds.size() > 0) {//打乱截取
     shuffle(bg_inds.begin(), bg_inds.end(), (caffe::rng_t *) this->rng_->generator());
     bg_inds.resize(bg_rois_per_this_image);
   }
@@ -346,7 +346,7 @@ void FrcnnProposalTargetLayer<Dtype>::_sample_rois(const vector<Point4f<Dtype> >
     int cls = labels[i];
     //get bbox_targets and bbox_inside_weights
     bbox_targets[i][cls] = bbox_targets_data[i];
-    bbox_inside_weights[i][cls] = Point4f<Dtype>(FrcnnParam::bbox_inside_weights);
+    bbox_inside_weights[i][cls] = Point4f<Dtype>(FrcnnParam::bbox_inside_weights);//正样本给权重1，负样本给0
   }
 
 }

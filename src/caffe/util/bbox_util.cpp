@@ -490,7 +490,7 @@ namespace caffe {
 					prior_bbox.ymax() + prior_variance[3] * bbox.ymax());
 			}
 		}
-		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
+		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {//Ö´ÐÐ
 			float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
 			CHECK_GT(prior_width, 0);
 			float prior_height = prior_bbox.ymax() - prior_bbox.ymin();

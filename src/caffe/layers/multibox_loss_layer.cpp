@@ -346,9 +346,9 @@ namespace caffe {
 			for (int batch_index = 0; batch_index < num_; batch_index++) {
 				int match_begin = batch_index * num_priors_;
 				for (int priors_index = 0; priors_index < num_priors_; priors_index++) {
-					top_data[match_begin * 3 + priors_index * 3] = all_match_indices_[batch_index][-1][priors_index];
-					top_data[match_begin * 3 + priors_index * 3 + 1] = all_match_overlaps[batch_index][-1][priors_index];
-					top_data[match_begin * 3 + priors_index * 3 + 2] = all_conf_preds[batch_index][priors_index];
+					top_data[match_begin * 3 + priors_index * 3] = all_match_indices_[batch_index][-1][priors_index];//gt index
+					top_data[match_begin * 3 + priors_index * 3 + 1] = all_match_overlaps[batch_index][-1][priors_index];//IOU
+					top_data[match_begin * 3 + priors_index * 3 + 2] = all_conf_preds[batch_index][priors_index];//score
 				}
 			}
 		}

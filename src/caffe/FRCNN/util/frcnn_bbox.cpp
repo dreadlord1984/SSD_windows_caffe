@@ -68,10 +68,10 @@ void GetAnchors(const Dtype* prior_data, const int num_priors,
 	prior_variances->clear();
 	for (int i = 0; i < num_priors; ++i) {
 		int start_idx = i * 4;
-		Point4f<Dtype> anchor(prior_data[start_idx] * im_width,
-			prior_data[start_idx + 1] * im_height,
-			prior_data[start_idx + 2] * im_width,
-			prior_data[start_idx + 3] * im_height);
+		Point4f<Dtype> anchor(prior_data[start_idx],
+			prior_data[start_idx + 1],
+			prior_data[start_idx + 2],
+			prior_data[start_idx + 3]);
 		anchors->push_back(anchor);
 	}
 
