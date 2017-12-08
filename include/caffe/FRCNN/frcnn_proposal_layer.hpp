@@ -78,7 +78,7 @@ class FrcnnProposalLayer : public Layer<Dtype> {
   float* anchors_;
 	unsigned long long *mask_;
   float* transform_bbox_;
-  int *selected_flags_;
+	int *selected_flags_;
   int *gpu_keep_indices_;
 #endif
 };

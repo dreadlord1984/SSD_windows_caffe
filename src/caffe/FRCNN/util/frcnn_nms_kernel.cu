@@ -44,13 +44,13 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
   __shared__ float block_boxes[threadsPerBlock * 4];
   if (threadIdx.x < col_size) {
     block_boxes[threadIdx.x * 4 + 0] =
-        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 4 + 0];
+        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 7 + 0];//
     block_boxes[threadIdx.x * 4 + 1] =
-        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 4 + 1];
+        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 7 + 1];//
     block_boxes[threadIdx.x * 4 + 2] =
-        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 4 + 2];
+        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 7 + 2];//
     block_boxes[threadIdx.x * 4 + 3] =
-        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 4 + 3];
+        dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 7 + 3];//
     //block_boxes[threadIdx.x * 5 + 4] =
     //  dev_boxes[(threadsPerBlock * col_start + threadIdx.x) * 5 + 4];
   }
@@ -58,7 +58,7 @@ __global__ void nms_kernel(const int n_boxes, const float nms_overlap_thresh,
 
   if (threadIdx.x < row_size) {
     const int cur_box_idx = threadsPerBlock * row_start + threadIdx.x;
-    const float *cur_box = dev_boxes + cur_box_idx * 4;
+    const float *cur_box = dev_boxes + cur_box_idx * 7;//
     int i = 0;
     unsigned long long t = 0;
     int start = 0;

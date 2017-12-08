@@ -2026,8 +2026,9 @@ layer {
   bottom: "mbox_priorbox_1"
   bottom: "label"
   top: "mbox_loss_1"
-  top: "pred_score"
+  top: "match_score"
   top: "match_info"
+  #top: "match_iou"
   include {
     phase: TRAIN
   }
@@ -2195,10 +2196,11 @@ layer {
 layer {
   name: "priorbox_proposal"
   type: "FrcnnProposal"
-  bottom: "pred_score"
+  bottom: "match_score"
   bottom: "mbox_loc_1"
   bottom: "mbox_priorbox_1"
   bottom: "match_info"
+  #bottom: "match_iou"
   bottom: "label"  
   top: "priorbox_rpn_rois"
   top: "priorbox_rpn_match"
@@ -2207,6 +2209,7 @@ layer {
   propagate_down: 0
   propagate_down: 0
   propagate_down: 0
+  #propagate_down: 0
 }
 
 layer {
