@@ -41,10 +41,12 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
     const vector<Blob<Dtype> *> &bottom, const vector<Blob<Dtype> *> &top) {
 	//bottom[0]: "rpn_rois" 维度：(box_final.size(), 5, 1, 1);
 	//bottom[1]: "gt_boxes" 维度：SSD(1, 1, gt_box.size(),8), faster(gt_box.size(), 5, 1,1);
-	/*cout << "bottom[0]: " << bottom[0]->num() << " " << bottom[0]->channels() << " " << bottom[0]->height() << " "
-		<< bottom[0]->width() << endl;
-	cout << "bottom[1]: " << bottom[1]->num() << " " << bottom[1]->channels() << " " << bottom[1]->height() << " "
-		<< bottom[1]->width() << endl;*/
+	/*-------------------------验证代码-------------------------*/
+	/*for (vector<Blob<Dtype> *>::const_iterator iter = bottom.cbegin(); iter != bottom.cend(); iter++)
+	{
+		cout << (*iter)->num() << " " << (*iter)->channels() << " " << (*iter)->height() << " " << (*iter)->width() << endl;
+	}*/
+	/*-------------------------验证代码-------------------------*/
 
 	/*-------------------------改写-------------------------*/
 	map<int, vector<Point4f<Dtype> >> batch_all_rois;
@@ -83,19 +85,19 @@ void FrcnnProposalTargetLayer<Dtype>::Forward_cpu(
 		       bottom[0]->data_at(i,4,0,0)));
 		 }
 		 /*-------------------------验证代码-------------------------*/
-		 ofstream  outfile;
-		 if (_access("frcnn_top.txt", 0) != -1) // 如果临时文件存在，删除！
-			 remove("frcnn_top.txt");
-		 outfile.open("frcnn_top.txt", ios::out | ios::app);
-		 outfile << bottom[0]->num() << endl;
-		 for (int i = 0; i < bottom[0]->num(); i++) {
-			 outfile << bottom[0]->data_at(i, 0, 0, 0) << " "
-				 << bottom[0]->data_at(i, 1, 0, 0) << " "
-				 << bottom[0]->data_at(i, 2, 0, 0) << " "
-				 << bottom[0]->data_at(i, 3, 0, 0) << " "
-				 << bottom[0]->data_at(i, 4, 0, 0) << endl;
-		 }
-		 outfile.close();
+		 //ofstream  outfile;
+		 //if (_access("frcnn_top.txt", 0) != -1) // 如果临时文件存在，删除！
+			// remove("frcnn_top.txt");
+		 //outfile.open("frcnn_top.txt", ios::out | ios::app);
+		 //outfile << bottom[0]->num() << endl;
+		 //for (int i = 0; i < bottom[0]->num(); i++) {
+			// outfile << bottom[0]->data_at(i, 0, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 1, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 2, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 3, 0, 0) << " "
+			//	 << bottom[0]->data_at(i, 4, 0, 0) << endl;
+		 //}
+		 //outfile.close();
 		 /*-------------------------验证代码-------------------------*/
 		 const Dtype* gt_data = bottom[1]->cpu_data();
 		 for (int i = 0; i < bottom[1]->height(); i++) {

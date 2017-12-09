@@ -54,7 +54,7 @@ void FrcnnProposalLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype> *> &bottom,
 template <typename Dtype>
 void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	const vector<Blob<Dtype> *> &top) {
-	Forward_gpu(bottom, top);
+	//Forward_gpu(bottom, top);
 	//#if 0
 	DLOG(ERROR) << "========== enter proposal layer";
 	const int scale_layer_num = FrcnnParam::scale_layer_num;
@@ -62,12 +62,12 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	const Dtype *loc_data = bottom[1]->cpu_data();   // rpn_bbox_pred
 	const Dtype *prior_data = bottom[2]->cpu_data();    // prior box
 	const Dtype* match_info = bottom[3]->cpu_data(); // match_info
-	//const Dtype* match_iou = bottom[4]->cpu_data(); // match_iou_info
+
 	/*-------------------------验证代码-------------------------*/
-	for (vector<Blob<Dtype> *>::const_iterator iter = bottom.cbegin(); iter != bottom.cend(); iter++)
+	/*for (vector<Blob<Dtype> *>::const_iterator iter = bottom.cbegin(); iter != bottom.cend(); iter++)
 	{
 		cout << (*iter)->num() << " " << (*iter)->channels() << " " << (*iter)->height() << " " << (*iter)->width() << endl;
-	}
+	}*/
 	/*-------------------------验证代码-------------------------*/
 	/***********************************************************************
 	* 注意: prototxt中如果多个尺度bottom需要按照confs、locs、boxes的顺序
@@ -260,37 +260,21 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 		//outfile.close();
 		/*-------------------------验证代码-------------------------*/
 		// 3. remove predicted boxes with either height or width < threshold
-		std::ofstream  outfile2;
-		if (_access("flags_CPU.txt", 0) != -1) // 如果临时文件存在，删除！
-			remove("flags_CPU.txt");
-		outfile2.open("flags_CPU.txt", ios::out | ios::app);
-		for (auto it = sort_vector.begin(); it != sort_vector.end();) {
-			if ((anchors[it->second][2] - anchors[it->second][0]) < min_size || (anchors[it->second][3] - anchors[it->second][1]) < min_size) {
-				it = sort_vector.erase(it);
-				outfile2 << 0 << std::endl;
-			}
-			else{
-				++it;
-				outfile2 << 1 << std::endl;
-			}
-		}
-		outfile2.close();
-
 		DLOG(ERROR) << "========== after clip and remove size < threshold box " << (int)sort_vector.size();
 		/*-------------------------验证代码-------------------------*/
-		std::ofstream  outfile;
-		if (_access("anchor_before_nmsCPU.txt", 0) != -1) // 如果临时文件存在，删除！
-			remove("anchor_before_nmsCPU.txt");
-		outfile.open("anchor_before_nmsCPU.txt", ios::out | ios::app);
-		outfile << sort_vector.size() << std::endl;
-		for (int i = 0; i < sort_vector.size(); i++) {
-			outfile << sort_vector[i].first << " " 
-				<< anchors[sort_vector[i].second][0] << " " << anchors[sort_vector[i].second][1] << " "
-				<< anchors[sort_vector[i].second][2] << " " << anchors[sort_vector[i].second][3] << " "
-				<< sort_vector[i].second << " "
-				<< match_indexes[sort_vector[i].second] << " " << match_overlaps[sort_vector[i].second] << endl;
-		}
-		outfile.close();
+		//std::ofstream  outfile;
+		//if (_access("anchor_before_nmsCPU.txt", 0) != -1) // 如果临时文件存在，删除！
+		//	remove("anchor_before_nmsCPU.txt");
+		//outfile.open("anchor_before_nmsCPU.txt", ios::out | ios::app);
+		//outfile << sort_vector.size() << std::endl;
+		//for (int i = 0; i < sort_vector.size(); i++) {
+		//	outfile << sort_vector[i].first << " " 
+		//		<< anchors[sort_vector[i].second][0] << " " << anchors[sort_vector[i].second][1] << " "
+		//		<< anchors[sort_vector[i].second][2] << " " << anchors[sort_vector[i].second][3] << " "
+		//		<< sort_vector[i].second << " "
+		//		<< match_indexes[sort_vector[i].second] << " " << match_overlaps[sort_vector[i].second] << endl;
+		//}
+		//outfile.close();
 		/*-------------------------验证代码-------------------------*/
 		std::vector<bool> select(sort_vector.size(), true);
 
@@ -338,10 +322,10 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	* 输出top[1]: match_gt_index  match_iou
 	***********************************************************************/
 	/*-------------------------验证代码-------------------------*/
-	ofstream  outfile;
-	if (_access("frcnn_proposal_layer_outputCPU.txt", 0) != -1) // 如果临时文件存在，删除！
-		remove("frcnn_proposal_layer_outputCPU.txt");
-	outfile.open("frcnn_proposal_layer_outputCPU.txt", ios::out | ios::app);
+	//ofstream  outfile;
+	//if (_access("frcnn_proposal_layer_outputCPU.txt", 0) != -1) // 如果临时文件存在，删除！
+	//	remove("frcnn_proposal_layer_outputCPU.txt");
+	//outfile.open("frcnn_proposal_layer_outputCPU.txt", ios::out | ios::app);
 	/*-------------------------验证代码-------------------------*/
 
 	top[0]->Reshape(total_boxes, 5, 1, 1);
@@ -353,33 +337,33 @@ void FrcnnProposalLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype> *> &bottom,
 	for (size_t batch_index = 0; batch_index < batch_box_final.size(); batch_index++) {
 		std::vector<Point4f<Dtype> > box_final = batch_box_final[batch_index];
 		std::vector<Dtype>scores_ = batch_scores_[batch_index];
-		outfile << "batch index:  " << batch_index << " " << box_final.size() << endl;
+		/*outfile << "batch index:  " << batch_index << " " << box_final.size() << endl;*/
 		CHECK_EQ(box_final.size(), scores_.size());
 		for (size_t i = 0; i < box_final.size(); i++) {
 			Point4f<Dtype> &box = box_final[i];
 			Dtype& score = scores_[i];
 			top_data[box_begin * 5 + i * 5] = batch_index; // batch index
-			outfile << score << " ";
+		/*	outfile << score << " ";*/
 			for (int j = 1; j < 5; j++) {
 				top_data[box_begin * 5 + i * 5 + j] = box[j - 1];
-				outfile << box[j - 1] << " ";
+				/*outfile << box[j - 1] << " ";*/
 			}
 			if (top.size() > 1) {
 				top[1]->mutable_cpu_data()[box_begin * 3 + 3 * i] = batch_box_index[batch_index][i];
 				top[1]->mutable_cpu_data()[box_begin * 3 + 3 * i + 1] = batch_box_match[batch_index][i];
 				top[1]->mutable_cpu_data()[box_begin * 3 + 3 * i + 2] = batch_match_overlaps[batch_index][i];
-				outfile << batch_box_index[batch_index][i] << " " 
+				/*outfile << batch_box_index[batch_index][i] << " " 
 					<< batch_box_match[batch_index][i] << " " 
-					<< batch_match_overlaps[batch_index][i] << endl;
+					<< batch_match_overlaps[batch_index][i] << endl;*/
 			}
 			else
 			{
-				outfile << endl;
+				/*outfile << endl;*/
 			}
 		}
 		box_begin += box_final.size();
 	}
-	outfile.close();
+	/*outfile.close();*/
   DLOG(ERROR) << "========== exit proposal layer";
 //#endif
 }

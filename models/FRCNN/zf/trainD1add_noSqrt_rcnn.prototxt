@@ -29,7 +29,7 @@ layer {
   }
   data_param {
     source: "E:\\caffe-master_\\Pedestrian\\Data_0731\\train_lmdb"
-    batch_size: 1
+    batch_size: 2
     backend: LMDB
   }
   annotated_data_param {
@@ -2066,132 +2066,149 @@ layer {
 
 
 #========= RoI Proposal ============
-#------- conv4_3 conf score -------
-layer {
-   name: "rpn_conv4_3_score_reshape"
-   bottom: "conv4_3_norm_mbox_conf_3"
-   top: "rpn_conv4_3_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_conv4_3_prob"
-  type: "Softmax"
-  bottom: "rpn_conv4_3_score_reshape"
-  top: "rpn_conv4_3_prob"
-}
-layer {
-  name: "rpn_conv4_3_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_conv4_3_score_reshape"
-  top: "rpn_conv4_3_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 20 dim: -1 dim: 0 } }
-}
-#------- fc7 conf score -------
-layer {
-   name: "rpn_fc7_score_reshape"
-   bottom: "fc7_mbox_conf_1"
-   top: "rpn_fc7_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_fc7_prob"
-  type: "Softmax"
-  bottom: "rpn_fc7_score_reshape"
-  top: "rpn_fc7_prob"
-}
-layer {
-  name: "rpn_fc7_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_fc7_prob"
-  top: "rpn_fc7_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 10 dim: -1 dim: 0 } }
-}
-#------- conv6_2 conf score -------
-layer {
-   name: "rpn_conv6_2_score_reshape"
-   bottom: "conv6_2_mbox_conf_1"
-   top: "rpn_conv6_2_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_conv6_2_prob"
-  type: "Softmax"
-  bottom: "rpn_conv6_2_score_reshape"
-  top: "rpn_conv6_2_prob"
-}
-layer {
-  name: "rpn_conv6_2_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_conv6_2_prob"
-  top: "rpn_conv6_2_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 10 dim: -1 dim: 0 } }
-}
-#------- conv7_2 conf score -------
-layer {
-   name: "rpn_conv7_2_score_reshape"
-   bottom: "conv7_2_mbox_conf_1"
-   top: "rpn_conv7_2_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_conv7_2_prob"
-  type: "Softmax"
-  bottom: "rpn_conv7_2_score_reshape"
-  top: "rpn_conv7_2_prob"
-}
-layer {
-  name: "rpn_conv7_2_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_conv7_2_prob"
-  top: "rpn_conv7_2_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 10 dim: -1 dim: 0 } }
-}
-#------- conv8_2 conf score -------
-layer {
-   name: "rpn_conv8_2_score_reshape"
-   bottom: "conv8_2_mbox_conf_1"
-   top: "rpn_conv8_2_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_conv8_2_prob"
-  type: "Softmax"
-  bottom: "rpn_conv8_2_score_reshape"
-  top: "rpn_conv8_2_prob"
-}
-layer {
-  name: "rpn_conv8_2_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_conv8_2_prob"
-  top: "rpn_conv8_2_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 10 dim: -1 dim: 0 } }
-}
-#------- pool6 conf score -------
-layer {
-   name: "rpn_pool6_score_reshape"
-   bottom: "pool6_mbox_conf_1"
-   top: "rpn_pool6_score_reshape"
-   type: "Reshape"
-   reshape_param { shape { dim: 0 dim: 2 dim: -1 dim: 0 } }
-}
-layer {
-  name: "rpn_pool6_prob"
-  type: "Softmax"
-  bottom: "rpn_pool6_score_reshape"
-  top: "rpn_pool6_prob"
-}
-layer {
-  name: "rpn_pool6_prob_reshape"
-  type: "Reshape"
-  bottom: "rpn_pool6_prob"
-  top: "rpn_pool6_prob_reshape"
-  reshape_param { shape { dim: 0 dim: 10 dim: -1 dim: 0 } }
-}
+# layer
+# {
+#     name: "rpn_conv4_3_score_reshape"
+#     bottom: "conv4_3_norm_mbox_conf_3"
+#     top: "rpn_conv4_3_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_conv4_3_prob"
+#     type: "Softmax"
+#     bottom: "rpn_conv4_3_score_reshape"
+#     top: "rpn_conv4_3_prob"
+# }
+# layer
+# {
+#     name: "rpn_conv4_3_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_conv4_3_score_reshape"
+#     top: "rpn_conv4_3_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 20 dim: -1 dim: 0}}
+# }
+# # ------- fc7 conf score -------
+# layer
+# {
+#     name: "rpn_fc7_score_reshape"
+#     bottom: "fc7_mbox_conf_1"
+#     top: "rpn_fc7_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_fc7_prob"
+#     type: "Softmax"
+#     bottom: "rpn_fc7_score_reshape"
+#     top: "rpn_fc7_prob"
+# }
+# layer
+# {
+#     name: "rpn_fc7_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_fc7_prob"
+#     top: "rpn_fc7_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 10 dim: -1 dim: 0}}
+# }
+# # ------- conv6_2 conf score -------
+# layer
+# {
+#     name: "rpn_conv6_2_score_reshape"
+#     bottom: "conv6_2_mbox_conf_1"
+#     top: "rpn_conv6_2_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_conv6_2_prob"
+#     type: "Softmax"
+#     bottom: "rpn_conv6_2_score_reshape"
+#     top: "rpn_conv6_2_prob"
+# }
+# layer
+# {
+#     name: "rpn_conv6_2_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_conv6_2_prob"
+#     top: "rpn_conv6_2_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 10 dim: -1 dim: 0}}
+# }
+# # ------- conv7_2 conf score -------
+# layer
+# {
+#     name: "rpn_conv7_2_score_reshape"
+#     bottom: "conv7_2_mbox_conf_1"
+#     top: "rpn_conv7_2_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_conv7_2_prob"
+#     type: "Softmax"
+#     bottom: "rpn_conv7_2_score_reshape"
+#     top: "rpn_conv7_2_prob"
+# }
+# layer
+# {
+#     name: "rpn_conv7_2_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_conv7_2_prob"
+#     top: "rpn_conv7_2_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 10 dim: -1 dim: 0}}
+# }
+# # ------- conv8_2 conf score -------
+# layer
+# {
+#     name: "rpn_conv8_2_score_reshape"
+#     bottom: "conv8_2_mbox_conf_1"
+#     top: "rpn_conv8_2_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_conv8_2_prob"
+#     type: "Softmax"
+#     bottom: "rpn_conv8_2_score_reshape"
+#     top: "rpn_conv8_2_prob"
+# }
+# layer
+# {
+#     name: "rpn_conv8_2_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_conv8_2_prob"
+#     top: "rpn_conv8_2_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 10 dim: -1 dim: 0}}
+# }
+# # ------- pool6 conf score -------
+# layer
+# {
+#     name: "rpn_pool6_score_reshape"
+#     bottom: "pool6_mbox_conf_1"
+#     top: "rpn_pool6_score_reshape"
+#     type: "Reshape"
+#     reshape_param {shape {dim: 0 dim: 2 dim: -1 dim: 0}}
+# }
+# layer
+# {
+#     name: "rpn_pool6_prob"
+#     type: "Softmax"
+#     bottom: "rpn_pool6_score_reshape"
+#     top: "rpn_pool6_prob"
+# }
+# layer
+# {
+#     name: "rpn_pool6_prob_reshape"
+#     type: "Reshape"
+#     bottom: "rpn_pool6_prob"
+#     top: "rpn_pool6_prob_reshape"
+#     reshape_param {shape {dim: 0 dim: 10 dim: -1 dim: 0}}
+# }
 
 layer {
   name: "priorbox_proposal"
@@ -2201,14 +2218,14 @@ layer {
   bottom: "mbox_priorbox_1"
   bottom: "match_info"
   #bottom: "match_iou"
-  bottom: "label"  
+  #bottom: "label"  
   top: "priorbox_rpn_rois"
-  top: "priorbox_rpn_match"
+  #top: "priorbox_rpn_match"
   propagate_down: 0
   propagate_down: 0
   propagate_down: 0
   propagate_down: 0
-  propagate_down: 0
+ # propagate_down: 0
   #propagate_down: 0
 }
 

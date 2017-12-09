@@ -146,11 +146,6 @@ namespace caffe {
 			const Dtype *bottom_rpn_bbox = bottom[1]->gpu_data();
 			const Dtype *prior_data = bottom[2]->gpu_data();    // prior box
 			const Dtype* match_info = bottom[3]->gpu_data(); // match_info
-			//const Dtype* match_iou = bottom[4]->gpu_data(); // match_iou_info
-			// bottom data comes from host memory
-			/*Dtype bottom_im_info[3];
-			CHECK_EQ(bottom[2]->count(), 3);
-			CUDA_CHECK(cudaMemcpy(bottom_im_info, bottom[2]->gpu_data(), sizeof(Dtype) * 3, cudaMemcpyDeviceToHost));*/
 
 			const int num = bottom[1]->num();// batch size
 			const int channes = bottom[1]->channels();
@@ -333,55 +328,55 @@ namespace caffe {
 				cudaDeviceSynchronize();
 
 				/*-------------------------验证代码-------------------------*/
-				if (selected_num > 0) {
-					std::ofstream  outfile;
-					if (_access("anchor_before_nmsGPU.txt", 0) != -1) // 如果临时文件存在，删除！
-						remove("anchor_before_nmsGPU.txt");
-					outfile.open("anchor_before_nmsGPU.txt", ios::out | ios::app);
-					vector<float> boxes(retained_anchor_num * 7);
-					vector<float> scores(retained_anchor_num);
-					/*vector<int> flags(retained_anchor_num);
-					cudaMemcpy(&flags[0], &selected_flags_[selected_flags_begin], retained_anchor_num * sizeof(int), cudaMemcpyDeviceToHost);*/
-					cudaMemcpy(&boxes[0], &transform_bbox_[transform_bbox_begin], 7 * retained_anchor_num * sizeof(float), cudaMemcpyDeviceToHost);
-					cudaMemcpy(&scores[0], bbox_score_, retained_anchor_num * sizeof(float), cudaMemcpyDeviceToHost);
-					/*vector<float>::iterator itBox;
-					vector<float>::iterator itScore;
-					vector<int>::iterator itFlag;
-					for (itFlag = flags.begin(), itBox = boxes.begin(), itScore = scores.begin(); itFlag != flags.end();)
-					{
-						if ((*itFlag) == 0)
-						{
-							itFlag = flags.erase(itFlag);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itBox = boxes.erase(itBox);
-							itScore = scores.erase(itScore);
-						}
-						else
-						{
-							itFlag++;
-							itBox = itBox + 7;
-							itScore++;
-						}
-					}
-*/
-					outfile << selected_num << std::endl;
-					for (int i = 0; i < selected_num; i++) {
-						outfile << scores[i] << " ";
-						outfile << boxes[7 * i] << " "
-							<< boxes[7 * i + 1] << " "
-							<< boxes[7 * i + 2] << " "
-							<< boxes[7 * i + 3] << " "
-							<< boxes[7 * i + 4] << " "
-							<< boxes[7 * i + 5] << " "
-							<< boxes[7 * i + 6] << std::endl;
-					}
-					outfile.close();
-				}
+//				if (selected_num > 0) {
+//					std::ofstream  outfile;
+//					if (_access("anchor_before_nmsGPU.txt", 0) != -1) // 如果临时文件存在，删除！
+//						remove("anchor_before_nmsGPU.txt");
+//					outfile.open("anchor_before_nmsGPU.txt", ios::out | ios::app);
+//					vector<float> boxes(retained_anchor_num * 7);
+//					vector<float> scores(retained_anchor_num);
+//					/*vector<int> flags(retained_anchor_num);
+//					cudaMemcpy(&flags[0], &selected_flags_[selected_flags_begin], retained_anchor_num * sizeof(int), cudaMemcpyDeviceToHost);*/
+//					cudaMemcpy(&boxes[0], &transform_bbox_[transform_bbox_begin], 7 * retained_anchor_num * sizeof(float), cudaMemcpyDeviceToHost);
+//					cudaMemcpy(&scores[0], bbox_score_, retained_anchor_num * sizeof(float), cudaMemcpyDeviceToHost);
+//					/*vector<float>::iterator itBox;
+//					vector<float>::iterator itScore;
+//					vector<int>::iterator itFlag;
+//					for (itFlag = flags.begin(), itBox = boxes.begin(), itScore = scores.begin(); itFlag != flags.end();)
+//					{
+//						if ((*itFlag) == 0)
+//						{
+//							itFlag = flags.erase(itFlag);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itBox = boxes.erase(itBox);
+//							itScore = scores.erase(itScore);
+//						}
+//						else
+//						{
+//							itFlag++;
+//							itBox = itBox + 7;
+//							itScore++;
+//						}
+//					}
+//*/
+//					outfile << selected_num << std::endl;
+//					for (int i = 0; i < selected_num; i++) {
+//						outfile << scores[i] << " ";
+//						outfile << boxes[7 * i] << " "
+//							<< boxes[7 * i + 1] << " "
+//							<< boxes[7 * i + 2] << " "
+//							<< boxes[7 * i + 3] << " "
+//							<< boxes[7 * i + 4] << " "
+//							<< boxes[7 * i + 5] << " "
+//							<< boxes[7 * i + 6] << std::endl;
+//					}
+//					outfile.close();
+//				}
 				/*-------------------------验证代码-------------------------*/
 
 				//Step 4. -----------------------------apply nms-------------------------------
@@ -403,6 +398,7 @@ namespace caffe {
 				CUDA_CHECK(cudaFree(sort_temp_storage_));
 				CUDA_CHECK(cudaFree(cumsum_temp_storage_));
 				CUDA_CHECK(cudaFree(selected_indices_));
+				CUDA_CHECK(cudaFree(tmp_transform_bbox));
 
 				batch_keep_num.push_back(keep_num);
 				batch_bbox_score_.push_back(bbox_score_);
@@ -422,10 +418,10 @@ namespace caffe {
 			}
 			int box_begin = 0;
 			/*-------------------------验证代码-------------------------*/
-			std::ofstream  outfile;
-			if (_access("frcnn_proposal_layer_outputGPU.txt", 0) != -1) // 如果临时文件存在，删除！
-				remove("frcnn_proposal_layer_outputGPU.txt");
-			outfile.open("frcnn_proposal_layer_outputGPU.txt", ios::out | ios::app);
+			//std::ofstream  outfile;
+			//if (_access("frcnn_proposal_layer_outputGPU.txt", 0) != -1) // 如果临时文件存在，删除！
+			//	remove("frcnn_proposal_layer_outputGPU.txt");
+			//outfile.open("frcnn_proposal_layer_outputGPU.txt", ios::out | ios::app);
 			/*-------------------------验证代码-------------------------*/
 			for (size_t batch_index = 0; batch_index < batch_keep_num.size(); batch_index++) {
 				const int keep_num = batch_keep_num[batch_index];
@@ -435,7 +431,7 @@ namespace caffe {
 					&gpu_keep_indices_[rpn_post_nms_top_n * batch_index],
 					top_data, batch_bbox_score_[batch_index], top_info);
 				/*-------------------------验证代码-------------------------*/
-				vector<float> boxes(rpn_pre_nms_top_n * 7);
+				/*vector<float> boxes(rpn_pre_nms_top_n * 7);
 				vector<Dtype> scores(rpn_pre_nms_top_n);
 				vector<int> indexes(keep_num);
 				cudaMemcpy(&boxes[0], &transform_bbox_[rpn_pre_nms_top_n * batch_index * 7], 7 * rpn_pre_nms_top_n * sizeof(float), cudaMemcpyDeviceToHost);
@@ -451,11 +447,11 @@ namespace caffe {
 						<< boxes[7 * indexes[i] + 4] << " "
 						<< boxes[7 * indexes[i] + 5] << " "
 						<< boxes[7 * indexes[i] + 6] << std::endl;
-				}
+				}*/
 				/*-------------------------验证代码-------------------------*/
 				box_begin += keep_num;
 			}
-			outfile.close();
+			/*outfile.close();*/
 			DLOG(ERROR) << "========== exit proposal layer";
 			////////////////////////////////////
 			// do not forget to free the malloc memory

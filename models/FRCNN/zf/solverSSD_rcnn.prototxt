@@ -3,8 +3,8 @@ test_net: "E:\\caffe-master_\\models\\FRCNN\\zf\\testD1add_noSqrt.prototxt"
 test_iter: 548 #batch_size: 16
 test_interval: 20000
 base_lr: 0.001
-display: 1
-max_iter: 5 #batch_size: 2
+display: 10
+max_iter: 10000 #batch_size: 2
 lr_policy: "multistep"
 gamma: 0.1
 momentum: 0.9
