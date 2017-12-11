@@ -8,7 +8,7 @@ layer {
     phase: TRAIN
   }
   transform_param {
-    mirror: false
+    mirror: true
     mean_value: 104
     mean_value: 117
     mean_value: 123
@@ -28,7 +28,7 @@ layer {
     }
   }
   data_param {
-    source: "E:\\caffe-master_\\Pedestrian\\Data_0731\\train_lmdb"
+    source: "E:\\caffe-master_\\Pedestrian\\Data_0922\\train_lmdb"
     batch_size: 2
     backend: LMDB
   }
@@ -37,7 +37,90 @@ layer {
       max_sample: 1
       max_trials: 1
     }
-		
+		batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.1
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.3
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.5
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.7
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        min_jaccard_overlap: 0.9
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
+    batch_sampler {
+      sampler {
+        min_scale: 0.3
+        max_scale: 1.0
+        min_aspect_ratio: 0.5
+        max_aspect_ratio: 2.0
+      }
+      sample_constraint {
+        max_jaccard_overlap: 1
+        min_object_coverage: 0.7
+      }
+      max_sample: 1
+      max_trials: 50
+    }
     label_map_file: "E:\\caffe-master_\\Pedestrian\\labelmap_VehicleFull.prototxt"
     config: "E:\\caffe-master_\\models\\FRCNN\\zf\\SSD_faster_rcnn.json"
   }
@@ -2217,16 +2300,13 @@ layer {
   bottom: "mbox_loc_1"
   bottom: "mbox_priorbox_1"
   bottom: "match_info"
-  #bottom: "match_iou"
-  #bottom: "label"  
   top: "priorbox_rpn_rois"
   #top: "priorbox_rpn_match"
   propagate_down: 0
   propagate_down: 0
   propagate_down: 0
   propagate_down: 0
- # propagate_down: 0
-  #propagate_down: 0
+
 }
 
 layer {
@@ -2255,6 +2335,8 @@ layer {
     pooled_h: 6
     spatial_scale: 0.125 # 1/8
   }
+  propagate_down: 1
+  propagate_down: 0
 }
 layer {
   name: "priorbox_fc6"

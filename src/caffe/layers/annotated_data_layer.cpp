@@ -2,7 +2,7 @@
 #include <opencv2/core/core.hpp>
 #endif  // USE_OPENCV
 #include <stdint.h>
-
+#include <io.h>
 #include <algorithm>
 #include <map>
 #include <vector>

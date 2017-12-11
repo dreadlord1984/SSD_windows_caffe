@@ -53,6 +53,7 @@ bool SatisfySampleConstraint(const NormalizedBBox& sampled_bbox,
     }
     // Test sample coverage.
     if (has_sample_coverage) {
+			found = false;
       const float sample_coverage = BBoxCoverage(sampled_bbox, object_bbox);
       if (sample_constraint.has_min_sample_coverage() &&
           sample_coverage < sample_constraint.min_sample_coverage()) {
@@ -66,6 +67,7 @@ bool SatisfySampleConstraint(const NormalizedBBox& sampled_bbox,
     }
     // Test object coverage.
     if (has_object_coverage) {
+			found = false;
       const float object_coverage = BBoxCoverage(object_bbox, sampled_bbox);
       if (sample_constraint.has_min_object_coverage() &&
           object_coverage < sample_constraint.min_object_coverage()) {
