@@ -4,7 +4,6 @@ import xml.etree.cElementTree as et
 import matplotlib
 import matplotlib.pyplot as plt
 import linecache
-import prettyplotlib as ppl
 import os
 
 """
@@ -117,11 +116,10 @@ def showList(IOU_all_List):
                                                 fill=False, edgecolor=colors[5], linewidth=2))
         # 排序
         boxes_total = int(data[2])
-        gt_boxes_set = set('x')
+        gt_boxes_set = set()
         for i in range(0, boxes_total, 1):
             gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
             gt_boxes_set.add(gt_box_index)
-        gt_boxes_set.remove('x')
 
         group_prior_box = [[] for x in gt_boxes_set]
         for i in range(0, boxes_total, 1):
@@ -140,7 +138,7 @@ def showList(IOU_all_List):
 
         # 显示
         for i in range(0, len(gt_boxes_set), 1):
-            dispaly_box = group_prior_box[i]
+            dispaly_box = group_prior_box[i][:1]
             for k in range(0, len(dispaly_box), 1):
                 display_txt = '%.4f' % ( dispaly_box[k][0])
                 currentAxis.add_patch(plt.Rectangle((dispaly_box[k][1], dispaly_box[k][2]),
@@ -156,73 +154,142 @@ def showList(IOU_all_List):
 @function:2.绘制进入训练的gt box和area的情况
 @param param1: 合并输出列表文件
 """
-def statistic(IOU_all_List):
+def statistic(IOU_all_List, tag):
     with open(IOU_all_List) as f:
         for line in f:
             prior_datas = line.strip().split('\t')
             # print prior_datas[0].decode("gbk")
             prior_boxes_total = int(prior_datas[2])
-
-            gt_set = set('x')
-            for i in range(0, prior_boxes_total, 1):
-                gt_box_index = (prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
-                gt_set.add(gt_box_index)
-            gt_set.remove('x')
-
-            gt_group = {}
-            for gt_index in gt_set:
-                gt_group[gt_index] = 0
-
-            for i in range(0, prior_boxes_total, 1):
-                gt_box_index = (prior_datas[7 * i + 9])
-                gt_group[gt_box_index] += 1
-
-            for gt_index in gt_set:
-                prior_box_num = gt_group[gt_index]
-                for i in range(0, len(prior_nums), 1):  # 判断IOU区间段
-                    if (prior_box_num <= prior_nums[i]):
-                        prior_group[i] += 1
-                        break
-                else:
-                    print prior_box_num
-                    print prior_datas[0].decode("gbk")
-
             full_xml_path = ROOTDIR + prior_datas[1]
             true_boxes, width, height = readXML(full_xml_path)
-            for gt_index in gt_set:
+
+            gt_boxes_set = set()
+            for i in range(0, prior_boxes_total, 1):
+                gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+                gt_boxes_set.add(gt_box_index)
+
+            # 1.按照iou排序prior box，随后按照最大匹配iou统计gt box分布
+            if tag == 'small':
+                group_prior_box = [[] for x in gt_boxes_set]
+                for i in range(0, prior_boxes_total, 1):
+                    gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+                    databox = [float(prior_datas[7 * i + 4]), int(prior_datas[7 * i + 3]),
+                               float(prior_datas[7 * i + 5]) * width, float(prior_datas[7 * i + 6]) * height, float(prior_datas[7 * i + 7]) * width,
+                           float(prior_datas[7 * i + 8]) * height]
+                    k = 0
+                    for gt_index in gt_boxes_set:
+                        if (gt_index == gt_box_index):
+                            group_prior_box[k].append(databox)
+                            break
+                        else:
+                            k += 1
+                for i in range(0, len(gt_boxes_set), 1):
+                    group_prior_box[i].sort(key=lambda x: x[0], reverse=True)
+
+                for i in range(0, len(gt_boxes_set), 1):
+                    dispaly_box = group_prior_box[i][0]
+                    for i in range(0, len(iou_thresholds), 1):  # 判断iou区间段
+                        if (dispaly_box[0] <= iou_thresholds[i]):
+                            iou_group[i] += 1
+                            break
+            else:
+                # 2.对于每个样本统计gt匹配的prior box数量以及该数量在哪个区间段
+                gt_group = {}
+                for gt_index in gt_boxes_set:
+                    gt_group[gt_index] = 0
+                for i in range(0, prior_boxes_total, 1):
+                    gt_box_index = int(prior_datas[7 * i + 9]) # 当前匹配的gt box序号（从0开始）
+                    gt_group[gt_box_index] += 1
+
+                for gt_index in gt_boxes_set:
+                    prior_box_num = gt_group[gt_index]
+                    for i in range(0, len(prior_nums), 1): # 判断匹配prior box数量所在区间段
+                        if (prior_box_num <= prior_nums[i]):
+                            prior_group[i] += 1
+                            break
+                    else:
+                        print prior_box_num
+                        print prior_datas[0].decode("gbk")
+
+            # 3.gt按照面积统计所在区间段
+            for j, gt_index in enumerate(gt_boxes_set):
                 area = true_boxes[int(gt_index)][4]
                 for i in range(0, len(area_thresholds), 1):  # 判断area区间段
                     if (area <= area_thresholds[i]):
                         area_group[i] += 1
+                        if tag == 'small' and i==chose_layer:
+                            prior_box_index = group_prior_box[j][0][1]  # max匹配 proir box序号（从0开始）
+                            for k in range(0, len(layer_thresholds), 1):  # 判断来自于哪一层
+                                if (prior_box_index < layer_thresholds[k]):
+                                    layer_group[k] += 1
+                                    break
                         break
                 else:
                     print area
 
+    if tag == 'small':
+        matplotlib.rcParams['figure.figsize'] = (8, 7)  # 设定显示大小
+        fig, ax = plt.subplots(1)
+        X = np.arange(iou_thresholds.size)
+        labels = [iou_thresholds[i] for i in X]
+        total = np.sum(iou_group)
+        plt.bar(X, iou_group, color='MediumAquamarine')
+        plt.xticks(X, labels, rotation=25)
+        for x, y in zip(X, iou_group[X]):
+            plt.text(x, y + 0.05, '%.2f' % y, ha='center', va='bottom')
+        ax.set_title('(gt total %d)' % total)
+        ax.set_xlabel('max iou')
+        ax.set_ylabel('gt num')
+        savename = os.path.dirname(IOU_all_List) + "\\smallGt.png"
+        plt.savefig(savename)
 
-    matplotlib.rcParams['figure.figsize'] = (24, 6)  # 设定显示大小
-    fig, ax = plt.subplots(1)
-    labels = [prior_nums[i] for i in s_ids]
-    anno_area2s = [('%d' % a) for a in prior_group[s_ids]]
-    total = np.sum(prior_group)
-    ppl.bar(ax, np.arange(len(prior_group)), prior_group[s_ids], annotate=anno_area2s, grid='y', xticklabels=labels)
-    plt.xticks(rotation=25)
-    ax.set_title('(gt total %d)' % total)
-    ax.set_xlabel('matching num')
-    ax.set_ylabel('gt num')
-    savename = os.path.dirname(IOU_all_List) + "\\matchNum.png"
-    plt.savefig(savename)
+        matplotlib.rcParams['figure.figsize'] = (8, 7)  # 设定显示大小
+        fig, ax = plt.subplots(1)
+        X = np.arange(layer_thresholds.size)
+        labels = [layer_thresholds[i] for i in X]
+        total = np.sum(layer_group)
+        plt.bar(X, layer_group[X], color='MediumAquamarine')
+        plt.xticks(X, labels, rotation=25)
+        for x, y in zip(X, layer_group[X]):
+            plt.text(x, y + 0.05, '%.2f' % y, ha='center', va='bottom')
+        ax.set_title('(total {} prior box in area {} come from)'.format(total, area_thresholds[chose_layer]))
+        ax.set_xlabel('layer')
+        ax.set_ylabel('prior num')
+        savename = os.path.dirname(IOU_all_List) + "\\smallLayer{}".format(chose_layer)+".png"
+        plt.savefig(savename)
+
+    else:
+        matplotlib.rcParams['figure.figsize'] = (24, 6)  # 设定显示大小
+        fig, ax = plt.subplots(1)
+        X = np.arange(prior_nums.size)
+        labels = [prior_nums[i] for i in X]
+        total = np.sum(prior_group)
+        plt.bar(np.arange(len(prior_group)), prior_group[X], color='MediumAquamarine')
+        plt.xticks(X, labels, rotation=25)
+        for x, y in zip(X, prior_group[X]):
+            plt.text(x, y + 0.05, '%.2f' % y, ha='center', va='bottom')
+        ax.set_title('(gt total %d)' % total)
+        ax.set_xlabel('matching num')
+        ax.set_ylabel('gt num')
+        savename = os.path.dirname(IOU_all_List) + "\\matchNum.png"
+        plt.savefig(savename)
 
     matplotlib.rcParams['figure.figsize'] = (8, 7)  # 设定显示大小
     fig, ax = plt.subplots(1)
-    labels = [area_thresholds[i] for i in s_ids2]
-    anno_area2s = [('%d' % a) for a in area_group[s_ids2]]
+    X = np.arange(area_thresholds.size)
+    labels = [area_thresholds[i] for i in X]
     total = np.sum(area_group)
-    ppl.bar(ax, np.arange(len(area_group)), area_group[s_ids2], annotate=anno_area2s, grid='y', xticklabels=labels)
-    plt.xticks(rotation=25)
+    plt.bar(np.arange(len(area_group)), area_group[X], color='MediumAquamarine')
+    plt.xticks(X, labels, rotation=25)
+    for x, y in zip(X, area_group[X]):
+        plt.text(x, y + 0.05, '%.2f' % y, ha='center', va='bottom')
     ax.set_title('(gt total %d)' % total)
     ax.set_xlabel('gt area')
     ax.set_ylabel('gt num')
-    savename = os.path.dirname(IOU_all_List) + "\\gtNum.png"
+    if tag == 'small':
+        savename = os.path.dirname(IOU_all_List) + "\\smallNum.png"
+    else:
+        savename = os.path.dirname(IOU_all_List) + "\\gtNum.png"
     plt.savefig(savename)
 
     plt.show()
@@ -234,13 +301,17 @@ ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
 prior_nums = np.linspace(1,40,40,dtype=np.int32)
 prior_group  = np.zeros(prior_nums.size,dtype=np.int32)
 area_thresholds = np.array([0.0025, 0.005, 0.01, 0.015, 0.02, 0.04, 0.08, 0.1, 0.25, 1.0],dtype=np.float64) # area 区间
+iou_thresholds = np.array([0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5],dtype=np.float64) # area 区间
+#layer_priorbox_num = np.array([15360, 1920, 480, 120, 30, 5],dtype=np.int32) # layer层priorbox 数
+layer_thresholds = np.array([12000, 24000, 27000, 27750, 27950, 28010, 28015],dtype=np.int32) # layer层priorbox 数
 area_group  = np.zeros(area_thresholds.size,dtype=np.int32)
-s_ids = np.arange(prior_nums.size)
-s_ids2 = np.arange(area_thresholds.size)
+iou_group  = np.zeros(iou_thresholds.size,dtype=np.int32)
+layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
+chose_layer = 0
 
 if __name__ == "__main__":
-    # copyList("..\\Data_480_320\\a\\IOU_ALL.txt",
-    # "..\\Data_480_320\\train_lmdb_list.txt",
-    # "..\\Data_480_320\\a\\IOU_ALL_image_List.txt")
-    # showList("..\\Data_480_320\\a\\IOU_ALL_image_List.txt")
-    statistic("..\\Data_480_320\\a\\IOU_ALL_image_List.txt")
+    copyList("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45.txt",
+    "..\\Data_480_320\\val_lmdb_list_new.txt",
+    "..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45_image_list.txt")
+    showList("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45_image_list.txt")
+    # statistic("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_image_list.txt", 'small')

@@ -1,1 +1,1 @@
-./ Path_Images.txt shuffle --anno_type="just_shuffle"  --shuffle=true
+E:\caffe-master_\Build\x64\Release\convert_annoset.exe  ./ Path_Images.txt shuffle --anno_type="just_shuffle"  --shuffle=true

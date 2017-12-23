@@ -65,12 +65,12 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'deployD1add_noSqrt.prototxt'
+model_def = '480_deployD1add_noSqrt.prototxt'
 model_weights = \
-    'View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\' \
-    'add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_290000.caffemodel'
+    'Data_480_320\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new\\' \
+    '480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new++_iter_140000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
-imgList = "Data_1111/val.txt"
+imgList = "Data_480_320\\val.txt"
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights4
@@ -84,8 +84,8 @@ transformer.set_raw_scale('data', 255)  # the reference model operates on images
 transformer.set_channel_swap('data', (2,1,0))  # the reference model has channels in BGR order instead of RGB
 
 # set net to batch size of 1
-resize_width = 384
-resize_height = 256
+resize_width = 480
+resize_height = 320
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 TPs = 0 # 正检

@@ -63,11 +63,11 @@ file = open(labelmap_file, 'r')
 labelmap = caffe_pb2.LabelMap()
 text_format.Merge(str(file.read()), labelmap)
 
-model_def = '..\\deployD1_noSqrt.prototxt' # 检测网络，有非极大值抑制过程
-model_weights = 'COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\' \
-                'add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000.caffemodel' # 训练好的模型
+model_def = '..\\480_deployD1add_noSqrt.prototxt' # 检测网络，有非极大值抑制过程
+model_weights = '..\\Data_480_320\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\' \
+                '480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_190000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
-imgList = "..\\Data_0922\\val.txt" # 样本列表
+imgList = "..\\Data_480_320\\val.txt" # 样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model
                 model_weights,  # contains the trained weights
@@ -81,8 +81,8 @@ transformer.set_raw_scale('data', 255)  # the reference model operates on images
 transformer.set_channel_swap('data', (2,1,0))  # the reference model has channels in BGR order instead of RGB
 
 # set net to batch size of 1
-resize_width = 384
-resize_height = 256
+resize_width = 480
+resize_height = 320
 net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
 TPs = 0 # 正检

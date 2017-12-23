@@ -1,36 +1,11 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_test(add_conv4_3_classification, delete sqrt(min*max) default box, add min_size)"
-layer {
-  name: "data"
-  type: "AnnotatedData"
-  top: "data"
-  top: "label"
-  include {
-    phase: TEST
-  }
-  transform_param {
-    mean_value: 104
-    mean_value: 117
-    mean_value: 123
-    resize_param {
-      prob: 1
-      resize_mode: WARP
-      height: 256
-      width: 384
-      interp_mode: LINEAR
-    }
-  }
-  data_param {
-    source: "E:/caffe-master_/Pedestrian/Data_0731/val_lmdb"
-    batch_size: 1
-    backend: LMDB
-  }
-  annotated_data_param {
-    batch_sampler {
-    }
-    label_map_file: "E:/caffe-master_/Pedestrian/labelmap_VehicleFull.prototxt"
-  }
+name: "SqueezeNet_Pedestrian_SSD_384x256_deploy(add_conv4_3_classification, delete sqrt(min*max) default box),add min_size"
+input: "data"
+input_shape {
+  dim: 1
+  dim: 3
+  dim: 320
+  dim: 480
 }
-
 
 layer {
   name: "conv1"
@@ -47,6 +22,7 @@ layer {
     }
   }
 }
+
 layer {
   name: "relu_conv1"
   type: "ReLU"
@@ -1216,7 +1192,7 @@ layer {
       value: 0
     }
   }
-  #propagate_down: false
+  propagate_down: false
 }
 
 layer {
@@ -1362,10 +1338,10 @@ layer {
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
-    min_size: 15.0
-	  max_size: 25.0
-    min_size: 25.0
-	  max_size: 51.0
+    min_size: 18.75
+    max_size: 31.25
+    min_size: 31.25
+    max_size: 63.75
     aspect_ratio: 0.25
 	  aspect_ratio: 0.5
 	  aspect_ratio: 0.75
@@ -1481,8 +1457,8 @@ layer {
   bottom: "data"
   top: "fc7_mbox_priorbox_1"
   prior_box_param {
-    min_size: 51.0
-    max_size: 97.0
+    min_size: 63.75
+    max_size: 121.25
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1598,8 +1574,8 @@ layer {
   bottom: "data"
   top: "conv6_2_mbox_priorbox_1"
   prior_box_param {
-    min_size: 97.0
-    max_size: 138.0
+    min_size: 121.25
+    max_size: 172.5
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1715,8 +1691,8 @@ layer {
   bottom: "data"
   top: "conv7_2_mbox_priorbox_1"
   prior_box_param {
-    min_size: 138.0
-    max_size: 184.0
+    min_size: 172.5
+    max_size: 230.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1832,8 +1808,8 @@ layer {
   bottom: "data"
   top: "conv8_2_mbox_priorbox_1"
   prior_box_param {
-    min_size: 184.0
-    max_size: 230.0
+    min_size: 230.0
+    max_size: 287.5
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -1949,8 +1925,8 @@ layer {
   bottom: "data"
   top: "pool6_mbox_priorbox_1"
   prior_box_param {
-    min_size: 230.0
-    max_size: 276.0
+    min_size: 287.5
+    max_size: 345.0
     aspect_ratio: 0.25
 	aspect_ratio: 0.5
 	aspect_ratio: 0.75
@@ -2005,59 +1981,6 @@ layer {
     axis: 2
   }
 }
-
-# ###################################################################
-# layer
-# {
-#     name: "mbox_loss_1"
-#     type: "MultiBoxLoss"
-#     bottom: "mbox_loc_1"
-#     bottom: "mbox_conf_1"
-#     bottom: "mbox_priorbox_1"
-#     bottom: "label"
-#     top: "mbox_loss_1"
-#     include {
-#         phase: TEST
-#     }
-#     propagate_down: false
-#     propagate_down: false
-#     propagate_down: false
-#     propagate_down: false
-#     loss_param {
-#         normalization: VALID  # FULL VALID BATCH_SIZE NONE
-#     }
-#     multibox_loss_param {
-#         loc_loss_type: SMOOTH_L1
-# 
-#         conf_loss_type: FocalLoss  # SOFTMAX LOGISTIC FocalLoss 
-#         fl_alpha: 0.75
-#         fl_gamma: 2.0
-# 
-#         loc_weight: 1.0
-#         num_classes: 2
-#         share_location: true
-#         match_type: PER_PREDICTION
-#         overlap_threshold: 0.5
-#         use_prior_for_matching: true
-#         background_label_id: 0
-#         # ignore_label_id: 13
-#         use_difficult_gt: true
-#         # do_neg_mining: true
-#         neg_pos_ratio: 3.0
-#         neg_overlap: 0.35
-#         code_type: CENTER_SIZE
-#         mining_type: NONE  # HARD_EXAMPLE MAX_NEGATIVE NONE
-#     }
-# }
-# 
-# layer
-# {
-#     name: "silence"
-#     type: "Silence"
-#     bottom: "mbox_loss_1"
-# }
-# ###########################################################
-
 layer {
   name: "mbox_conf_reshape_1"
   type: "Reshape"
@@ -2095,7 +2018,6 @@ layer {
   bottom: "mbox_loc_1"
   bottom: "mbox_conf_flatten_1"
   bottom: "mbox_priorbox_1"
-  bottom: "label"   						############################################
   top: "detection_out"
   include {
     phase: TEST
@@ -2111,22 +2033,5 @@ layer {
     code_type: CENTER_SIZE
     keep_top_k: 200
     confidence_threshold: 0.01
-  }
-}
-layer {
-  name: "detection_eval"
-  type: "DetectionEvaluate"
-  bottom: "detection_out"
-  bottom: "label"
-  top: "detection_eval"
-  include {
-    phase: TEST
-  }
-  detection_evaluate_param {
-    num_classes: 2
-    background_label_id: 0
-    overlap_threshold: 0.5
-    evaluate_difficult_gt: false
-    #name_size_file: "E:/caffe-master_/Pedestrian/Data_0922/val_name_size.txt"
   }
 }
