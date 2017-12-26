@@ -225,6 +225,7 @@
     <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_file.cpp" />
     <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_param.cpp" />
     <ClCompile Include="..\..\src\caffe\FRCNN\util\frcnn_vis.cpp" />
+    <ClCompile Include="..\..\src\caffe\layers\conv_dw_layer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\include\caffe\blob.hpp" />
@@ -356,6 +357,7 @@
     <ClInclude Include="..\..\include\caffe\FRCNN\util\frcnn_param.hpp" />
     <ClInclude Include="..\..\include\caffe\FRCNN\util\frcnn_utils.hpp" />
     <ClInclude Include="..\..\include\caffe\FRCNN\util\frcnn_vis.hpp" />
+    <ClInclude Include="..\..\include\caffe\layers\conv_dw_layer.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(CpuOnlyBuild)'=='false'">
     <CudaCompile Include="..\..\src\caffe\layers\absval_layer.cu" />
@@ -415,6 +417,7 @@
     <CudaCompile Include="..\..\src\caffe\solvers\sgd_solver.cu" />
     <CudaCompile Include="..\..\src\caffe\util\im2col.cu" />
     <CudaCompile Include="..\..\src\caffe\util\math_functions.cu" />
+    <CudaCompile Include="..\..\src\caffe\layers\conv_dw_layer.cu" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
