@@ -67,8 +67,8 @@ def computIOU(A, B):
 
 model_def = '480_deployD1add_noSqrt.prototxt'
 model_weights = \
-    'Data_480_320\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new\\' \
-    '480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new++_iter_140000.caffemodel' # 训练好的模型
+    'Data_480_320\\480_add_prior2_gamma2_D1_add15_P5N35D15E4_noSqrt\\' \
+    '480_add_prior2_gamma2_D1_add15_P5N35D15E4_noSqrt_iter_190000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
 imgList = "Data_480_320\\val.txt"
 

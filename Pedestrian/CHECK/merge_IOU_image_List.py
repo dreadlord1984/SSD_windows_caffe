@@ -310,8 +310,8 @@ layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
 chose_layer = 0
 
 if __name__ == "__main__":
-    copyList("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45.txt",
-    "..\\Data_480_320\\val_lmdb_list_new.txt",
-    "..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45_image_list.txt")
-    showList("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_VAL_NEW_48_IOU45_image_list.txt")
+    copyList("..\\Data_0922\matching_static\\IOU_ALL_VAL_15_35.txt",
+    "..\\Data_0922\\val_lmdb_list.txt",
+    "..\\Data_0922\\matching_static\\IOU_ALL_VAL_15_35_image_list.txt")
+    showList("..\\Data_0922\\matching_static\\IOU_ALL_VAL_15_35_image_list.txt")
     # statistic("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_image_list.txt", 'small')

@@ -41,33 +41,41 @@ def statistic(IOU_all_List, save_name):
 
             # 1. 将 gt box 按照gt box height分组
             for gt_index in range(0, len(true_boxes), 1):
-                index = int((true_boxes[gt_index][3] - true_boxes[gt_index][1]) * 320 / height) # 往小取整！
-                if index <= 9:
+                index = int((true_boxes[gt_index][3] - true_boxes[gt_index][1]) * image_train_height / height) # 往小取整！
+                if index <= 7:
                     print prior_datas[0].decode("gbk") + ' ' +  str(index) + ' '+ str(true_boxes[gt_index][3])
                     shutil.copy(ROOTDIR + prior_datas[0], bad_image_root)
                     shutil.copy(ROOTDIR + prior_datas[1], bad_xml_root)
                 gt_height_group[index] += 1
-            # 2. 将 priot box 按照匹配的gt box height分组
+
+            # # 2. 将 gt box 按照gt box width/height分组
+            # for gt_index in range(0, len(true_boxes), 1):
+            #     index = int(
+            #         float(true_boxes[gt_index][2] - true_boxes[gt_index][0]) / float(true_boxes[gt_index][3] - true_boxes[gt_index][1]) * 100)  # 往小取整！
+            #     gt_width_height_ratio_group[index] += 1
+
+            # 3. 将 priot box 按照匹配的gt box height分组
             for i in range(0, prior_boxes_total, 1):
                 if int(prior_datas[7 * i + 3]) == -1: # prior box index
-                    no_match_index = int((float(prior_datas[7 * i + 8]) - float(prior_datas[7 * i + 6])) * 320) # 往小取整！
+                    no_match_index = int((float(prior_datas[7 * i + 8]) - float(prior_datas[7 * i + 6])) * image_train_height) # 往小取整！
                     no_match_gt_height_group[no_match_index] += 1
                     continue
                 else:
                     gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
                     try:
-                        index = int((true_boxes[gt_box_index][3] - true_boxes[gt_box_index][1]) * 320 / height)
-                        if index >= height_come_from_min and index <= height_come_from_max:
-                            prior_box_index = int(prior_datas[7 * i + 3])
-                            for k in range(0, len(layer_thresholds), 1):  # 判断来自于哪一层
-                                if (prior_box_index < layer_thresholds[k]):
-                                    layer_group[k] += 1
-                                    break
+                        index = int((true_boxes[gt_box_index][3] - true_boxes[gt_box_index][1]) * image_train_height / height)
+                        # if index >= height_come_from_min and index <= height_come_from_max:
+                        #     prior_box_index = int(prior_datas[7 * i + 3])
+                        #     for k in range(0, len(layer_thresholds), 1):  # 判断来自于哪一层
+                        #         if (prior_box_index < layer_thresholds[k]):
+                        #             layer_group[k] += 1
+                        #             break
                         prior_gt_group[index] += 1
                     except:
                         print 'error occurs while reading gt box'
 
     scipy.io.savemat(mat_save_name, {'gt_height_group': gt_height_group,
+                                     # 'gt_width_height_ratio_group': gt_width_height_ratio_group,
                                      'prior_gt_group':prior_gt_group,
                                      'no_match_gt_height_group': no_match_gt_height_group})
 
@@ -88,22 +96,25 @@ def draw_curve(*curves):
         prior_gt_group_data = data['prior_gt_group'][0]
         no_match_gt_height_group = data['no_match_gt_height_group'][0]
         ##########################################################################
-        for index in range(0, len(gt_height_group_data), 1):  # 求平均
+        none_gt = 0
+        for index in range(0, len(gt_height_group_data), 1):  # Anchor匹配求平均
             if gt_height_group_data[index] != 0:
                 mean_anchor_group[index] = float(prior_gt_group_data[index]) / gt_height_group_data[index]
+            else:
+                none_gt += 1
+
         axes[0].plot(mean_anchor_group, color=colors[curve_i], linewidth=1, markeredgewidth=3,
                  markeredgecolor='#99CC01', alpha=0.8, label=filename)
+        avarage = np.sum(mean_anchor_group) / (len(gt_height_group_data) - none_gt)
+        axes[0].plot([0, len(gt_height_group_data)], [avarage, avarage], '--', color=(0.6, 0.6, 0.6), label='Luck')
         # 添加x轴标签
         axes[0].set_xlabel('Sacle of pedestrian')
         # 添加y周标签
         axes[0].set_ylabel(u'Number of matched anchors')
         # 添加图表标题
         axes[0].set_title(u'anchor-gt distribute')
-        # total_0 = np.sum(mean_anchor_group)
-        # axes[0].set_title(u'anchor-gt distribute: {}'.format(total_0))
         # 添加图表网格线，设置网格线颜色，线形，宽度和透明度
-        plt.grid(color='#95a5a6', linestyle='--', linewidth=1, axis='y', alpha=0.4)
-        # axes[0].legend(loc="lower left")
+        axes[0].grid(color='#95a5a6', linestyle='--', linewidth=1, axis='y', alpha=0.4)
         ##########################################################################
         axes[1].plot(gt_height_group_data, color=colors[curve_i], linewidth=1, markeredgewidth=3,
                  markeredgecolor='#99CC01', alpha=0.8, label=filename )
@@ -116,6 +127,19 @@ def draw_curve(*curves):
         total_1 = np.sum(gt_height_group_data)
         axes[1].set_title(u'gt distribute: {}'.format(total_1))
         axes[1].legend(loc="lower left")
+
+        # gt_width_height_ratio_group_data = data['gt_width_height_ratio_group'][0]
+        # axes[1].plot(gt_width_height_ratio_group_data, color=colors[curve_i], linewidth=1, markeredgewidth=3,
+        #              markeredgecolor='#99CC01', alpha=0.8, label=filename)
+        # # 添加x轴标签
+        # axes[1].set_xlabel('Sacle of pedestrian')
+        # # 添加y周标签
+        # axes[1].set_ylabel(u'Number of gt')
+        # # 添加图表标题
+        # # axes[1].set_title(u'gt distribute')
+        # total_1 = np.sum(gt_width_height_ratio_group_data)
+        # axes[1].set_title(u'gt distribute: {}'.format(total_1))
+        # axes[1].legend(loc="lower left")
         ##########################################################################
         total_2 = np.sum(no_match_gt_height_group)
         max_indx = np.argmax(no_match_gt_height_group)
@@ -139,30 +163,41 @@ def draw_curve(*curves):
 
 
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
-gt_heights = np.linspace(1,320,320,dtype=np.int32)
+SRCDIR = u'E:\\caffe-master_\\Pedestrian\\Data_0922\\matching_static'.encode('gbk')
+image_train_height = 256
+image_train_width = 384
+gt_heights = np.linspace(1,image_train_height,image_train_height,dtype=np.int32)
 gt_height_group  = np.zeros(gt_heights.size,dtype=np.int32)
+gt_width_height_ratio_group  = np.zeros(200,dtype=np.int32)
 prior_gt_group  = np.zeros(gt_heights.size,dtype=np.int32)
 mean_anchor_group = np.zeros(gt_heights.size,dtype=np.float)
-layer_thresholds = np.array([12000, 24000, 27000, 27750, 27950, 28010, 28015],dtype=np.int32) # layer层priorbox 数
-layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
-height_come_from_min = 74
-height_come_from_max = 84
+# layer_thresholds = np.array([12000, 24000, 27000, 27750, 27950, 28010, 28015],dtype=np.int32) # layer层priorbox 数
+# layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
+# height_come_from_min = 74
+# height_come_from_max = 84
 no_match_gt_height_group  = np.zeros(gt_heights.size,dtype=np.int32)
 bad_image_root = 'D:\\Other_Dataets\\Pedestrian\\view\\JPEGImages'
 bad_xml_root = 'D:\\Other_Dataets\\Pedestrian\\view\\Annotations'
 colors = ['Blue', 'Red',  'MediumAquamarine', 'HotPink', 'Chartreuse','Gray', 'Chocolate']
+# tag = 'gt_height_group'
 
-SRCDIR = u'E:\\caffe-master_\\Pedestrian\\Data_480_320\\19,32_64_118_172_227_281'.encode('gbk')
 if __name__ == "__main__":
-    # statistic(os.path.join(SRCDIR, "IOU_ALL_VAL_NEW_48_IOU45_image_list.txt"),"Anchor_Group_NEW_48_IOU45")
+    # statistic(os.path.join(SRCDIR, "IOU_ALL_VAL_image_list.txt"),"VAL_Anchor_Group")
     draw_curve(
-        # os.path.join(SRCDIR, "Anchor_Group.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group.mat"),
         # os.path.join(SRCDIR, "Anchor_Group_NEW.mat"),
-        os.path.join(SRCDIR, "VAL_Anchor_Group_NEW.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.25_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.2_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.2_0.25_0.33_0.5_0.75_ALL.mat"),
-        os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_48.mat"),
-        os.path.join(SRCDIR, "Anchor_Group_NEW_48_IOU45.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_48.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_48_IOU45.mat"),
+        # os.path.join(SRCDIR, "Anchor_Group_NEW_0.2_0.25_0.33_0.5_0.75_ALL.mat"),
+        # os.path.join(SRCDIR, "Anchor_Group_NEW_48.mat"),
+        # os.path.join(SRCDIR, "Anchor_Group_NEW_48_IOU45.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_0.25_0.33_0.5_0.75_ALL.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_15.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_15_35.mat"),
+        os.path.join(SRCDIR, "VAL_Anchor_Group_18_35.mat"),
                )

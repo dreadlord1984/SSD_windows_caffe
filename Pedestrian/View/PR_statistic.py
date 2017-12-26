@@ -64,8 +64,8 @@ labelmap = caffe_pb2.LabelMap()
 text_format.Merge(str(file.read()), labelmap)
 
 model_def = '..\\480_deployD1add_noSqrt.prototxt' # 检测网络，有非极大值抑制过程
-model_weights = '..\\Data_480_320\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\' \
-                '480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_190000.caffemodel' # 训练好的模型
+model_weights = '..\\Data_480_320\\480_add_prior2_gamma2_D1_add15_P5N35D15E4_noSqrt_oldDate\\' \
+                '480_add_prior2_gamma2_D1_add15_P5N35D15E4_noSqrt_oldDate_iter_190000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
 imgList = "..\\Data_480_320\\val.txt" # 样本列表
 

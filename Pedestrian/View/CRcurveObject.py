@@ -70,7 +70,6 @@ def save_data(testList, resultList):
                 xmax = int(result_datas[5 * i + 5])
                 ymax = int(result_datas[5 * i + 6])
                 result_boxes.append([conf,[xmin, ymin, xmax, ymax]])
-
             for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
                 for boxT in true_boxes:
                     for area_i in range(0, len(area_thresholds), 1):  # 判断area区间段
@@ -90,6 +89,43 @@ def save_data(testList, resultList):
 
     scipy.io.savemat(CR_mat,{ 'all_change_group_Object': all_change_group})
 
+def save_height_data(testList, resultList):
+    CR_mat = resultList.strip() + '_Object_height.mat'
+    with open(testList) as fp1, open(resultList + '.txt') as fp2:  # 对于每个测试图片
+        for testFile, resultFile in zip(fp1, fp2):
+            # img_name = ROOTDIR + testFile.strip().split('.jpg ')[0]
+            xml_name = ROOTDIR + testFile.strip().split('.jpg ')[1]
+            true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
+
+            result_datas = resultFile.strip().split('\t')
+            result_boxes_total = int(result_datas[1])  # 匹配box数量
+            result_boxes = []
+            for i in range(0, result_boxes_total, 1): # 对每个result box
+                conf = float(result_datas[5 * i + 2])  # 分类置信度
+                xmin = int(result_datas[5 * i + 3])
+                ymin = int(result_datas[5 * i + 4])
+                xmax = int(result_datas[5 * i + 5])
+                ymax = int(result_datas[5 * i + 6])
+                result_boxes.append([conf,[xmin, ymin, xmax, ymax]])
+            for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
+                for boxT in true_boxes:
+                    for height_i in range(0, len(height_thresholds), 1):  # 判断area区间段
+                        height_ratio = float(boxT[3] - boxT[1]) / height
+                        if (height_ratio <= height_thresholds[height_i]):
+                            height_index = height_i
+                            break
+
+                    TP = 0  # 正检
+                    for result_box in result_boxes:
+                        if result_box[0] >= conf_thresholds[conf_i]:  # 属于该分类阈值下的检测结果
+                            if (computIOU(boxT, result_box[1]) >= 0.5):  # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
+                                TP += 1  # 正确检测
+                                break
+                    FN = 1 if TP == 0 else 0  # 漏检
+                    all_change_group[height_index][conf_i]['FN'] += FN
+                    all_change_group[height_index][conf_i]['TP'] += TP
+
+    scipy.io.savemat(CR_mat,{ 'all_change_group_Object_height': all_change_group})
 """
 @function:绘制PR曲线
 @param param1: 模型统计结果
@@ -127,24 +163,62 @@ def draw_curve(data_mat):
     plt.savefig(savename)
     plt.show()
 
+def draw_height_curve(data_mat):
+    plt.rcParams['figure.figsize'] = (9, 10)
+    plt.rcParams['image.interpolation'] = 'nearest'
+    plt.rcParams['image.cmap'] = 'gray'
+    data = scipy.io.loadmat(data_mat + '_Object_height.mat')
+    data = data['all_change_group_Object_height']
+    for area_i in range(0, len(height_thresholds), 1):  # 判断area区间段
+        recalls = []
+        for conf_i in range(0, len(conf_thresholds), 1):
+            TP = float(data[area_i][conf_i]['TP'])
+            FN = float(data[area_i][conf_i]['FN'])
+            if TP == 0:
+                recall = 0
+            else:
+                recall = TP / (TP + FN)
+            recalls.append(recall)
+        P = TP + FN
+        plt.plot(conf_thresholds, recalls, lw=2, color=colors[area_i],
+                     label=str(height_thresholds[area_i]) + '(' +  str(int(P)) + ')')  # 绘制每一条recall曲线
+        plt.plot(conf_thresholds, recalls, 'o', color=colors[area_i])
+    plt.legend(loc="lower left")
+    # 画对角线
+    plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
+    plt.xlabel('Confidence')
+    plt.ylabel('Recall')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 1.0])
+    plt.title('Confidence-Recall')
+    plt.grid()
+    savename = os.path.dirname(data_mat) + "\\CRcurveObject_height.png"
+    plt.savefig(savename)
+    plt.show()
 
 # colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Chartreuse','Gray', 'Chocolate']
 conf_thresholds = np.array([0.05, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/"
-all_change_group = []  # 初始化
 s_ids = np.arange(len(conf_thresholds))
 area_thresholds = np.array([0.0025, 0.005, 0.01, 0.015, 0.02, 0.04, 0.08, 0.1, 0.25, 1.0],dtype=np.float64) # area 区间
+height_thresholds = np.array([0.05, 0.1, 0.15, 0.2, 0.25, 0.5, 1.0],dtype=np.float64) # height 区间
+
 all_change_group =  [[] for x in range(len(area_thresholds))]  # 初始化
 for k in range(0, len(area_thresholds), 1):
     for j in range(0, len(conf_thresholds), 1):
         all_change_group[k].append({'TP': 0, 'FN': 0})
+all_change_group =  [[] for x in range(len(height_thresholds))]  # 初始化
+for k in range(0, len(height_thresholds), 1):
+    for j in range(0, len(conf_thresholds), 1):
+        all_change_group[k].append({'TP': 0, 'FN': 0})
+
 
 if __name__ == "__main__":
-    save_data("..\\Data_480_320\\val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              "..\\Data_480_320\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new\\"
-              "480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new++_iter_140000") # PR_statistic.py中输出的目标检测结果
+    save_height_data("..\\Data_480_320_new\\val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+              "..\\Data_480_320\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\"
+              "480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000") # PR_statistic.py中输出的目标检测结果
 
     # 绘制统计结果
-    draw_curve("..\\Data_480_320\\\\480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new\\"
-               "480_add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_new++_iter_140000")
+    draw_height_curve("..\\Data_480_320\\\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\"
+               "480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000")
