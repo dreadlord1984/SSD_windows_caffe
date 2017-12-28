@@ -102,6 +102,7 @@ CURRENT
 MANIFEST-*
 
 #Visual Studio files
+*.filters
 *.user
 *.suo
 *.sdf

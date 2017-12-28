@@ -83,7 +83,8 @@ def which_layer(index_list):
     return layer
 
 
-def save_data(imgList, model_def, model_weights, savename):
+def save_data(imgList, model_def, model_weights):
+    savename = model_weights.strip() + '_Layer.mat'
     net = caffe.Net(model_def,      # defines the structure of the model
                     model_weights,  # contains the trained weights
                     caffe.TEST)     # use test mode (e.g., don't perform dropout)
@@ -94,10 +95,6 @@ def save_data(imgList, model_def, model_weights, savename):
     transformer.set_mean('data', np.array([104,117,123])) # mean pixel
     transformer.set_raw_scale('data', 255)  # the reference model operates on images in [0,255] range instead of [0,1]
     transformer.set_channel_swap('data', (2,1,0))  # the reference model has channels in BGR order instead of RGB
-
-    # set net to batch size of 1
-    resize_width = 384
-    resize_height = 256
     net.blobs['data'].reshape(1,3,resize_height,resize_width)
 
     image_num = 0
@@ -120,11 +117,10 @@ def save_data(imgList, model_def, model_weights, savename):
         det_xmax = detections[0,0,:,5]
         det_ymax = detections[0,0,:,6]
 
-        plt.imshow(image)
-        currentAxis = plt.gca()
+        # plt.imshow(image)
+        # currentAxis = plt.gca()
 
         for conf_i in range(0, len(conf_thresholds), 1):  # 对于每个分类置信阈值
-            conf_i = 4
             # 1.Get detections with confidence higher than conf_threshold.
             top_indices = [i for i, conf in enumerate(det_conf) if conf >= conf_thresholds[conf_i]] #预测为正的所有default box
 
@@ -154,7 +150,7 @@ def save_data(imgList, model_def, model_weights, savename):
                         not_match += 1  # 未匹配次数
                 if not_match == len(true_boxes):  # 没有一个gt box能和result box匹配则为误检FP
                     allFPs[result_box[0]][conf_i]['FP'] += 1
-                    # display_txt = 'TP: %.2f' % (result_box[1])
+                    # display_txt = 'FP: %.2f' % (result_box[1])
                     # coords = (result_box[2][0], result_box[2][1]), \
                     #          result_box[2][2] - result_box[2][0] + 1, result_box[2][3] - result_box[2][1] + 1
                     # currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor='green', linewidth=2))
@@ -205,17 +201,18 @@ def save_data(imgList, model_def, model_weights, savename):
                     #                  bbox={'facecolor': 'blue', 'alpha': 0.5})
                 else:  # 有至少一个gt box能和result box匹配则为漏检FN
                     allFPs[result_box[0]][conf_i]['FN'] += 1
-                    display_txt = 'FN: %.2f' % (result_box[1])
-                    coords = (result_box[2][0], result_box[2][1]), \
-                             result_box[2][2] - result_box[2][0] + 1, result_box[2][3] - result_box[2][1] + 1
-                    currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor='red', linewidth=2))
-                    currentAxis.text(result_box[2][0], result_box[2][1], display_txt, bbox={'facecolor': 'red', 'alpha': 0.5})
-            plt.show()
+                    # display_txt = 'FN: %.2f' % (result_box[1])
+                    # coords = (result_box[2][0], result_box[2][1]), \
+                    #          result_box[2][2] - result_box[2][0] + 1, result_box[2][3] - result_box[2][1] + 1
+                    # currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor='red', linewidth=2))
+                    # currentAxis.text(result_box[2][0], result_box[2][1], display_txt, bbox={'facecolor': 'red', 'alpha': 0.5})
+            # plt.show()
         if image_num % 1000 == 0:
             print( '** ** ** ** ** ** process %d images ** ** ** ** ** ** ** ' % image_num)
     scipy.io.savemat(savename,{ 'allFPs': allFPs})
 
 def draw_curve(data_name, image_num):
+    data_name = data_name.strip() + '_Layer.mat'
     data = scipy.io.loadmat(data_name)
     allFPs = data['allFPs']
     s_ids = np.arange(len(conf_thresholds))
@@ -224,7 +221,7 @@ def draw_curve(data_name, image_num):
     fig, axes = plt.subplots(nrows=2, ncols= 3, figsize=(36, 12))
     for k in range(0, len(layer_priorbox_num), 1):
         for conf_i in range(0, len(conf_thresholds), 1):
-            FPr[k].append(float(allFPs[k][conf_i]['FP'])*100/(float(allFPs[k][conf_i]['FP'])+float(allFPs[k][conf_i]['TN'])))
+            FPr[k].append(float(allFPs[k][conf_i]['FP'])*100/(layer_priorbox_num[k] * image_num))
         ppl.bar(axes[k/3][k%3],s_ids, FPr[k],
                     annotate=True,width = 0.4,
                     grid='y', xticklabels=labels,
@@ -243,8 +240,7 @@ def draw_curve(data_name, image_num):
             if allFPs[k][conf_i]['TN'] == 0:
                 FNr[k].append(0)
             else:
-                FNr[k].append(float(allFPs[k][conf_i]['FN']) * 100
-                                   /float(allFPs[k][conf_i]['TP']  + allFPs[k][conf_i]['FN']))
+                FNr[k].append(float(allFPs[k][conf_i]['FN']) * 100/(layer_priorbox_num[k] * image_num))
         ppl.bar(axes[k/3][k%3],s_ids, FNr[k],
                     annotate=True,width = 0.4,
                     grid='y', xticklabels=labels,
@@ -258,16 +254,19 @@ def draw_curve(data_name, image_num):
     plt.show()
 
 # load PASCAL VOC labels
-labelmap_file = 'labelmap_VehicleFull.prototxt'
+labelmap_file = '../labelmap_VehicleFull.prototxt'
 file = open(labelmap_file, 'r')
 labelmap = caffe_pb2.LabelMap()
 text_format.Merge(str(file.read()), labelmap)
 # load model
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 待测试样本集所在根目录
+resize_width = 384
+resize_height = 256
 
 # configure
 colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Chartreuse']
-layer_priorbox_num = np.array([9216, 2304, 576, 144, 36, 6],dtype=np.int32) # layer层priorbox 数
+layer_priorbox_num = np.array([15360, 1920, 480, 120, 30, 5],dtype=np.int32) # layer层priorbox 数
+# layer_priorbox_num = np.array([9216, 2304, 576, 144, 36, 6],dtype=np.int32) # layer层priorbox 数
 conf_thresholds = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 allFPs =  [[] for x in range(len(layer_priorbox_num))]  # 误检初始化
 for k in range(0, len(layer_priorbox_num), 1):
@@ -275,12 +274,10 @@ for k in range(0, len(layer_priorbox_num), 1):
         allFPs[k].append({'TP': 0, 'TN':0, 'FP':0, 'FN':0}) # 正检、负检、误检、漏检
 
 if __name__ == "__main__":
-    # save_data("../Data_0825/val.txt", # 样本列表
-    #           '../CHECK/deploy2.prototxt',  # 检测网络,使用CHECK文件夹下的，不使用NMS和keep_top_k
-    #           'COMPARE\NONE_A75G20_S_D\NONE_A75G20_S_D_iter_200000.caffemodel', # 模型
-    #           'COMPARE\NONE_A75G20_S_D_fix\layers.mat') # 待输出的统计结果，即不同conf阈值下的TP、FP
+    save_data("../Data_0922/val.txt", # 样本列表
+              '../deployD1add_noSqrt.prototxt',  # 检测网络,使用CHECK文件夹下的，不使用NMS和keep_top_k
+              'COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt_iter_290000.caffemodel') # 模型
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("COMPARE\NONE_A75G20_S_D\layers.mat", 6300)
-
-    #  'COMPARE\NONE_A75G20_S_D_fix\NONE_A75G20_S_D_fix_iter_150000.caffemodel', # 模型
+    # draw_curve("COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt_iter_290000", 2)
+    # draw_curve("COMPARE\\NONE_A75G20_S_D\\", 6300)

@@ -194,7 +194,7 @@ s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    save_data("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt",
-              "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\result_ALL_image_List.txt",
-              "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")
-    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")
+    # save_data("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt",
+    #           "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\result_ALL_image_List.txt",
+    #           "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")
+    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")

@@ -1,8 +1,8 @@
 pause
-..\..\Build\x64\Release\classification.exe ^
- D:/caffe-master_/models/MobileNet/deploy.prototxt ^
- D:/caffe-master_/models/MobileNet/mobilenet.caffemodel ^
- D:/caffe-master_/data/ilsvrc12/imagenet_mean.binaryproto  ^
- D:/caffe-master_/data/ilsvrc12/synset_words.txt ^
- D:/caffe-master_/examples/images/cat.jpg
+..\\..\\Build\\x64\\Release\\classification.exe ^
+../../models/MobileNet/mobilenet_deploy.prototxt ^
+../../models/MobileNet/mobilenet.caffemodel ^
+../../data/ilsvrc12/imagenet_mean.binaryproto  ^
+../../data/ilsvrc12/synset_words.txt ^
+../../examples/images/cat.jpg
 pause

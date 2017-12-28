@@ -231,6 +231,7 @@ void Detector::Preprocess(const cv::Mat& img,
 
 	cv::Mat sample_normalized;
 	cv::subtract(sample_float, mean_, sample_normalized);
+	/*sample_normalized = sample_float * 0.007843;*/
 
 	/* This operation will write the separate BGR planes directly to the
 	* input layer of the network because it is wrapped by the cv::Mat
@@ -244,7 +245,7 @@ void Detector::Preprocess(const cv::Mat& img,
 
 DEFINE_string(mean_file, "",
 	"The mean file used to subtract from the input image.");
-DEFINE_string(mean_value, "104,117,123",
+DEFINE_string(mean_value, "127.5,127.5,127.5",
 	"If specified, can be one value or can be same as image channels"
 	" - would subtract from the corresponding channel). Separated by ','."
 	"Either mean_file or mean_value should be provided, not both.");
@@ -310,7 +311,7 @@ int main(int argc, char** argv) {
 	std::ifstream infile(argv[3]);
 	std::string file, xmlfile;
 	std::string imagefile;;
-	string root = "\\\\192.168.1.186\\PedestrianData\\";
+	string root = "D:/Other_Dataets/Pedestrian/";
 	string djStrLine;
 	while (infile) {
 		if (getline(infile, djStrLine))

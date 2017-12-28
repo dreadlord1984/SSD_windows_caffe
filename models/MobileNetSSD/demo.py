@@ -1,8 +1,7 @@
 import numpy as np  
 import sys,os  
 import cv2
-caffe_root = '/home/yaochuanqi/ssd/caffe/'
-sys.path.insert(0, caffe_root + 'python')  
+
 import caffe  
 
 
@@ -64,6 +63,7 @@ def detect(imgfile):
     if k == 27 : return False
     return True
 
+#cv2.namedWindow("SSD", 0)
 for f in os.listdir(test_dir):
     if detect(test_dir + "/" + f) == False:
        break
