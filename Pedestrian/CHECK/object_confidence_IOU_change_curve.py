@@ -78,10 +78,10 @@ def save_data(priorList, resultList, data_mat):
                 gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
                 IOU = float(prior_datas[7 * i + 4])
                 prior_IOU.append([gt_box_index, IOU])
-                conf = float(result_datas[6 * i + 2])  # 分类置信度
+                conf = float(result_datas[6 * i + 3])  # 分类置信度
                 prior_conf.append([gt_box_index, conf])
-                result_box_coordinates = [float(result_datas[6 * i + 3]) * width, float(result_datas[6 * i + 4]) * height,
-                                          float(result_datas[6 * i + 5]) * width, float(result_datas[6 * i + 6]) * height]
+                result_box_coordinates = [float(result_datas[6 * i + 4]) * width, float(result_datas[6 * i + 5]) * height,
+                                          float(result_datas[6 * i + 6]) * width, float(result_datas[6 * i + 7]) * height]
                 result_IOU.append([gt_box_index, computIOU(true_boxes[gt_box_index], result_box_coordinates)])
 
             # 3.按照area和匹配IOU统计划分

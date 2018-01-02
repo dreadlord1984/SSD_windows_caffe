@@ -108,7 +108,7 @@ def draw_curve(*curves):
         Ps = []
         recalls = []
         precisions = []
-        data_name = os.path.basename(curve_name)[:-12]# 图例名称
+        data_name = curve_name.split('\\')[-2]# 图例名称
         for conf_i in range(0, len(conf_thresholds), 1):
             TP = float(data[conf_i]['TP'])
             FP = float(data[conf_i]['FP'])
@@ -159,14 +159,15 @@ s_ids = np.arange(len(conf_thresholds))
 
 
 if __name__ == "__main__":
-    save_data("..\\Data_480_320_new\\val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
-              '..\\Data_480_320\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\' \
-              '480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000') # PR_statistic.py中输出的目标检测结果
+    # save_data("..\\Data_480_320_new\\val.txt", # 样本列表，注意这里的样本列表要与PR_statistic.py中样本列表相同！
+    #           '..\\Data_480_320\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\' \
+    #           '480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000') # PR_statistic.py中输出的目标检测结果
 
     # 曲线数量+各个曲线对应的统计结果文件
     draw_curve(
+            # "COMPARE\\publish1\\result",
             "COMPARE2\\gamma2_D_new\\gamma2_D_new_iter_200000",
-            "COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000",
-            "COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_290000",
-            "..\\Data_480_320\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000",
+            # "COMPARE2\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt\\add_prior_gamma2_D1_new_P5N35D15E4_noSqrt_iter_200000",
+            "COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt_iter_290000",
+            # "..\\Data_480_320\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45\\480_add_prior2_gamma2_D1_add19_48_NEW_P5N35D15E45_iter_200000",
             )

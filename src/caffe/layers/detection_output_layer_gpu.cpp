@@ -70,7 +70,8 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         cur_bbox_data += c * num_priors_ * 4;
       }
 
-#ifdef BOX_LIST
+#ifdef MATCH_BOX_LIST
+		// 统计匹配成功的prior box的分类和回归情况
 	  indices[c].clear();
 	  if (_access("temp.txt", 0) != -1) // 如果临时文件存在读取转存！
 	  {
@@ -99,7 +100,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
 			  confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
 		  num_det += indices[c].size(); // nms后剩下检测框
 	  }
-#endif // BOX_LIST
+#endif // MATCH_BOX_LIST
 
     }
     if (keep_top_k_ > -1 && num_det > keep_top_k_) {
@@ -179,11 +180,12 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       if (!share_location_) {
         cur_bbox_data += label * num_priors_ * 4;
       }
-#ifdef BOX_LIST
+#ifdef RESULT_BOX_LIST
 	  /********************************************************************/
 	  ofstream  outfile("result.txt", ios::out | ios::app);
+		outfile << "\t" << indices.size();
 	  /********************************************************************/
-#endif // BOX_LIST
+#endif // RESULT_BOX_LIST
       for (int j = 0; j < indices.size(); ++j) {
         int idx = indices[j];
         top_data[count * 7] = i;
@@ -192,24 +194,22 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         for (int k = 0; k < 4; ++k) {
           top_data[count * 7 + 3 + k] = cur_bbox_data[idx * 4 + k];
         }
-#ifdef BOX_LIST
-		/********************************************************************/
-		NormalizedBBox bbox;
-		bbox.set_xmin(top_data[count * 7 + 3]);
-		bbox.set_ymin(top_data[count * 7 + 4]);
-		bbox.set_xmax(top_data[count * 7 + 5]);
-		bbox.set_ymax(top_data[count * 7 + 6]);
-		float score = top_data[count * 7 + 2];
-		float xmin = bbox.xmin();
-		float ymin = bbox.ymin();
-		float xmax = bbox.xmax();
-		float ymax = bbox.ymax();
-		outfile << "\t" << idx << "\t" << score << "\t"
-			<< xmin << "\t" << ymin << "\t" << xmax << "\t" << ymax;
-		/********************************************************************/
-#endif // BOX_LIST
-
-
+#ifdef RESULT_BOX_LIST
+				/********************************************************************/
+				NormalizedBBox bbox;
+				bbox.set_xmin(top_data[count * 7 + 3]);
+				bbox.set_ymin(top_data[count * 7 + 4]);
+				bbox.set_xmax(top_data[count * 7 + 5]);
+				bbox.set_ymax(top_data[count * 7 + 6]);
+				float score = top_data[count * 7 + 2];
+				float xmin = bbox.xmin();
+				float ymin = bbox.ymin();
+				float xmax = bbox.xmax();
+				float ymax = bbox.ymax();
+				outfile << "\t" << idx << "\t" << score << "\t"
+					<< xmin << "\t" << ymin << "\t" << xmax << "\t" << ymax;
+				/********************************************************************/
+#endif // RESULT_BOX_LIST
         if (need_save_) {
           // Generate output bbox.
           NormalizedBBox bbox;
@@ -250,12 +250,12 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
         }
         ++count;
       }
-#ifdef BOX_LIST
-	  /********************************************************************/
-	  outfile << endl;
-	  outfile.close();
-	  /********************************************************************/
-#endif // BOX_LIST
+#ifdef RESULT_BOX_LIST
+			/********************************************************************/
+			outfile << endl;
+			outfile.close();
+			/********************************************************************/
+#endif // RESULT_BOX_LIST
     }
     if (need_save_) {
       ++name_count_;
@@ -345,7 +345,7 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       }
     }
   }
-  if (visualize_) {
+	if (visualize_) {
 #ifdef USE_OPENCV
     vector<cv::Mat> cv_imgs;
     this->data_transformer_->TransformInv(bottom[3], &cv_imgs);

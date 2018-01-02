@@ -184,8 +184,7 @@ colors = ['Blue', 'Red',  'MediumAquamarine', 'HotPink', 'Chartreuse','Gray', 'C
 if __name__ == "__main__":
     # statistic(os.path.join(SRCDIR, "IOU_ALL_VAL_image_list.txt"),"VAL_Anchor_Group")
     draw_curve(
-        # os.path.join(SRCDIR, "VAL_Anchor_Group.mat"),
-        # os.path.join(SRCDIR, "VAL_Anchor_Group.mat"),
+        os.path.join(SRCDIR, "VAL_Anchor_Group.mat"),
         # os.path.join(SRCDIR, "Anchor_Group_NEW.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.25_0.33_0.5_0.75_ALL.mat"),
@@ -196,8 +195,9 @@ if __name__ == "__main__":
         # os.path.join(SRCDIR, "Anchor_Group_NEW_0.2_0.25_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "Anchor_Group_NEW_48.mat"),
         # os.path.join(SRCDIR, "Anchor_Group_NEW_48_IOU45.mat"),
+        # os.path.join(SRCDIR, "Anchor_Group.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_0.25_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_15.mat"),
-        # os.path.join(SRCDIR, "VAL_Anchor_Group_15_35.mat"),
-        os.path.join(SRCDIR, "VAL_Anchor_Group_18_35.mat"),
+        os.path.join(SRCDIR, "VAL_Anchor_Group_15_35.mat"),
+        # os.path.join(SRCDIR, "VAL_Anchor_Group_18_35.mat"),
                )

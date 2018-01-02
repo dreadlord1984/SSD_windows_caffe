@@ -74,23 +74,23 @@ def copyList(IOUList, imageList, outList):
         # 因为一个样本中有多个匹配数据，我们要将属于同一个样本的匹配数据按顺序放入dataALL
         if imageTmp!=theline[0] : # 如果前后两次样本不相同
             totalNum = 1
-            dataALL.append([theline[0], theline[1], str(totalNum), datas[2], datas[1], datas[3], datas[4], datas[5], datas[6], datas[9]])
+            dataALL.append([theline[0], str(totalNum), datas[2], datas[1], datas[3], datas[4], datas[5], datas[6], datas[9]])
             totalNum = 0
             imageTmp = theline[0]
         else:                    # 如果前后两次样本相同
-            dataALL[-1][2] = str(int(dataALL[-1][2])+1)
+            dataALL[-1][1] = str(int(dataALL[-1][1])+1)
             dataALL[-1] = dataALL[-1] + [datas[2], datas[1], datas[3], datas[4], datas[5], datas[6], datas[9]]
             imageTmp = theline[0]
         # else:
         #     continue
     fout = file(outList, "w+")
     for newData in dataALL:
-        fout.write((newData[0] + '\t' + newData[1] + '\t' + newData[2]))
-        for i in range(0,int(newData[2]),1):
+        fout.write((newData[0]  + '\t' + newData[1]))
+        for i in range(0,int(newData[1]),1):
             fout.write('\t')
-            fout.write((newData[7*i + 3] + '\t' + newData[7*i + 4] + '\t' + newData[7*i + 5] + '\t'
-                        + newData[7 * i + 6] + '\t' + newData[7 * i + 7]  + '\t' + newData[7 * i + 8]
-                        + '\t' + newData[7 * i + 9] ))
+            fout.write((newData[7*i + 2] + '\t' + newData[7*i + 3] + '\t' + newData[7*i + 4] + '\t'
+                        + newData[7 * i + 5] + '\t' + newData[7 * i + 6]  + '\t' + newData[7 * i + 7]
+                        + '\t' + newData[7 * i + 8] ))
         fout.write('\n')
     fout.close()
 
@@ -107,7 +107,7 @@ def showList(IOU_all_List):
         currentAxis = plt.gca()
         # width = img.shape[1]
         # height = img.shape[0]
-        full_xml_path = ROOTDIR + data[1]
+        full_xml_path = ROOTDIR + data[0].replace('jpg','xml').replace('JPEGImages','Annotations')
         true_boxes,width,height = readXML(full_xml_path)
         print full_xml_path.decode("gb2312")
 
@@ -115,17 +115,17 @@ def showList(IOU_all_List):
             currentAxis.add_patch(plt.Rectangle((boxT[0], boxT[1]), boxT[2] - boxT[0], boxT[3] - boxT[1],
                                                 fill=False, edgecolor=colors[5], linewidth=2))
         # 排序
-        boxes_total = int(data[2])
+        boxes_total = int(data[1])
         gt_boxes_set = set()
         for i in range(0, boxes_total, 1):
-            gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+            gt_box_index = int(data[7 * i + 8])  # 当前匹配的gt box序号（从0开始）
             gt_boxes_set.add(gt_box_index)
 
         group_prior_box = [[] for x in gt_boxes_set]
         for i in range(0, boxes_total, 1):
-            gt_box_index = int(data[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
-            databox = [float(data[7*i + 4]), float(data[7 * i + 5]) * width, float(data[7 * i + 6]) * height, float(data[7 * i + 7]) * width,
-                       float(data[7 * i + 8]) * height]
+            gt_box_index = int(data[7 * i + 8])  # 当前匹配的gt box序号（从0开始）
+            databox = [float(data[7*i + 3]), float(data[7 * i + 4]) * width, float(data[7 * i + 5]) * height, float(data[7 * i + 6]) * width,
+                       float(data[7 * i + 7]) * height]
             k = 0
             for gt_index in gt_boxes_set:
                 if (gt_index == gt_box_index):
@@ -159,23 +159,23 @@ def statistic(IOU_all_List, tag):
         for line in f:
             prior_datas = line.strip().split('\t')
             # print prior_datas[0].decode("gbk")
-            prior_boxes_total = int(prior_datas[2])
-            full_xml_path = ROOTDIR + prior_datas[1]
+            prior_boxes_total = int(prior_datas[1])
+            full_xml_path = ROOTDIR + prior_datas[0].replace('jpg','xml').replace('JPEGImages','Annotations')
             true_boxes, width, height = readXML(full_xml_path)
 
             gt_boxes_set = set()
             for i in range(0, prior_boxes_total, 1):
-                gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
+                gt_box_index = int(prior_datas[7 * i + 8])  # 当前匹配的gt box序号（从0开始）
                 gt_boxes_set.add(gt_box_index)
 
             # 1.按照iou排序prior box，随后按照最大匹配iou统计gt box分布
             if tag == 'small':
                 group_prior_box = [[] for x in gt_boxes_set]
                 for i in range(0, prior_boxes_total, 1):
-                    gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
-                    databox = [float(prior_datas[7 * i + 4]), int(prior_datas[7 * i + 3]),
-                               float(prior_datas[7 * i + 5]) * width, float(prior_datas[7 * i + 6]) * height, float(prior_datas[7 * i + 7]) * width,
-                           float(prior_datas[7 * i + 8]) * height]
+                    gt_box_index = int(prior_datas[7 * i + 8])  # 当前匹配的gt box序号（从0开始）
+                    databox = [float(prior_datas[7 * i + 3]), int(prior_datas[7 * i + 2]),
+                               float(prior_datas[7 * i + 4]) * width, float(prior_datas[7 * i + 5]) * height, float(prior_datas[7 * i + 6]) * width,
+                           float(prior_datas[7 * i + 7]) * height]
                     k = 0
                     for gt_index in gt_boxes_set:
                         if (gt_index == gt_box_index):
@@ -198,7 +198,7 @@ def statistic(IOU_all_List, tag):
                 for gt_index in gt_boxes_set:
                     gt_group[gt_index] = 0
                 for i in range(0, prior_boxes_total, 1):
-                    gt_box_index = int(prior_datas[7 * i + 9]) # 当前匹配的gt box序号（从0开始）
+                    gt_box_index = int(prior_datas[7 * i + 8]) # 当前匹配的gt box序号（从0开始）
                     gt_group[gt_box_index] += 1
 
                 for gt_index in gt_boxes_set:
@@ -310,8 +310,8 @@ layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
 chose_layer = 0
 
 if __name__ == "__main__":
-    copyList("..\\Data_0922\matching_static\\IOU_ALL_VAL_15_35.txt",
+    copyList("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL.txt",
     "..\\Data_0922\\val_lmdb_list.txt",
-    "..\\Data_0922\\matching_static\\IOU_ALL_VAL_15_35_image_list.txt")
-    showList("..\\Data_0922\\matching_static\\IOU_ALL_VAL_15_35_image_list.txt")
-    # statistic("..\\Data_480_320\\19,32_64_118_172_227_281\\IOU_ALL_image_list.txt", 'small')
+    "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt")
+    showList("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt")
+    # statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt", 'small')

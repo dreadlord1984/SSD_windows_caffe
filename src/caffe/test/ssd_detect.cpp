@@ -297,7 +297,7 @@ int main(int argc, char** argv) {
 	}
 	std::ostream out(buf);
 
-#ifdef BOX_LIST
+#ifdef RESULT_BOX_LIST
 	/********************************************************************/
 	if (_access("result.txt", 0) != -1){ // 如果临时文件存在读取转存！
 		remove("result.txt");
@@ -305,7 +305,7 @@ int main(int argc, char** argv) {
 	/********************************************************************/
 #else
 	cv::namedWindow("result");
-#endif // BOX_LIST
+#endif // RESULT_BOX_LIST
 
 	// Process image one by one.
 	std::ifstream infile(argv[3]);
@@ -318,11 +318,11 @@ int main(int argc, char** argv) {
 		{
 			int dwPos = djStrLine.rfind(".jpg");
 			file = djStrLine.substr(0, dwPos + 4);
-			int dwEnd = djStrLine.rfind(".xml");
-			xmlfile = djStrLine.substr(dwPos + 5, (dwEnd + dwPos - 1));
-			std::istringstream iss(djStrLine.substr(dwEnd + 4));
+			/*int dwEnd = djStrLine.rfind(".xml");
+			xmlfile = djStrLine.substr(dwPos + 5, (dwEnd + dwPos - 1));*/
+			std::istringstream iss(djStrLine.substr(dwPos + 4));//dwEnd
 
-#ifdef BOX_LIST
+#ifdef MATCH_BOX_LIST
 			if (_access("temp.txt", 0) != -1)
 				remove("temp.txt");
 			std::ofstream  tmpfile("temp.txt", ios::out);
@@ -335,7 +335,7 @@ int main(int argc, char** argv) {
 				tmpfile << index << "\n";
 			}
 			tmpfile.close();
-#endif // BOX_LIST
+#endif // MATCH_BOX_LIST
 
 		}
 		else
@@ -350,7 +350,7 @@ int main(int argc, char** argv) {
 			cv::Mat img = cv::imread(file, -1);
 			CHECK(!img.empty()) << "Unable to decode image " << file;
 	
-#ifdef BOX_LIST
+#ifdef RESULT_BOX_LIST
 			/* Print the detection results. */
 			// <img_name> <<prior_box1_index> <prior_box1_coordinates> ...>
 			/********************************************************************/
@@ -393,7 +393,7 @@ int main(int argc, char** argv) {
 			}
 			cv::imshow("result", img);
 			cv::waitKey(0);
-#endif // BOX_LIST
+#endif // RESULT_BOX_LIST
 		}
 		else if (file_type == "video") {
 			cv::VideoCapture cap(file);
