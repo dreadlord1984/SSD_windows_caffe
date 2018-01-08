@@ -172,7 +172,7 @@ def draw_curve(*curves):
 
 ###################################################################################################
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 样本根目录
-SRCDIR = u'E:\\caffe-master_\\Pedestrian\\Data_0922\\FocalLoss_NONE_D1_noSqrt'.encode('gbk')
+SRCDIR = u'E:\\caffe-master_\\Pedestrian\\Data_0922\\gamma2_D1_noSqrt_addM_P5N35D15'.encode('gbk')
 image_train_height = 256
 image_train_width = 384
 move_small_to_check = False
@@ -189,11 +189,11 @@ no_match_gt_height_group  = np.zeros(gt_heights.size,dtype=np.int32)
 colors = ['Blue', 'Red',  'MediumAquamarine', 'HotPink', 'Chartreuse','Gray', 'Chocolate']
 
 if __name__ == "__main__":
-    statistic(os.path.join(SRCDIR, "IOU_ALL_image_list.txt"),"Anchor_Group_noSqrt")
+    # statistic(os.path.join(SRCDIR, "IOU_ALL_image_list.txt"),"Anchor_Group_noSqrt_addM_P5N35D15")
     draw_curve(
-        os.path.join(SRCDIR, "Anchor_Group.mat"),
+        # os.path.join(SRCDIR, "Anchor_Group.mat"),
         os.path.join(SRCDIR, "Anchor_Group_noSqrt.mat"),
-        # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW.mat"),
+        os.path.join(SRCDIR, "Anchor_Group_noSqrt_addM_P5N35D15.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.25_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.2_0.33_0.5_0.75_ALL.mat"),
         # os.path.join(SRCDIR, "VAL_Anchor_Group_NEW_0.2_0.25_0.33_0.5_0.75_ALL.mat"),

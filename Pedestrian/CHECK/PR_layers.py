@@ -225,7 +225,7 @@ def draw_curve(data_name, image_num):
     plt.legend(loc="lower left")
     plt.grid(True, linestyle = "--", color=(0.6, 0.6, 0.6))
     plt.plot([0, 1], [0, 1], '--', color=(0.6, 0.6, 0.6), label='Luck')
-    savename1 = data_name.replace('mat','png')
+    savename1 = data_name.replace('mat','jpg')
     plt.savefig(savename1)
     plt.show()
 
@@ -235,7 +235,8 @@ resize_width = 384
 resize_height = 256
 ## 注意！这里layer_priorbox_num，不同的网络可能不同！
 # layer_priorbox_num = np.array([15360, 1920, 480, 120, 30, 5],dtype=np.int32) # layer层priorbox 数
-layer_priorbox_num = np.array([9216, 2304, 576, 144, 36, 6],dtype=np.int32) # layer层priorbox 数
+# layer_priorbox_num = np.array([9216, 2304, 576, 144, 36, 6],dtype=np.int32) # layer层priorbox 数
+layer_priorbox_num = np.array([7680, 1920, 480, 120, 30, 5],dtype=np.int32) # layer层priorbox 数
 ##################################################################################
 conf_thresholds = np.array([0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95], dtype=np.float64)
 all_gt_group = np.zeros(layer_priorbox_num.size,dtype=np.float)
@@ -247,13 +248,13 @@ colors = ['Black', 'Blue', 'Cyan', 'Pink', 'Red', 'Purple', 'Gold', 'Chartreuse'
 
 
 if __name__ == "__main__":
-    # save_data(
-    #     "..\\Data_0922\\FocalLoss_NONE_D", # 文件夹
-    #     "RESULT_VAL_image_list.txt", # 验证集检测结果列表
-    #     "IOU_ALL_VAL_image_List.txt", # 验证集匹配结果列表
-    #     view = False
-    #           )
+    save_data(
+        "..\\Data_0922\\FocalLoss_NONE_D1_noSqrt", # 文件夹
+        "RESULT_VAL_image_list.txt", # 验证集检测结果列表
+        "IOU_ALL_VAL_image_List.txt", # 验证集匹配结果列表
+        view = False
+              )
 
     # 曲线数量+各个曲线对应的统计结果文件
-    draw_curve("..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\RESULT_VAL_image_list", 8765)
-    # # draw_curve("COMPARE\\NONE_A75G20_S_D\\", 6300)
+    draw_curve("..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\RESULT_VAL_image_list", 8765)
+    # draw_curve("..\\Data_0922\\FocalLoss_NONE_D\\RESULT_VAL_image_list", 8765)

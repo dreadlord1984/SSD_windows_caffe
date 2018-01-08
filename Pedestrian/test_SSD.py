@@ -65,10 +65,10 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'Data_0922\\FocalLoss_NONE_D\\deployD.prototxt'
+model_def = 'Data_0922\\FocalLoss_NONE_D1_noSqrt\\deployD1_noSqrt.prototxt'
 model_weights = \
-    'Data_0922\\FocalLoss\\' \
-    'alpha75_gamma2_D_new_iter_200000.caffemodel' # 训练好的模型
+    'Data_0922\\FocalLoss_NONE_D1_noSqrt\\' \
+    'gamma2_D1_noSqrt_iter_200000.caffemodel' # 训练好的模型
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
 imgList = "Data_0922\\val.txt"
 

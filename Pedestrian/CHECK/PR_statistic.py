@@ -64,8 +64,8 @@ labelmap = caffe_pb2.LabelMap()
 text_format.Merge(str(file.read()), labelmap)
 
 ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
-model_def = '..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\deploy.prototxt' # 检测网络，有非极大值抑制过程
-model_weights = '..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\SOFTMAX_MAX_NEGATIVE_iter_190000.caffemodel' # 训练好的模型
+model_def = '..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\deployD1_noSqrt.prototxt' # 检测网络，有非极大值抑制过程
+model_weights = '..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\gamma2_D1_noSqrt_iter_200000.caffemodel' # 训练好的模型
 imgList = "..\\Data_0922\\val.txt" # 待测试样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model

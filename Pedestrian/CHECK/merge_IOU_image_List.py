@@ -310,8 +310,8 @@ layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
 chose_layer = 0
 
 if __name__ == "__main__":
-    copyList("..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL.txt",# 匹配列表
-    "..\\Data_0922\\val_lmdb_list.txt", # 样本列表
-    "..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL_image_list.txt") # 输出合并列表
-    showList("..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL_image_list.txt") # 显示匹配结果
+    copyList("..\\Data_0922\\gamma2_D1_noSqrt_addM_P5N35D15\\IOU_ALL.txt",# 匹配列表
+    "..\\Data_0922\\train_lmdb_list.txt", # 样本列表
+    "..\\Data_0922\\gamma2_D1_noSqrt_addM_P5N35D15\\IOU_ALL_image_list.txt") # 输出合并列表
+    showList("..\\Data_0922\\gamma2_D1_noSqrt_addM_P5N35D15\\IOU_ALL_image_list.txt") # 显示匹配结果
     # statistic("..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\IOU_ALL_image_list.txt", 'bigger') # 统计gt分布
