@@ -140,9 +140,8 @@ namespace caffe {
 	void MatchBBox(const vector<NormalizedBBox>& gt,
 		const vector<NormalizedBBox>& pred_bboxes, const int label,
 		const MatchType match_type, const float overlap_threshold,
-		const float ignore_overlap, const float addition_overlap,
 		const bool ignore_cross_boundary_bbox,
-		vector<int>* match_indices, vector<float>* match_overlaps, const int& index);
+		vector<int>* match_indices, vector<float>* match_overlaps);
 
 	// Find matches between prediction bboxes and ground truth bboxes.
 	//    all_loc_preds: stores the location prediction, where each item contains
@@ -510,6 +509,18 @@ namespace caffe {
 		vector<vector<float> >* all_conf_loss,
 		const float fl_alpha, const float fl_gamma, const float fl_beta);
 	/*****************************************************************************/
+
+	/***********************************************************************
+	* function: 获取 confrence
+	***********************************************************************/
+	template <typename Dtype>
+	void GetConfPredictionsGPU(const Blob<Dtype>& conf_blob, const int num,
+		const int num_preds_per_class, const int num_classes,
+		const int background_label_id, const int loss_type,
+		const vector<map<int, vector<int> > >& all_match_indices,
+		const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+		vector<vector<Dtype> >* all_conf_preds);
+
 #endif  // !CPU_ONLY
 
 #ifdef USE_OPENCV
@@ -521,6 +532,17 @@ namespace caffe {
 		const map<int, string>& label_to_display_name,
 		const string& save_file);
 #endif  // USE_OPENCV
+
+	/***********************************************************************
+	* function: 获取 confrence
+	***********************************************************************/
+	template <typename Dtype>
+	void GetConfPredictions(const Dtype* conf_data, const int num,
+		const int num_preds_per_class, const int num_classes,
+		const int background_label_id, const int loss_type,
+		const vector<map<int, vector<int> > >& all_match_indices,
+		const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
+		vector<vector<Dtype> >* all_conf_preds);
 
 }  // namespace caffe
 
