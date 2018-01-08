@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 import numpy as np
-import matplotlib.pyplot as plt
 import xml.etree.cElementTree as et
-
-plt.rcParams['figure.figsize'] = (10, 10)
-plt.rcParams['image.interpolation'] = 'nearest'
-plt.rcParams['image.cmap'] = 'gray'
-
+import os
 
 import caffe
 caffe.set_device(0)
@@ -14,12 +12,6 @@ caffe.set_mode_gpu()
 
 from google.protobuf import text_format
 from caffe.proto import caffe_pb2
-
-# load PASCAL VOC labels
-labelmap_file = 'labelmap_VehicleFull.prototxt'
-file = open(labelmap_file, 'r')
-labelmap = caffe_pb2.LabelMap()
-text_format.Merge(str(file.read()), labelmap)
 
 def get_labelname(labelmap, labels):
     num_labels = len(labelmap.item)
@@ -65,15 +57,19 @@ def computIOU(A, B):
     iou = float(cross) / (SA + SB - cross)
     return iou
 
-model_def = 'Data_0922\\FocalLoss_NONE_D\\deployD.prototxt'
-model_weights = \
-    'Data_0922\\FocalLoss\\' \
-    'alpha75_gamma2_D_new_iter_200000.caffemodel' # 训练好的模型
-ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" #服务器路径
-imgList = "Data_0922\\val.txt"
+# load PASCAL VOC labels
+labelmap_file = '../labelmap_VehicleFull.prototxt'
+file = open(labelmap_file, 'r')
+labelmap = caffe_pb2.LabelMap()
+text_format.Merge(str(file.read()), labelmap)
+
+ROOTDIR = "\\\\192.168.1.186\\PedestrianData\\" # 待测试样本集所在根目录
+model_def = '..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\deploy.prototxt' # 检测网络，有非极大值抑制过程
+model_weights = '..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\SOFTMAX_MAX_NEGATIVE_iter_190000.caffemodel' # 训练好的模型
+imgList = "..\\Data_0922\\val.txt" # 待测试样本列表
 
 net = caffe.Net(model_def,      # defines the structure of the model
-                model_weights,  # contains the trained weights4
+                model_weights,  # contains the trained weights
                 caffe.TEST)     # use test mode (e.g., don't perform dropout)
 
 # input preprocessing: 'data' is the name of the input blob == net.inputs[0]
@@ -92,17 +88,21 @@ TPs = 0 # 正检
 FPs = 0 # 误检
 FNs = 0 # 漏检
 
+result_file = model_weights.strip().split('.caffemodel')[0]+'.txt'
+if  os.path.exists(result_file):
+    os.remove(result_file)
+
 for imgFile in open(imgList).readlines():  # 对于每个测试图片
+    output = open(result_file, 'a')
     img_name = ROOTDIR + imgFile.strip().split('.jpg ')[0]
     xml_name = ROOTDIR + imgFile.strip().split('.jpg ')[1]
+    output.write(imgFile.strip().split('.jpg ')[0])
     image = caffe.io.load_image(img_name+'.jpg')
-    true_boxes = readXML(xml_name);
+    # true_boxes = readXML(xml_name);
     transformed_image = transformer.preprocess('data', image)
     net.blobs['data'].data[...] = transformed_image
     # Forward pass.
-    print img_name.decode("gbk")
     detections = net.forward()['detection_out']
-
 
     # Parse the outputs.
     det_label = detections[0,0,:,1]
@@ -113,7 +113,7 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     det_ymax = detections[0,0,:,6]
 
     # Get detections with confidence higher than 0.6.
-    top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.4]
+    top_indices = [i for i, conf in enumerate(det_conf) if conf >= 0.05]
 
     top_conf = det_conf[top_indices]
     top_label_indices = det_label[top_indices].tolist()
@@ -123,15 +123,11 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
     top_xmax = det_xmax[top_indices]
     top_ymax = det_ymax[top_indices]
 
-    colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist()
+    output.write('\t')
+    output.write(str(top_conf.shape[0]))
+    if top_conf.shape[0] < 1:
+        print img_name.decode("gbk")
 
-    plt.imshow(image)
-    currentAxis = plt.gca()
-
-    TP = 0 # 正检
-    FP = 0 # 误检
-    FN = 0 # 漏检
-    detectBoxes = []
     for i in xrange(top_conf.shape[0]): # 对每个检测到的目标
         not_match = 0
         xmin = int(round(top_xmin[i] * image.shape[1]))
@@ -139,37 +135,20 @@ for imgFile in open(imgList).readlines():  # 对于每个测试图片
         xmax = int(round(top_xmax[i] * image.shape[1]))
         ymax = int(round(top_ymax[i] * image.shape[0]))
         score = top_conf[i]
+        output.write('\t')
+        output.write(str(score))
+        output.write('\t')
+        output.write(str(xmin))
+        output.write('\t')
+        output.write(str(ymin))
+        output.write('\t')
+        output.write(str(xmax))
+        output.write('\t')
+        output.write(str(ymax))
         label = int(top_label_indices[i])
         label_name = top_labels[i]
-        display_txt = '%s: %.2f'%(label_name, score)
-        coords = (xmin, ymin), xmax-xmin+1, ymax-ymin+1
-        color = colors[label]
-        detectBoxes.append([xmin, ymin, xmax, ymax])
-        currentAxis.add_patch(plt.Rectangle(*coords, fill=False, edgecolor=color, linewidth=2))
-        currentAxis.text(xmin, ymin, display_txt, bbox={'facecolor': color, 'alpha': 0.5})
-        for boxT in true_boxes:
-            if (computIOU(boxT, [xmin, ymin, xmax, ymax]) < 0.5):
-                not_match += 1  # 未匹配次数
-        if not_match == len(true_boxes):
-            FP += 1
 
-    for boxT in true_boxes:
-        currentAxis.add_patch(plt.Rectangle((boxT[0], boxT[1]), boxT[2] - boxT[0], boxT[3] - boxT[1],
-                                            fill=False, edgecolor=colors[5], linewidth=2))
-        for boxP in detectBoxes:
-            if (computIOU(boxT, boxP) > 0.5): # 如果有任意一个检测框能和ground_truth_box 匹配上则TP+1
-                TP += 1  # 正确检测
-                break
-
-    FN = len(true_boxes) - TP
-    display_txt2 = 'TP: %i FP: %i FN: %i'%(TP, FP, FN)
-    currentAxis.text(5, 15, display_txt2, bbox={'facecolor': colors[10], 'alpha': 0.5})
-
-    TPs += TP
-    FPs += FP
-    FNs += FN
-    plt.show()
-
-print 'TPs: %i FPs: %i FNs: %i'%(TPs, FPs, FNs)
+    output.write('\n')
+    output.close()
 
 

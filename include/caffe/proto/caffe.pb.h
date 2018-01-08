@@ -10731,6 +10731,20 @@ class MultiBoxLossParameter : public ::google::protobuf::Message {
   inline float fl_beta() const;
   inline void set_fl_beta(float value);
 
+  // optional float ignore_overlap = 28 [default = 0];
+  inline bool has_ignore_overlap() const;
+  inline void clear_ignore_overlap();
+  static const int kIgnoreOverlapFieldNumber = 28;
+  inline float ignore_overlap() const;
+  inline void set_ignore_overlap(float value);
+
+  // optional float addition_overlap = 29 [default = 0.5];
+  inline bool has_addition_overlap() const;
+  inline void clear_addition_overlap();
+  static const int kAdditionOverlapFieldNumber = 29;
+  inline float addition_overlap() const;
+  inline void set_addition_overlap(float value);
+
   // @@protoc_insertion_point(class_scope:caffe.MultiBoxLossParameter)
  private:
   inline void set_has_loc_loss_type();
@@ -10785,6 +10799,10 @@ class MultiBoxLossParameter : public ::google::protobuf::Message {
   inline void clear_has_fl_alpha();
   inline void set_has_fl_beta();
   inline void clear_has_fl_beta();
+  inline void set_has_ignore_overlap();
+  inline void clear_has_ignore_overlap();
+  inline void set_has_addition_overlap();
+  inline void clear_has_addition_overlap();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -10816,6 +10834,8 @@ class MultiBoxLossParameter : public ::google::protobuf::Message {
   float fl_gamma_;
   float fl_alpha_;
   float fl_beta_;
+  float ignore_overlap_;
+  float addition_overlap_;
   friend void  protobuf_AddDesc_caffe_2eproto();
   friend void protobuf_AssignDesc_caffe_2eproto();
   friend void protobuf_ShutdownFile_caffe_2eproto();
@@ -29867,6 +29887,54 @@ inline void MultiBoxLossParameter::set_fl_beta(float value) {
   set_has_fl_beta();
   fl_beta_ = value;
   // @@protoc_insertion_point(field_set:caffe.MultiBoxLossParameter.fl_beta)
+}
+
+// optional float ignore_overlap = 28 [default = 0];
+inline bool MultiBoxLossParameter::has_ignore_overlap() const {
+  return (_has_bits_[0] & 0x04000000u) != 0;
+}
+inline void MultiBoxLossParameter::set_has_ignore_overlap() {
+  _has_bits_[0] |= 0x04000000u;
+}
+inline void MultiBoxLossParameter::clear_has_ignore_overlap() {
+  _has_bits_[0] &= ~0x04000000u;
+}
+inline void MultiBoxLossParameter::clear_ignore_overlap() {
+  ignore_overlap_ = 0;
+  clear_has_ignore_overlap();
+}
+inline float MultiBoxLossParameter::ignore_overlap() const {
+  // @@protoc_insertion_point(field_get:caffe.MultiBoxLossParameter.ignore_overlap)
+  return ignore_overlap_;
+}
+inline void MultiBoxLossParameter::set_ignore_overlap(float value) {
+  set_has_ignore_overlap();
+  ignore_overlap_ = value;
+  // @@protoc_insertion_point(field_set:caffe.MultiBoxLossParameter.ignore_overlap)
+}
+
+// optional float addition_overlap = 29 [default = 0.5];
+inline bool MultiBoxLossParameter::has_addition_overlap() const {
+  return (_has_bits_[0] & 0x08000000u) != 0;
+}
+inline void MultiBoxLossParameter::set_has_addition_overlap() {
+  _has_bits_[0] |= 0x08000000u;
+}
+inline void MultiBoxLossParameter::clear_has_addition_overlap() {
+  _has_bits_[0] &= ~0x08000000u;
+}
+inline void MultiBoxLossParameter::clear_addition_overlap() {
+  addition_overlap_ = 0.5f;
+  clear_has_addition_overlap();
+}
+inline float MultiBoxLossParameter::addition_overlap() const {
+  // @@protoc_insertion_point(field_get:caffe.MultiBoxLossParameter.addition_overlap)
+  return addition_overlap_;
+}
+inline void MultiBoxLossParameter::set_addition_overlap(float value) {
+  set_has_addition_overlap();
+  addition_overlap_ = value;
+  // @@protoc_insertion_point(field_set:caffe.MultiBoxLossParameter.addition_overlap)
 }
 
 // -------------------------------------------------------------------

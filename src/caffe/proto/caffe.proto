@@ -1367,6 +1367,8 @@ message MultiBoxLossParameter {
   optional float fl_gamma = 25 [default = 2.0];
   optional float fl_alpha = 26 [default = 0.25];
   optional float fl_beta = 27 [default = 1.0];
+  optional float ignore_overlap = 28 [default = 0];
+  optional float addition_overlap = 29 [default = 0.5];
 }
 
 message MVNParameter {

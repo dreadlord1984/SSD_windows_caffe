@@ -1,5 +1,4 @@
-#注意：由于这里是用于统计分析，所以mirror: false且不需要样本随机裁剪
-name: "SqueezeNet_Pedestrian_SSD_384x256_train(add_all_classification)"
+﻿name: "SqueezeNet_Pedestrian_SSD_384x256_train(add_all_classification)"
 layer {
   name: "data"
   type: "AnnotatedData"
@@ -29,8 +28,8 @@ layer {
     }
   }
   data_param {
-    source: "../Data_0922/train_lmdb"
-    batch_size: 16
+    source: "E:/tyang/Pedestrian/Data_0922/train_lmdb"
+    batch_size: 32
     backend: LMDB
   }
   annotated_data_param {
@@ -38,7 +37,7 @@ layer {
       max_sample: 1
       max_trials: 1
     }
-    label_map_file: "../labelmap_VehicleFull.prototxt"
+    label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
   }
 }
 
@@ -2625,7 +2624,7 @@ layer {
     use_difficult_gt: true
     #do_neg_mining: true
     neg_pos_ratio: 3.0
-    neg_overlap: 0.35
+    neg_overlap: 0.4
     code_type: CENTER_SIZE
 	mining_type: NONE  #HARD_EXAMPLE MAX_NEGATIVE NONE
   }

@@ -1,6 +1,6 @@
 pause
-..\\..\\Build\\x64\\Release\\test_ssd.exe -confidence_threshold 0.4 ^
-.\\deployD1add_noSqrt.prototxt ^
-..\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt_iter_290000.caffemodel ^
-..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt
+..\\..\\Build\\x64\\MATCH_BOX_LIST_RESULT_BOX_LIST\\test_ssd.exe -confidence_threshold 0.4 ^
+..\\Data_0922\\FocalLoss_NONE_D\\CHECK\\deployD.prototxt ^
+..\\Data_0922\\FocalLoss_NONE_D\\gamma2_D_iter_200000.caffemodel ^
+..\\Data_0922\\FocalLoss_NONE_D\\IOU_ALL_image_List.txt
 pause

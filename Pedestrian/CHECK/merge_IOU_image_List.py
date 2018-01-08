@@ -267,7 +267,7 @@ def statistic(IOU_all_List, tag):
         plt.bar(np.arange(len(prior_group)), prior_group[X], color='MediumAquamarine')
         plt.xticks(X, labels, rotation=25)
         for x, y in zip(X, prior_group[X]):
-            plt.text(x, y + 0.05, '%.2f' % y, ha='center', va='bottom')
+            plt.text(x, y + 0.05, '%d' % y, ha='center', va='bottom')
         ax.set_title('(gt total %d)' % total)
         ax.set_xlabel('matching num')
         ax.set_ylabel('gt num')
@@ -294,15 +294,15 @@ def statistic(IOU_all_List, tag):
 
     plt.show()
 
-
-batch_size = 32
-colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
+###################################################################
 ROOTDIR = "\\\\192.168.1.186/PedestrianData/" # 样本根目录
+batch_size =32 # one_epoch_train.bat 训练中batch_size大小
+###################################################################
+colors = plt.cm.hsv(np.linspace(0, 1, 21)).tolist() # 颜色列表
 prior_nums = np.linspace(1,40,40,dtype=np.int32)
 prior_group  = np.zeros(prior_nums.size,dtype=np.int32)
 area_thresholds = np.array([0.0025, 0.005, 0.01, 0.015, 0.02, 0.04, 0.08, 0.1, 0.25, 1.0],dtype=np.float64) # area 区间
 iou_thresholds = np.array([0.2, 0.25, 0.3, 0.35, 0.4, 0.45, 0.5],dtype=np.float64) # area 区间
-#layer_priorbox_num = np.array([15360, 1920, 480, 120, 30, 5],dtype=np.int32) # layer层priorbox 数
 layer_thresholds = np.array([12000, 24000, 27000, 27750, 27950, 28010, 28015],dtype=np.int32) # layer层priorbox 数
 area_group  = np.zeros(area_thresholds.size,dtype=np.int32)
 iou_group  = np.zeros(iou_thresholds.size,dtype=np.int32)
@@ -310,8 +310,8 @@ layer_group = np.zeros(layer_thresholds.size,dtype=np.int32)
 chose_layer = 0
 
 if __name__ == "__main__":
-    copyList("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL.txt",
-    "..\\Data_0922\\val_lmdb_list.txt",
-    "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt")
-    showList("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt")
-    # statistic("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\IOU_ALL_VAL_image_list.txt", 'small')
+    copyList("..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL.txt",# 匹配列表
+    "..\\Data_0922\\val_lmdb_list.txt", # 样本列表
+    "..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL_image_list.txt") # 输出合并列表
+    showList("..\\Data_0922\\FocalLoss_NONE_D1_noSqrt\\IOU_ALL_VAL_image_list.txt") # 显示匹配结果
+    # statistic("..\\Data_0922\\SOFTMAX_MAX_NEGATIVE\\IOU_ALL_image_list.txt", 'bigger') # 统计gt分布

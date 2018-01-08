@@ -4,6 +4,7 @@ import pylab as plt
 import prettyplotlib as ppl
 import xml.etree.cElementTree as et
 import scipy.io
+import os
 
 """
 @function:计算两个box的IOU
@@ -57,7 +58,7 @@ def save_data(priorList, resultList, data_mat):
             resultFile = fp2.readline()  # 每一行检测数据 priorFile
             prior_datas = priorFile.strip().split('\t')
             result_datas = resultFile.strip().split('\t')
-            xml_name = ROOTDIR + prior_datas[1]
+            xml_name = os.path.join(ROOTDIR, prior_datas[0].replace('jpg','xml').replace('JPEGImages','Annotations'))
             # print prior_datas[1]
             # 1.记录各个gt box面积占比
             true_boxes, width, height = readXML(xml_name)  # 所有的ground truth boxes
@@ -71,12 +72,12 @@ def save_data(priorList, resultList, data_mat):
             # 2.记录各个prior box匹配IOU、分类conf和回归IOU
             prior_IOU = []  # 训练时所有匹配的prior box与gt box的IOU
             prior_conf = []  # 训练时所有匹配的prior box与gt box的IOU
-            prior_boxes_total = int(prior_datas[2])  # 匹配box数量
+            prior_boxes_total = int(prior_datas[1])  # 匹配box数量
             result_IOU = []  # result box与gt box的IOU
             # total_prior_num += prior_boxes_total
             for i in range(0, prior_boxes_total, 1):
-                gt_box_index = int(prior_datas[7 * i + 9])  # 当前匹配的gt box序号（从0开始）
-                IOU = float(prior_datas[7 * i + 4])
+                gt_box_index = int(prior_datas[7 * i + 8])  # 当前匹配的gt box序号（从0开始）
+                IOU = float(prior_datas[7 * i + 3])
                 prior_IOU.append([gt_box_index, IOU])
                 conf = float(result_datas[6 * i + 3])  # 分类置信度
                 prior_conf.append([gt_box_index, conf])
@@ -170,7 +171,7 @@ def draw_curve(data_mat):
         plt.ylim((0, 1))
         # ax2 = axes[1].twiny()
         # plt.xticks(s_ids, prior_num, rotation=10)
-        savename = data_mat[:data_mat.rfind("\\")] + '\\figure_' + str(pl) + '.png';
+        savename = data_mat[:data_mat.rfind("\\")] + '\\figure_' + str(pl) + '.jpg';
         plt.savefig(savename)
         plt.show()
 
@@ -194,7 +195,7 @@ s_ids = np.arange(len(IOU_thresholds))
 colors = plt.cm.hsv(np.linspace(0, 1, 10)).tolist()
 
 if __name__ == "__main__":
-    # save_data("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\IOU_ALL_image_List.txt",
-    #           "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\result_ALL_image_List.txt",
-    #           "..\\View\\COMPARE2\\add_prior_gamma2_D1add15_new_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")
-    draw_curve("..\\View\\COMPARE2\\add_prior_gamma2_D1add15_P5N35D15E4_noSqrt\\object_confidence_IOU_change_curve.mat")
+    # save_data("..\\Data_0922\\FocalLoss_NONE_D\\IOU_ALL_image_List.txt",
+    #           "..\\Data_0922\\FocalLoss_NONE_D\\result_IOU_ALL_image_List.txt",
+    #           "..\\Data_0922\\FocalLoss_NONE_D\\object_confidence_IOU_change_curve.mat")
+    draw_curve("..\\Data_0922\\FocalLoss_NONE_D\\object_confidence_IOU_change_curve.mat")

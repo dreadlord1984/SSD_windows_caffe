@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_test(add_conv4_3_classification, delete sqrt(min*max) default box, add min_size)"
+﻿name: "SqueezeNet_Pedestrian_SSD_384x256_test(add_conv4_3_classification, delete sqrt(min*max) default box)"
 layer {
   name: "data"
   type: "AnnotatedData"
@@ -20,14 +20,14 @@ layer {
     }
   }
   data_param {
-    source: "../Data_0922/val_lmdb"
-    batch_size: 16
+    source: "E:/tyang/Pedestrian/Data_1111/val_lmdb"
+    batch_size: 32
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "../labelmap_VehicleFull.prototxt"
+    label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
   }
 }
 
@@ -2127,6 +2127,6 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    #name_size_file: "../Data_0922/val_name_size.txt"
+    #name_size_file: "E:/tyang/Pedestrian/Data_0922/val_name_size.txt"
   }
 }

@@ -399,7 +399,7 @@ namespace caffe {
 					(bbox.ymax() - prior_bbox.ymax()) / prior_variance[3]);
 			}
 		}
-		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {//执行
+		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
 			float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
 			CHECK_GT(prior_width, 0);
 			float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
@@ -490,7 +490,7 @@ namespace caffe {
 					prior_bbox.ymax() + prior_variance[3] * bbox.ymax());
 			}
 		}
-		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {//执行
+		else if (code_type == PriorBoxParameter_CodeType_CENTER_SIZE) {
 			float prior_width = prior_bbox.xmax() - prior_bbox.xmin();
 			CHECK_GT(prior_width, 0);
 			float prior_height = prior_bbox.ymax() - prior_bbox.ymin();
@@ -616,6 +616,7 @@ namespace caffe {
 	void MatchBBox(const vector<NormalizedBBox>& gt_bboxes,
 		const vector<NormalizedBBox>& pred_bboxes, const int label,
 		const MatchType match_type, const float overlap_threshold,
+		const float ignore_overlap, const float addition_overlap,
 		const bool ignore_cross_boundary_bbox,
 		vector<int>* match_indices, vector<float>* match_overlaps, const int& index) {
 		int num_pred = pred_bboxes.size();
@@ -698,7 +699,7 @@ namespace caffe {
 						max_overlap = it->second[j];
 					}
 				}
-				if (max_overlap < 0.1 || max_overlap >= 0.5)
+				if (max_overlap < 0.15 || max_overlap >= 0.5)//(max_overlap < 0.1 || max_overlap >= 0.5)
 				{
 					// Erase the ground truth.
 					gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
@@ -728,7 +729,7 @@ namespace caffe {
 					//	continue;
 					//}
 					// Find the maximum overlapped pair.
-					if (it->second[j] >= 0.1) {
+					if (it->second[j] >= 0.15) {
 						// If the prediction has not been matched to any ground truth,
 						// and the overlap is larger than maximum overlap, update.
 						max_idx = i;
@@ -785,9 +786,10 @@ namespace caffe {
 				break;
 			}
 #ifdef ADD_PRIOR_BOX
-			else if (max_overlap < 0.15){
-				// b.对于最大匹配IOU<0.1的,删除
+			else if (max_overlap < ignore_overlap){
+				// b.对于最大匹配IOU<0.15的,删除
 				// Erase the ground truth.
+				gt_pool_for_add.erase(std::find(gt_pool_for_add.begin(), gt_pool_for_add.end(), max_gt_idx));
 				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
 			}
 			else if (max_overlap >= overlap_threshold){
@@ -815,7 +817,6 @@ namespace caffe {
 						(*match_overlaps)[pre_i] = max_overlap;
 					}
 				}
-
 				// Erase the ground truth.
 				gt_pool.erase(std::find(gt_pool.begin(), gt_pool.end(), max_gt_idx));
 			}
@@ -879,7 +880,6 @@ namespace caffe {
 			}
 			gt_pool_again.erase(std::find(gt_pool_again.begin(), gt_pool_again.end(), max_gt_idx));
 		}
-		
 #endif // ADD_PRIOR_BOX
 
 		switch (match_type) {
@@ -919,10 +919,10 @@ namespace caffe {
 					(*match_indices)[i] = gt_indices[max_gt_idx];
 					(*match_overlaps)[i] = max_overlap;
 				}
-				else if (finder != gt_pool_for_add.end() && max_overlap >= 0.4 && max_gt_idx != -1)
+				else if (finder != gt_pool_for_add.end() && max_overlap >= addition_overlap && max_gt_idx != -1)
 				{
-					// 该pred_bboxes不存在大于overlap_threshold的匹配
-					// 1. 最大IOU匹配大于等于阈值（0.4）
+					// 该pred_bbox匹配的gt box不存在大于overlap_threshold的匹配
+					// 1. 最大IOU匹配大于等于阈值（addition_overlap）
 					// 2. gt box被部分包含
 					// 满足上面条件，则将该prior box作为该gt box的最终匹配
 					if (pred_bboxes[i].xmin() > gt_bboxes[max_gt_idx].xmin()
@@ -1005,6 +1005,8 @@ namespace caffe {
 			multibox_loss_param.encode_variance_in_target();
 		const bool ignore_cross_boundary_bbox =
 			multibox_loss_param.ignore_cross_boundary_bbox();
+		const float ignore_overlap = multibox_loss_param.ignore_overlap();
+		const float addition_overlap = multibox_loss_param.addition_overlap();
 		// Find the matches.
 		int num = all_loc_preds.size();
 
@@ -1041,16 +1043,18 @@ namespace caffe {
 						code_type, encode_variance_in_target, clip_bbox,
 						all_loc_preds[i].find(label)->second, &loc_bboxes);
 					MatchBBox(gt_bboxes, loc_bboxes, label, match_type,
-						overlap_threshold, ignore_cross_boundary_bbox,
-						&match_indices[label], &match_overlaps[label], i);
+						overlap_threshold, ignore_overlap, addition_overlap,
+						ignore_cross_boundary_bbox, &match_indices[label],
+						&match_overlaps[label], i);
 				}
 			}
 			else {
-				// 执行Use prior bboxes to match against all ground truth.
+				// Use prior bboxes to match against all ground truth.
 				vector<int> temp_match_indices;
 				vector<float> temp_match_overlaps;
 				const int label = -1;
-				MatchBBox(gt_bboxes, prior_bboxes, label, match_type, overlap_threshold,
+				MatchBBox(gt_bboxes, prior_bboxes, label, match_type,
+					overlap_threshold, ignore_overlap, addition_overlap,
 					ignore_cross_boundary_bbox, &temp_match_indices,
 					&temp_match_overlaps, i);
 				if (share_location) {
@@ -1202,7 +1206,6 @@ namespace caffe {
 		const int sample_size = multibox_loss_param.sample_size();// multibox_loss_param.sample_size()
 		// Compute confidence losses based on matching results.
 		vector<vector<float> > all_conf_loss;
-
 #ifdef CPU_ONLY
 		ComputeConfLoss(conf_blob.cpu_data(), num, num_priors, num_classes,
 			background_label_id, conf_loss_type, *all_match_indices, all_gt_bboxes,
@@ -1247,7 +1250,7 @@ namespace caffe {
 			const vector<float>& loc_loss = all_loc_loss[i];
 			vector<float> loss;
 			std::transform(conf_loss.begin(), conf_loss.end(), loc_loss.begin(),
-			std::back_inserter(loss), std::plus<float>());
+				std::back_inserter(loss), std::plus<float>());
 			// Pick negatives or hard examples based on loss.
 			set<int> sel_indices;
 			vector<int> neg_indices;
@@ -1258,9 +1261,6 @@ namespace caffe {
 				// Get potential indices and loss pairs.
 				vector<pair<float, int> > loss_indices;
 				for (int m = 0; m < match_indices[label].size(); ++m) {
-					// 选择负样本
-					// 1.对于MAX_NEGATIVE或者NONE，满足IOU<neg_overlap且没有匹配成功的prior box才作为候选负样本
-					// 2.对于HARD_EXAMPLE，则全部纳入负样本候选集
 					if (IsEligibleMining(mining_type, match_indices[label][m],
 						match_overlaps.find(label)->second[m], neg_overlap)) {
 						loss_indices.push_back(std::make_pair(loss[m], m));
@@ -1281,7 +1281,7 @@ namespace caffe {
 					num_sel = std::min(sample_size, num_sel);
 				}
 				// Select samples.
-				if (has_nms_param && nms_threshold > 0) {
+				if (has_nms_param && nms_threshold > 0) {//no
 					// Do nms before selecting samples.
 					vector<float> sel_loss;
 					vector<NormalizedBBox> sel_bboxes;
@@ -1832,7 +1832,7 @@ namespace caffe {
 					}
 				}
 				Dtype loss = 0;
-				if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX || loss_type == MultiBoxLossParameter_ConfLossType_FocalLoss) {
+				if (loss_type == MultiBoxLossParameter_ConfLossType_SOFTMAX) {
 					CHECK_GE(label, 0);
 					CHECK_LT(label, num_classes);
 					// Compute softmax probability.
@@ -2630,77 +2630,5 @@ namespace caffe {
 		const string& save_file);
 
 #endif  // USE_OPENCV
-
-	/***********************************************************************
-	* function: 获取 confrence
-	***********************************************************************/
-	template <typename Dtype>
-	void GetConfPredictions(const Dtype* conf_data, const int num,
-		const int num_preds_per_class, const int num_classes,
-		const int background_label_id, const int loss_type,
-		const vector<map<int, vector<int> > >& all_match_indices,
-		const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-		vector<vector<Dtype> >* all_conf_preds) {
-		CHECK_LT(background_label_id, num_classes);
-		all_conf_preds->clear();
-		for (int i = 0; i < num; ++i) {
-			vector<Dtype> conf_score;
-			const map<int, vector<int> >& match_indices = all_match_indices[i];
-			for (int p = 0; p < num_preds_per_class; ++p) {
-				int start_idx = p * num_classes;
-				// Get the label index.
-				int label = background_label_id;
-				for (map<int, vector<int> >::const_iterator it =
-					match_indices.begin(); it != match_indices.end(); ++it) {
-					const vector<int>& match_index = it->second;
-					CHECK_EQ(match_index.size(), num_preds_per_class);
-					if (match_index[p] > -1) {
-						CHECK(all_gt_bboxes.find(i) != all_gt_bboxes.end());
-						const vector<NormalizedBBox>& gt_bboxes =
-							all_gt_bboxes.find(i)->second;
-						CHECK_LT(match_index[p], gt_bboxes.size());
-						label = gt_bboxes[match_index[p]].label();
-						CHECK_GE(label, 0);
-						CHECK_NE(label, background_label_id);
-						CHECK_LT(label, num_classes);
-						// A prior can only be matched to one gt bbox.
-						break;
-					}
-				}
-				CHECK_GE(label, 0);
-				CHECK_LT(label, num_classes);
-				// Compute softmax probability.
-				// We need to subtract the max to avoid numerical issues.
-				Dtype maxval = conf_data[start_idx];
-				for (int c = 1; c < num_classes; ++c) {
-					maxval = std::max<Dtype>(conf_data[start_idx + c], maxval);
-				}
-				Dtype sum = 0.;
-				for (int c = 0; c < num_classes; ++c) {
-					/*std::cout << conf_data[start_idx + c] << std::endl;*/
-					sum += std::exp(conf_data[start_idx + c] - maxval);
-				}
-				Dtype prob = std::exp(conf_data[start_idx + label] - maxval) / sum;
-				
-				conf_score.push_back(prob);
-			}
-			conf_data += num_preds_per_class * num_classes;
-			all_conf_preds->push_back(conf_score);
-		}
-	}
-
-	// Explicit initialization.
-	template void GetConfPredictions(const float* conf_data, const int num,
-		const int num_preds_per_class, const int num_classes,
-		const int background_label_id, const int loss_type,
-		const vector<map<int, vector<int> > >& all_match_indices,
-		const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-		vector<vector<float> >* all_conf_preds);
-	template void GetConfPredictions(const double* conf_data, const int num,
-		const int num_preds_per_class, const int num_classes,
-		const int background_label_id, const int loss_type,
-		const vector<map<int, vector<int> > >& all_match_indices,
-		const map<int, vector<NormalizedBBox> >& all_gt_bboxes,
-		vector<vector<double> >* all_conf_preds);
 
 }  // namespace caffe

@@ -2,7 +2,7 @@
 #include <functional>
 #include <utility>
 #include <vector>
-#include <io.h>
+
 #include "caffe/layers/prior_box_layer.hpp"
 
 namespace caffe {
@@ -44,7 +44,11 @@ namespace caffe {
 				max_sizes_.push_back(prior_box_param.max_size(i));
 				CHECK_GT(max_sizes_[i], min_sizes_[i])
 					<< "max_size must be greater than min_size.";
-				/*num_priors_ += 1;*/
+#ifdef NO_SQRT
+
+#else
+				num_priors_ += 1;
+#endif // NO_SQRT
 			}
 		}
 		clip_ = prior_box_param.clip();
@@ -149,9 +153,108 @@ namespace caffe {
 		Dtype* top_data = top[0]->mutable_cpu_data();
 		int dim = layer_height * layer_width * num_priors_ * 4;
 
+		//////////////////////////////////////////////////////////////////
+		/*
+		int idx = 0;
+		int new_step_w;
+		int new_step_h;
+		int new_layer_width;
+		int new_layer_height;
+		int set_step = 4;
+		for (int s = 0; s < min_sizes_.size(); ++s) {
+		int min_size_ = min_sizes_[s];
 
- 
-		//int default_box_num = 0;
+		if (min_size_ >= 20) // 不改变步长和遍历范围
+		{
+		new_step_w = step_w;
+		new_step_h = step_h;
+		new_layer_width = layer_width;
+		new_layer_height = layer_height;
+		for (int h = 0; h < new_layer_height; ++h) {
+		for (int w = 0; w < new_layer_width; ++w) {
+		float center_x = (w + offset_) * new_step_w;
+		float center_y = (h + offset_) * new_step_h;
+		float box_width, box_height;
+		// first prior: aspect_ratio = 1, size = min_size
+		box_width = box_height = min_size_;
+		// xmin
+		top_data[idx++] = (center_x - box_width / 2.) / img_width;
+		// ymin
+		top_data[idx++] = (center_y - box_height / 2.) / img_height;
+		// xmax
+		top_data[idx++] = (center_x + box_width / 2.) / img_width;
+		// ymax
+		top_data[idx++] = (center_y + box_height / 2.) / img_height;
+
+		// rest of priors
+		for (int r = 0; r < aspect_ratios_.size(); ++r) {
+		float ar = aspect_ratios_[r];
+		if (fabs(ar - 1.) < 1e-6) {
+		continue;
+		}
+		box_width = min_size_ * sqrt(ar);
+		box_height = min_size_ / sqrt(ar);
+		// xmin
+		top_data[idx++] = (center_x - box_width / 2.) / img_width;
+		// ymin
+		top_data[idx++] = (center_y - box_height / 2.) / img_height;
+		// xmax
+		top_data[idx++] = (center_x + box_width / 2.) / img_width;
+		// ymax
+		top_data[idx++] = (center_y + box_height / 2.) / img_height;
+		}
+		}
+		}
+		}
+		else //改变步长和遍历范围
+		{
+		new_step_w = set_step;
+		new_step_h = set_step;
+		new_layer_width = img_width / new_step_w;
+		new_layer_height = img_height / new_step_h;
+
+		for (int h = 0; h < new_layer_height; ++h) {
+		for (int w = 0; w < new_layer_width; ++w) {
+		float center_x = (w + offset_) * new_step_w;
+		float center_y = (h + offset_) * new_step_h;
+		float box_width, box_height;
+
+		// first prior: aspect_ratio = 1, size = min_size
+		box_width = box_height = min_size_;
+		// xmin
+		top_data[idx++] = (center_x - box_width / 2.) / img_width;
+		// ymin
+		top_data[idx++] = (center_y - box_height / 2.) / img_height;
+		// xmax
+		top_data[idx++] = (center_x + box_width / 2.) / img_width;
+		// ymax
+		top_data[idx++] = (center_y + box_height / 2.) / img_height;
+
+		// rest of priors
+		for (int r = 0; r < aspect_ratios_.size(); ++r) {
+		float ar = aspect_ratios_[r];
+		if (fabs(ar - 1.) < 1e-6) {
+		continue;
+		}
+		box_width = min_size_ * sqrt(ar);
+		box_height = min_size_ / sqrt(ar);
+		// xmin
+		top_data[idx++] = (center_x - box_width / 2.) / img_width;
+		// ymin
+		top_data[idx++] = (center_y - box_height / 2.) / img_height;
+		// xmax
+		top_data[idx++] = (center_x + box_width / 2.) / img_width;
+		// ymax
+		top_data[idx++] = (center_y + box_height / 2.) / img_height;
+		}
+		}
+		}
+		}
+		}
+		*/
+		//////////////////////////////////////////////////////////////////
+
+
 		int idx = 0;
 		for (int h = 0; h < layer_height; ++h) {
 			for (int w = 0; w < layer_width; ++w) {
@@ -162,7 +265,6 @@ namespace caffe {
 					int min_size_ = min_sizes_[s];
 
 					// first prior: aspect_ratio = 1, size = min_size
-					//default_box_num++;
 					box_width = box_height = min_size_;
 					// xmin
 					top_data[idx++] = (center_x - box_width / 2.) / img_width;
@@ -173,25 +275,27 @@ namespace caffe {
 					// ymax
 					top_data[idx++] = (center_y + box_height / 2.) / img_height;
 
+#ifdef NO_SQRT
 					/***********************************************************************
 					* note: 注释掉 aspect_ratio = 1, size = sqrt(min_size * max_size)此情况
 					***********************************************************************/
-					
-					//if (max_sizes_.size() > 0) {
-					//  CHECK_EQ(min_sizes_.size(), max_sizes_.size());
-					//  int max_size_ = max_sizes_[s];
-					//  // second prior: aspect_ratio = 1, size = sqrt(min_size * max_size)
-					//  box_width = box_height = sqrt(min_size_ * max_size_);
-					//  // xmin
-					//  top_data[idx++] = (center_x - box_width / 2.) / img_width;
-					//  // ymin
-					//  top_data[idx++] = (center_y - box_height / 2.) / img_height;
-					//  // xmax
-					//  top_data[idx++] = (center_x + box_width / 2.) / img_width;
-					//  // ymax
-					//  top_data[idx++] = (center_y + box_height / 2.) / img_height;
-					//}
-					
+#else
+					if (max_sizes_.size() > 0) {
+						CHECK_EQ(min_sizes_.size(), max_sizes_.size());
+						int max_size_ = max_sizes_[s];
+						// second prior: aspect_ratio = 1, size = sqrt(min_size * max_size)
+						box_width = box_height = sqrt(min_size_ * max_size_);
+						// xmin
+						top_data[idx++] = (center_x - box_width / 2.) / img_width;
+						// ymin
+						top_data[idx++] = (center_y - box_height / 2.) / img_height;
+						// xmax
+						top_data[idx++] = (center_x + box_width / 2.) / img_width;
+						// ymax
+						top_data[idx++] = (center_y + box_height / 2.) / img_height;
+					}
+
+#endif // NO_SQRT
 
 					// rest of priors
 					for (int r = 0; r < aspect_ratios_.size(); ++r) {
@@ -201,7 +305,6 @@ namespace caffe {
 						}
 						box_width = min_size_ * sqrt(ar);
 						box_height = min_size_ / sqrt(ar);
-						//default_box_num++;
 						// xmin
 						top_data[idx++] = (center_x - box_width / 2.) / img_width;
 						// ymin
@@ -214,32 +317,14 @@ namespace caffe {
 				}
 			}
 		}
-		
+
+
 		// clip the prior's coordidate such that it is within [0, 1]
 		if (clip_) {
 			for (int d = 0; d < dim; ++d) {
 				top_data[d] = std::min<Dtype>(std::max<Dtype>(top_data[d], 0.), 1.);
 			}
 		}
-		/*-------------------------验证代码-------------------------*/
-		/*ofstream  outfile;
-		outfile.open("prior_box.txt", ios::out | ios::app);
-		ofstream  outfile2;
-		outfile2.open("prior_box_norm.txt", ios::out | ios::app);
-		for (int d = 0; d < dim/4; ++d) {
-			outfile << top_data[4 * d] * img_width << " "
-				<< top_data[4 * d + 1] * img_height << " "
-				<< top_data[4 * d + 2] * img_width << " "
-				<< top_data[4 * d + 3] * img_height << endl;
-			outfile2 << top_data[4 * d] << " "
-				<< top_data[4 * d + 1] << " "
-				<< top_data[4 * d + 2] << " "
-				<< top_data[4 * d + 3] << endl;
-		}
-		outfile.close();
-		outfile2.close();*/
-		/*-------------------------验证代码-------------------------*/
-
 		// set the variance.
 		top_data += top[0]->offset(0, 1);
 		if (variance_.size() == 1) {

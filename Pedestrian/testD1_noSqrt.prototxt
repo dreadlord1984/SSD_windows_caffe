@@ -20,14 +20,14 @@ layer {
     }
   }
   data_param {
-    source: "./val_lmdb"
-    batch_size: 16
+    source: "E:/tyang/Pedestrian/Data_0922/val_lmdb"
+    batch_size: 32
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "../labelmap_VehicleFull.prototxt"
+    label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
   }
 }
 
@@ -1156,7 +1156,7 @@ layer {
     decay_mult: 0
   }
   convolution_param {
-    num_output: 20 #24
+    num_output: 20
     pad: 1
     kernel_size: 3
     stride: 1
@@ -1361,15 +1361,13 @@ layer {
   bottom: "conv4_3_norm_1"
   bottom: "data"
   top: "conv4_3_norm_mbox_priorbox_1"
-  prior_box_param {
-    min_size: 15.0
-	  max_size: 25.0
+prior_box_param {
     min_size: 25.0
-	  max_size: 51.0
+    max_size: 51.0
     aspect_ratio: 0.25
-	  aspect_ratio: 0.5
-	  aspect_ratio: 0.75
-	  aspect_ratio: 1.25
+    aspect_ratio: 0.5
+    aspect_ratio: 0.75
+    aspect_ratio: 1.25
     flip: false
     clip: true
     variance: 0.1
@@ -2127,6 +2125,6 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    #name_size_file: "./val_name_size.txt"
+    #name_size_file: "E:/tyang/Pedestrian/Data_0922/val_name_size.txt"
   }
 }

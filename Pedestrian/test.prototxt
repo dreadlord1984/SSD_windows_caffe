@@ -20,14 +20,14 @@ layer {
     }
   }
   data_param {
-    source: "./val_lmdb"
-    batch_size: 16
+    source: "E:/tyang/Pedestrian/Data_0922/val_lmdb"
+    batch_size: 32
     backend: LMDB
   }
   annotated_data_param {
     batch_sampler {
     }
-    label_map_file: "../labelmap_VehicleFull.prototxt"
+    label_map_file: "E:/tyang/Pedestrian/labelmap_VehicleFull.prototxt"
   }
 }
 
@@ -1888,53 +1888,55 @@ layer {
 }
 
 ###################################################################
-layer {
-  name: "mbox_loss_1"
-  type: "MultiBoxLoss"
-  bottom: "mbox_loc_1"
-  bottom: "mbox_conf_1"
-  bottom: "mbox_priorbox_1"
-  bottom: "label"
-  top: "mbox_loss_1"
-  include {
-    phase: TEST
-  }
-  propagate_down: true
-  propagate_down: true
-  propagate_down: false
-  propagate_down: false
-  loss_param {
-    normalization: VALID # FULL VALID BATCH_SIZE NONE
-  }
-  multibox_loss_param {
-    loc_loss_type: SMOOTH_L1
-	
-    conf_loss_type: FocalLoss #SOFTMAX LOGISTIC FocalLoss 
-    fl_alpha: 0.75
-    fl_gamma:  2.0
-	
-    loc_weight: 1.0
-    num_classes: 2
-    share_location: true
-    match_type: PER_PREDICTION
-    overlap_threshold: 0.5
-    use_prior_for_matching: true
-    background_label_id: 0
-	#ignore_label_id: 13
-    use_difficult_gt: true
-    #do_neg_mining: true
-    neg_pos_ratio: 3.0
-    neg_overlap: 0.5
-    code_type: CENTER_SIZE
-	mining_type: NONE #HARD_EXAMPLE MAX_NEGATIVE NONE
-  }
-}
-
-layer {
-  name: "silence"
-  type: "Silence"
-  bottom: "mbox_loss_1"
-}
+# layer
+# {
+#     name: "mbox_loss_1"
+#     type: "MultiBoxLoss"
+#     bottom: "mbox_loc_1"
+#     bottom: "mbox_conf_1"
+#     bottom: "mbox_priorbox_1"
+#     bottom: "label"
+#     top: "mbox_loss_1"
+#     include {
+#         phase: TEST
+#     }
+#     propagate_down: true
+#     propagate_down: true
+#     propagate_down: false
+#     propagate_down: false
+#     loss_param {
+#         normalization: VALID  # FULL VALID BATCH_SIZE NONE
+#     }
+#     multibox_loss_param {
+#         loc_loss_type: SMOOTH_L1
+# 
+#         conf_loss_type: FocalLoss  # SOFTMAX LOGISTIC FocalLoss 
+#         fl_alpha: 0.75
+#         fl_gamma: 2.0
+# 
+#         loc_weight: 1.0
+#         num_classes: 2
+#         share_location: true
+#         match_type: PER_PREDICTION
+#         overlap_threshold: 0.5
+#         use_prior_for_matching: true
+#         background_label_id: 0
+#         # ignore_label_id: 13
+#         use_difficult_gt: true
+#         # do_neg_mining: true
+#         neg_pos_ratio: 3.0
+#         neg_overlap: 0.5
+#         code_type: CENTER_SIZE
+#         mining_type: NONE  # HARD_EXAMPLE MAX_NEGATIVE NONE
+#     }
+# }
+# 
+# layer
+# {
+#     name: "silence"
+#     type: "Silence"
+#     bottom: "mbox_loss_1"
+# }
 ###########################################################
 
 layer {
@@ -1974,7 +1976,7 @@ layer {
   bottom: "mbox_loc_1"
   bottom: "mbox_conf_flatten_1"
   bottom: "mbox_priorbox_1"
-  bottom: "label"   						############################################
+  #bottom: "label"   						############################################
   top: "detection_out"
   include {
     phase: TEST
@@ -2006,6 +2008,6 @@ layer {
     background_label_id: 0
     overlap_threshold: 0.5
     evaluate_difficult_gt: false
-    #name_size_file: "./val_name_size.txt"
+    #name_size_file: "E:/tyang/Pedestrian/Data_0825/val_name_size.txt"
   }
 }

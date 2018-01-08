@@ -88,51 +88,51 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
 	  }
 
 #else
-	  if (nms_threshold_ >= 1)
-	  {
-		  for (int prior_box_index = 0; prior_box_index < num_priors_; prior_box_index++)
-			indices[c].push_back(prior_box_index);
-		  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
-	  }
-	  else
-	  {
-		  ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
-			  confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
-		  num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
-	  }
+		ApplyNMSFast(cur_bbox_data, cur_conf_data, num_priors_,
+			confidence_threshold_, nms_threshold_, eta_, top_k_, &(indices[c]));
+		num_det += indices[c].size(); // nmsºóÊ£ÏÂ¼ì²â¿ò
 #endif // MATCH_BOX_LIST
 
-    }
-    if (keep_top_k_ > -1 && num_det > keep_top_k_) {
-      vector<pair<float, pair<int, int> > > score_index_pairs;
-      for (map<int, vector<int> >::iterator it = indices.begin();
-           it != indices.end(); ++it) {
-        int label = it->first;
-        const vector<int>& label_indices = it->second;
-        for (int j = 0; j < label_indices.size(); ++j) {
-          int idx = label_indices[j];
-          float score = conf_cpu_data[conf_idx + label * num_priors_ + idx];
-          score_index_pairs.push_back(std::make_pair(
-                  score, std::make_pair(label, idx)));
-        }
-      }
-      // Keep top k results per image.
-      std::sort(score_index_pairs.begin(), score_index_pairs.end(),
-                SortScorePairDescend<pair<int, int> >);
-      score_index_pairs.resize(keep_top_k_);
-      // Store the new indices.
-      map<int, vector<int> > new_indices;
-      for (int j = 0; j < score_index_pairs.size(); ++j) {
-        int label = score_index_pairs[j].second.first;
-        int idx = score_index_pairs[j].second.second;
-        new_indices[label].push_back(idx);
-      }
-      all_indices.push_back(new_indices);
-      num_kept += keep_top_k_;
-    } else {
-      all_indices.push_back(indices);
-      num_kept += num_det;
-    }
+   }
+#ifdef MATCH_BOX_LIST
+		// ²»ÅÅÐòÌôÑ¡
+		all_indices.push_back(indices);
+		num_kept += num_det;
+#else
+		// ÅÅÐòÌôÑ¡
+		if (keep_top_k_ > 0 && num_det > keep_top_k_) {
+			vector<pair<float, pair<int, int> > > score_index_pairs;
+			for (map<int, vector<int> >::iterator it = indices.begin();
+				it != indices.end(); ++it) {
+				int label = it->first;
+				const vector<int>& label_indices = it->second;
+				for (int j = 0; j < label_indices.size(); ++j) {
+					int idx = label_indices[j];
+					float score = conf_cpu_data[conf_idx + label * num_priors_ + idx];
+					score_index_pairs.push_back(std::make_pair(
+						score, std::make_pair(label, idx)));
+				}
+			}
+			// Keep top k results per image.
+			std::sort(score_index_pairs.begin(), score_index_pairs.end(),
+				SortScorePairDescend<pair<int, int> >);
+			score_index_pairs.resize(keep_top_k_);
+			// Store the new indices.
+			map<int, vector<int> > new_indices;
+			for (int j = 0; j < score_index_pairs.size(); ++j) {
+				int label = score_index_pairs[j].second.first;
+				int idx = score_index_pairs[j].second.second;
+				new_indices[label].push_back(idx);
+			}
+			all_indices.push_back(new_indices);
+			num_kept += keep_top_k_;
+		}
+		else
+		{
+			all_indices.push_back(indices);
+			num_kept += num_det;
+		}
+#endif // MATCH_BOX_LIST
   }
 
   vector<int> top_shape(2, 1);
@@ -150,7 +150,8 @@ void DetectionOutputLayer<Dtype>::Forward_gpu(
       top_data[0] = i;
       top_data += 7;
     }
-  } else {
+  } else 
+	{
     top[0]->Reshape(top_shape);
     top_data = top[0]->mutable_cpu_data();
   }

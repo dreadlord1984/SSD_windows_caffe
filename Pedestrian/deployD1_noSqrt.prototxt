@@ -1,4 +1,4 @@
-name: "SqueezeNet_Pedestrian_SSD_384x256_deploy(add_conv4_3_classification, delete sqrt(min*max) default box)"
+name: "SqueezeNet_Pedestrian_SSD_384x256_train(add_conv4_3_classification, delete sqrt(min*max) default box)"
 input: "data"
 input_shape {
   dim: 1
@@ -1339,11 +1339,11 @@ layer {
   top: "conv4_3_norm_mbox_priorbox_1"
   prior_box_param {
     min_size: 25.0
-		max_size: 51
+	 max_size: 51
     aspect_ratio: 0.25
-		aspect_ratio: 0.5
-		aspect_ratio: 0.75
-		aspect_ratio: 1.25
+	 aspect_ratio: 0.5
+	 aspect_ratio: 0.75
+	 aspect_ratio: 1.25
     flip: false
     clip: true
     variance: 0.1
